@@ -320,10 +320,16 @@ def getCcpForgeUrls(molType,ccpCode,sourceName=None):
   Creates the URL info for ChemComp(Coord) downloads from CcpForge
   """
 
-  ccpForgeUrl = "http://ccpforge.cse.rl.ac.uk/gf/project/ccpn-chemcomp/scmcvs/?action=browse&root=ccpn-chemcomp&pathrev=MAIN&path=/"
-  checkOutDir = "~checkout~"    
-  archiveDir = "ccpn-chemcomp/data/pdbe/chemComp/archive/"
-  
+  # ccpForgeUrl = "http://ccpforge.cse.rl.ac.uk/gf/project/ccpn-chemcomp/scmcvs/?action=browse&root=ccpn-chemcomp&pathrev=MAIN&path=/"
+  # checkOutDir = "~checkout~"
+  # archiveDir = "ccpn-chemcomp/data/pdbe/chemComp/archive/"
+
+  ccpForgeUrl = "https://api.github.com/repos/edbrooksbank/CcpNmr-ChemComps/contents/"
+  checkOutDir = ""
+  archiveDir = "data/pdbe/chemComp/archive/"
+
+  # https: // api.github.com / repos / {user} / {repo_name} / contents / {path_to_file}
+
   #%2Acheckout%2A%2Fccpn-chemcomp%2Fdata%2Fpdbe%2FchemComp%2Farchive%2FChemComp%2Fprotein%2Fprotein%252B004%252Bpdbe_ccpnRef_2010-09-23-14-41-20-237_00001.xml&revision=1.1
   
   if not sourceName:
@@ -348,10 +354,31 @@ def findCcpForgeDownloadLink(dirData,fileType,ccpCode,ccpForgeDownloadUrl):
   Finds the relevant XML file name and download link for the ChemComp(Coord) from the repository directory data off CcpForge.
   Works by ccpCode only, assuming that info comes from right directory!
   """
+  import json
 
   fileHtmlPatt = re.compile("a name=\"([^\"]+)\"\s+href\=\"([^\"]+)\"\s+title=\"")
-  
+
   urlLocation = chemCompXmlFile = None
+
+  dirDataDict = json.loads(dirData.decode('utf-8'))
+
+  for entry in dirDataDict:
+
+    # get the name of the  file
+    chemCompXmlFile = entry['name']
+
+    if fileType == 'ChemComp':
+      (tmpMolType, tmpCcpCode, suffix) = chemCompXmlFile.split("+")
+    else:
+      (tmpSourceName, tmpMolType, tmpCcpCode, suffix) = chemCompXmlFile.split("+")
+
+    if ccpCode == tmpCcpCode:
+      urlLocation = entry['download_url']
+      break
+
+  return (urlLocation, chemCompXmlFile)
+
+  # original below
 
   for urlDirLine in dirData.split("\n"):
     
