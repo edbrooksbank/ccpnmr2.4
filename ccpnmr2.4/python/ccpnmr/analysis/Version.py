@@ -1,0 +1,13 @@
+version = '2.4.2'
+build = ''
+timestamp = 'Mon Mar  2 17:20:42 2015'
+platform = 'darwin'
+bits = 64
+arch = 'x86_64'
+built_by = 'ejb66'
+category = 'user-compiled'
+platform = 'darwin'
+bits = 64
+arch = 'x86_64'
+built_by = 'ejb66'
+category = 'user-compiled'
