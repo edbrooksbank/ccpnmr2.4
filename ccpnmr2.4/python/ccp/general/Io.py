@@ -356,51 +356,56 @@ def findCcpForgeDownloadLink(dirData,fileType,ccpCode,ccpForgeDownloadUrl):
   """
   import json
 
-  fileHtmlPatt = re.compile("a name=\"([^\"]+)\"\s+href\=\"([^\"]+)\"\s+title=\"")
-
   urlLocation = chemCompXmlFile = None
-
   dirDataDict = json.loads(dirData)
+
+  # check that dirData is a list
+  if not isinstance(dirDataDict, list):
+    return (urlLocation, chemCompXmlFile)
 
   for entry in dirDataDict:
 
-    # get the name of the  file
-    try:
+    # check that each entry is a dict containing the correct keys
+    if entry and isinstance(entry, dict) and 'name' in entry and 'download_url' in entry:
+
+      # get the name of the file
       chemCompXmlFile = entry['name']
-    except Exception, es:
-      pass
 
-    if fileType == 'ChemComp':
-      (tmpMolType, tmpCcpCode, suffix) = chemCompXmlFile.split("+")
-    else:
-      (tmpSourceName, tmpMolType, tmpCcpCode, suffix) = chemCompXmlFile.split("+")
+      if fileType == 'ChemComp':
+        (tmpMolType, tmpCcpCode, suffix) = chemCompXmlFile.split("+")
+      else:
+        (tmpSourceName, tmpMolType, tmpCcpCode, suffix) = chemCompXmlFile.split("+")
 
-    if ccpCode == tmpCcpCode:
-      urlLocation = entry['download_url']
-      break
+      if ccpCode == tmpCcpCode:
+        urlLocation = entry['download_url']
+        break
 
   return (urlLocation, chemCompXmlFile)
 
   # original below
-
-  for urlDirLine in dirData.split("\n"):
-    
-    fileHtmlSearch = fileHtmlPatt.search(urlDirLine)
-    
-    if fileHtmlSearch:
-      chemCompXmlFile = fileHtmlSearch.group(1)
-      
-      if fileType == 'ChemComp':
-        (tmpMolType,tmpCcpCode,suffix) = chemCompXmlFile.split("+")
-      else:
-        (tmpSourceName,tmpMolType,tmpCcpCode,suffix) = chemCompXmlFile.split("+")
-                
-      if ccpCode == tmpCcpCode:
-        
-        urlLocation = "%s/%s&content-type=text/plain" % (ccpForgeDownloadUrl,chemCompXmlFile.replace('+','%252B'))
-        break        
-  
-  return (urlLocation, chemCompXmlFile)
+  #
+  # fileHtmlPatt = re.compile("a name=\"([^\"]+)\"\s+href\=\"([^\"]+)\"\s+title=\"")
+  #
+  # urlLocation = chemCompXmlFile = None
+  #
+  # for urlDirLine in dirData.split("\n"):
+  #
+  #   fileHtmlSearch = fileHtmlPatt.search(urlDirLine)
+  #
+  #   if fileHtmlSearch:
+  #     chemCompXmlFile = fileHtmlSearch.group(1)
+  #
+  #     if fileType == 'ChemComp':
+  #       (tmpMolType,tmpCcpCode,suffix) = chemCompXmlFile.split("+")
+  #     else:
+  #       (tmpSourceName,tmpMolType,tmpCcpCode,suffix) = chemCompXmlFile.split("+")
+  #
+  #     if ccpCode == tmpCcpCode:
+  #
+  #       urlLocation = "%s/%s&content-type=text/plain" % (ccpForgeDownloadUrl,chemCompXmlFile.replace('+','%252B'))
+  #       break
+  #
+  # return (urlLocation, chemCompXmlFile)
 
 def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=None, showError=None):
   
