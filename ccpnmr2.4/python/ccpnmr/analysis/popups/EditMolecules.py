@@ -1105,9 +1105,7 @@ class EditMoleculesPopup(BasePopup):
                                                      ccpCode=ccpCode)
 
       if not chemCompCoord:
-        msg = 'Chemical component coordinates (%s) not available locally. OK to download to project directory?' % sourceName
-        if showOkCancel('Query', msg, parent=self):
-          chemCompVarCoord.append(getChemCompCoord(self.project, sourceName, molType, ccpCode, download=True))
+        chemCompVarCoord.append(getChemCompCoord(self.project, sourceName, molType, ccpCode, download=True))
 
   def chooseChemComp(self, obj, row, col):
   
@@ -1121,8 +1119,9 @@ class EditMoleculesPopup(BasePopup):
       if showOkCancel('Query', msg, parent=self):
         chemComp = getChemComp(self.project, molType, ccpCode, download=True)
 
-    # 20190321:ED read the chemCompCoord files before view update
-    self._chooseChemCompCoord(obj, row, col)
+        # 20190321:ED read the chemCompCoord files before view update
+        # assumes that existance of chemComp implies existance of Coord files, otherwise will test on every click
+        self._chooseChemCompCoord(obj, row, col)
 
     if chemComp:
       chemCompVar = chemComp.findFirstChemCompVar(linking='middle', descriptor='neutral') \
