@@ -360,12 +360,15 @@ def findCcpForgeDownloadLink(dirData,fileType,ccpCode,ccpForgeDownloadUrl):
 
   urlLocation = chemCompXmlFile = None
 
-  dirDataDict = json.loads(dirData.decode('utf-8'))
+  dirDataDict = json.loads(dirData)
 
   for entry in dirDataDict:
 
     # get the name of the  file
-    chemCompXmlFile = entry['name']
+    try:
+      chemCompXmlFile = entry['name']
+    except Exception, es:
+      pass
 
     if fileType == 'ChemComp':
       (tmpMolType, tmpCcpCode, suffix) = chemCompXmlFile.split("+")
@@ -430,8 +433,18 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
 
     try:
       dirData = r1.read()
-      r1.close()      
+      r1.close()
 
+      # 20190321:ED skip if no directory has been found
+      import json
+
+      dirDataObj = json.loads(dirData)
+      if isinstance(dirDataObj, dict) and "message" in dirDataObj:
+        # check response from gitHub
+        if dirDataObj['message'] == 'Not Found':
+          return None
+
+      # continue with load
       (urlLocation, chemCompXmlFile) = findCcpForgeDownloadLink(dirData,fileType,ccpCode,ccpForgeDownloadUrl)
       
       if urlLocation:
@@ -441,7 +454,7 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
         try:
           data = r2.read()
           r2.close()
-  
+
           try:
             saveChemCompPath = repository.getFileLocation('ccp.molecule.%s' % fileType)
             if not os.path.exists(saveChemCompPath):

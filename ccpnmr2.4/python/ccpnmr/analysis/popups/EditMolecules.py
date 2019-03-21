@@ -46,7 +46,7 @@ from ccp.general.ChemCompOverview import chemCompStdDict
 from ccp.general.Constants import ccpCodeToCode1LetterDict 
 from ccp.general.Constants import code1LetterToCcpCodeDict
 
-from ccp.general.Io import getChemComp
+from ccp.general.Io import getChemComp, getChemCompCoord
 
 from ccp.util.Molecule import addMolResidues, setMolResidueChemCompVar, setMolResidueCcpCode
 from ccp.util.Molecule import makeChainCopy, makeChain, nextChainCode
@@ -1088,11 +1088,30 @@ class EditMoleculesPopup(BasePopup):
     if molResLinkEnd is not self.molResLinkEnd:
       self.molResLinkEnd = molResLinkEnd
   
- 
+
+  def _chooseChemCompCoord(self, obj, row, col):
+    """New routine to try to load ChemCompCoord files from Url
+    Not use which are required so check all in the imported source_names list
+    """
+    from ccp.gui.ViewChemCompVarFrame import SOURCE_NAMES
+
+    self.compoundKey = obj
+    (ccpCode, molType) = self.compoundKey
+
+    chemCompVarCoord = []
+    for sourceName in SOURCE_NAMES:
+      chemCompCoord = self.project.findFirstChemCompCoord(sourceName=sourceName,
+                                                     molType=molType,
+                                                     ccpCode=ccpCode)
+
+      if not chemCompCoord:
+        msg = 'Chemical component coordinates (%s) not available locally. OK to download to project directory?' % sourceName
+        if showOkCancel('Query', msg, parent=self):
+          chemCompVarCoord.append(getChemCompCoord(self.project, sourceName, molType, ccpCode, download=True))
+
   def chooseChemComp(self, obj, row, col):
   
     self.compoundKey = obj
-    
     (ccpCode,molType) = self.compoundKey
     
     chemComp = self.project.findFirstChemComp(molType=molType, ccpCode=ccpCode)
@@ -1101,7 +1120,10 @@ class EditMoleculesPopup(BasePopup):
       msg = 'Chemical component not available locally. OK to download to project directory?'
       if showOkCancel('Query', msg, parent=self):
         chemComp = getChemComp(self.project, molType, ccpCode, download=True)
-  
+
+    # 20190321:ED read the chemCompCoord files before view update
+    self._chooseChemCompCoord(obj, row, col)
+
     if chemComp:
       chemCompVar = chemComp.findFirstChemCompVar(linking='middle', descriptor='neutral') \
                     or chemComp.findFirstChemCompVar(linking='none') \
