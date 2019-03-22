@@ -70,6 +70,14 @@ UPDATE_DATABASE_FILE = '__UpdateAgentData.db'
 UPDATE_HTTP_DIR = 'updateadmin'
 UPDATE_UID = 'ccpn'
 
+# 20190322:ED updated for new server
+UPDATE_SCRIPT = 'cgi-bin/update/downloadFile'
+UPDATE_BASE_DIRECTORY = 'ccpNmrUpdate'
+BAD_DOWNLOAD = 'Exception: '
+VERSION_ROUTE= 'ccpnmr.analysis.Version'
+VERSION_ATTRIBUTE = 'version'
+
+
 fieldSep = '\t'
 environmentFile = 'environment.txt'
 SERVER_USER_ROOT = '/home'
@@ -99,17 +107,20 @@ class UpdateAgent:
 
   def __init__(self, serverLocation, serverDirectory, dataFile,
                httpDir=UPDATE_HTTP_DIR, installRoot=None, isGraphical=True,
-               versionRoute='ccpnmr.analysis.Version', admin=False,isStandAlone=False):
+               versionRoute=VERSION_ROUTE, admin=False,isStandAlone=False):
 
-    module  = __import__(versionRoute, {}, {}, ['version'])
+    module  = __import__(versionRoute, {}, {}, [VERSION_ATTRIBUTE])
 
-    self.version         = getattr(module, 'version')
+    self.version         = getattr(module, VERSION_ATTRIBUTE)
     self.serverLocation  = serverLocation
     self.serverDirectory = serverDirectory
     self.dataFile        = dataFile
     self.isGraphical     = isGraphical
     self.isStandAlone    = isStandAlone
-    
+
+    # 20190322:ED
+    self._UPDATE_DIRECTORY = UPDATE_BASE_DIRECTORY+self.version
+
     self.installRoot = installRoot
     if self.installRoot is None:
       self.getInstallRoot()
@@ -365,26 +376,46 @@ class UpdateServer:
     added = 0
     if self.fileUpdates:
       fileName = joinPath(self.parent.tempDir, self.dataFile)
-      file     = open(fileName, 'w')
-      file.write('%s\n' % self.parent.version)
-      for x in self.fileUpdates:
-        if (not x.isNew) and refresh and (x in fileUpdates):
-          if not x.getIsUpToDate():
-            x.timestamp()
-            x.isNew = True
-      
-        data = fieldSep.join([x.fileName, x.filePath, x.storedAs, x.language, x.date, x.details, str(x.priority)])
-        file.write('%s\n' % data)
- 
-        if x.isNew:
-          copyfile(x.installedFile, x.tempFile)
-          self.uploadFile(passwd, x.tempFile,x.storedAs)
-          added += 1
+      # file     = open(fileName, 'w')
 
-      file.close()
+      with open(fileName, 'w') as file:
+        file.write('%s\n' % self.parent.version)
+        for x in self.fileUpdates:
+          if (not x.isNew) and refresh and (x in fileUpdates):
+            if not x.getIsUpToDate():
+              x.timestamp()
+              x.isNew = True
 
-      self.uploadFile(passwd, fileName,self.dataFile)
-    
+          data = fieldSep.join([x.fileName, x.filePath, x.storedAs, x.language, x.date, x.details, str(x.priority)])
+          file.write('%s\n' % data)
+
+          if x.isNew:
+            copyfile(x.installedFile, x.tempFile)
+            # self.uploadFile(passwd, x.tempFile,x.storedAs)
+
+            # 20190322:ED write update files to the server
+            try:
+              with open(x.tempFile, 'rb') as fp:
+                fileData = fp.read()
+            except:
+              print 'error reading file, not unicode'
+              fileData = ''
+            self._uploadFile('ccpn', passwd, 'https://www.ccpn.ac.uk/cgi-bin/updateadmin/uploadFile', fileData, self.identity[-1], x.storedAs)
+            added += 1
+
+      # file.close()
+
+      # self.uploadFile(passwd, fileName,self.dataFile)
+
+      # 20190322:ED write update file database to the server
+      try:
+        with open(fileName, 'rb') as fp:
+          fileData = fp.read()
+      except Exception, es:
+        print 'error reading file, not unicode', str(es)
+        fileData = ''
+      self._uploadFile('ccpn', passwd, 'https://www.ccpn.ac.uk/cgi-bin/updateadmin/uploadFile', fileData, self.identity[-1], self.dataFile)
+
     else:
       self.deleteFile(passwd, self.dataFile)
     
@@ -395,11 +426,18 @@ class UpdateServer:
   def uploadFile(self, passwd, localFile, serverFile):
 
     cc = open(localFile).read()
-    ss = joinPath(self.basedir, serverFile)
+    # ss = joinPath(self.basedir, serverFile)
+
+    ss = joinPath(self.identity[-1], serverFile)
+
     data = urllib.urlencode({'content': cc, 'file': ss})
     try:
       # 18 Aug 08: TEMP: TBD: remove Temp when Jenny password protects directory
-      self.callHttpScript(passwd, 'uploadFileTemp', data)
+      # self.callHttpScript(passwd, 'uploadFileTemp', data)
+
+      # 20190322:ED different script
+      self.callHttpScript(passwd, 'uploadFile', data)
+
     except Exception, e:
       self.parent.warningMessage('Server', 'Server exception: %s' % str(e))
 
@@ -407,7 +445,11 @@ class UpdateServer:
 
     print 'deleteFile', serverFile
 
+
   def callHttpScript(self, passwd, script, data):
+
+    import ssl
+    context = ssl._create_unverified_context()
 
     auth = base64.encodestring(self.uid + ":" + passwd)[:-1]
     authheader = 'Basic %s' % auth
@@ -417,6 +459,104 @@ class UpdateServer:
     req.add_data(data)
     uu = urllib2.urlopen(req)
     print uu.read()
+
+
+  class _urlEncodeWithQuote(object):
+
+    def __init__(self):
+      self.should_patch = True
+
+    def __enter__(self):
+      if self.should_patch:
+        self.original_handler = urllib.quote_plus
+        urllib.quote_plus = urllib.quote
+
+    def __exit__(self, *args):
+      if self.should_patch:
+        urllib.quote_plus = self.original_handler
+
+  def _uploadFile(self, serverUser, serverPassword, serverScript, fileData, serverDbRoot, fileStoredAs):
+    """Upload a file to the server
+    """
+    import hashlib
+    import certifi
+    import urllib3
+    import ssl
+
+    # context = ssl._create_unverified_context()
+    SERVER_PASSWORD_MD5 = b'c Wo\xfc\x1e\x08\xfc\xd1C\xcb~(\x14\x8e\xdc'
+
+    # early check on password
+    m = hashlib.md5()
+    m.update(serverPassword.encode('utf-8'))
+    if m.digest() != SERVER_PASSWORD_MD5:
+      raise Exception('incorrect password')
+
+    auth = base64.encodestring(serverUser + ":" + serverPassword)[:-1]
+    authheader = 'Basic %s' % auth
+
+    # context = ssl.create_default_context()
+    # context.check_hostname = False
+    # context.verify_mode = ssl.CERT_NONE
+
+    headers = {'Content-type' : 'application/x-www-form-urlencoded;charset=UTF-8',
+               'Authorization': authheader}
+
+    # use the original quote and not quote_plus (option not available in early versions)
+    with self._urlEncodeWithQuote():
+      body = urllib.urlencode({'fileData': fileData, 'fileName': fileStoredAs, 'serverDbRoot': serverDbRoot}).encode('utf-8')
+
+    # urllib3.contrib.pyopenssl.inject_into_urllib3()
+    http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
+                               ca_certs=certifi.where(),
+                               timeout=urllib3.Timeout(connect=5.0, read=5.0),
+                               retries=urllib3.Retry(1, redirect=False))
+
+    try:
+      response = http.request('POST', serverScript,
+                              headers=headers,
+                              body=body,
+                              preload_content=False)
+      result = response.read().decode('utf-8')
+
+      if result.startswith(BAD_DOWNLOAD):
+        print 'Error reading from server.'
+      else:
+        return result
+
+    except Exception, es:
+      print 'Error reading from server:', str(es)
+
+  def _downloadFile(self, serverScript, serverDbRoot, fileName):
+    import ssl
+
+    context = ssl._create_unverified_context()
+    fileName = os.path.join(serverDbRoot, fileName)
+
+    addr = '%s?fileName=%s' % (serverScript, fileName)
+    try:
+      response = urllib.urlopen(addr, context=context)
+
+      data = response.read()  # just split for testing
+      if isinstance(data, unicode):
+        data = data.decode('UTF-8')
+      response.close()
+
+      if data.startswith(BAD_DOWNLOAD):
+        raise Exception(data[len(BAD_DOWNLOAD):])
+
+      return data
+    except:
+      return None
+
+  def _openUrl(self, serverScript, serverDbRoot, fileName):
+    import ssl
+
+    context = ssl._create_unverified_context()
+    fileName = os.path.join(serverDbRoot, fileName)
+
+    addr = '%s?fileName=%s' % (serverScript, fileName)
+    return urllib.urlopen(addr, context=context)
 
   def getFileUpdates(self):
   
@@ -428,9 +568,12 @@ class UpdateServer:
       fileUpdate.delete()
     
     try:
-      addr = 'http://' + joinPath(self.url,self.dataFile)
-      url  = urllib.urlopen(addr)
-   
+      # addr = 'http://' + joinPath(self.url,self.dataFile)
+      # url  = urllib.urlopen(addr)
+
+      addr = 'http://' + joinPath(UPDATE_SERVER_LOCATION, UPDATE_SCRIPT)
+      url = self._openUrl(addr, UPDATE_BASE_DIRECTORY+self.parent.version, self.dataFile)
+
     except:
       if self.parent.isGraphical:
         self.parent.warningMessage('Warning','Cannot access update server via network')
@@ -518,7 +661,11 @@ class FileUpdate:
     self.details    = details
     self.priority   = priority
     self.date       = date or '%s' % ctime()
-    self.storedAs   = '__temp_'.join(filePath.split('/')) + '_' + fileName
+
+    # self.storedAs   = '__temp_'.join(filePath.split('/')) + '_' + fileName
+
+    fullPath = os.path.join(filePath, fileName)
+    self.storedAs   = '__sep_'.join(fullPath.split('/'))
 
     self.isCached   = 0
 
@@ -549,9 +696,18 @@ class FileUpdate:
     
     # copy server file to tempFile
     self.isCached = 1
-    addr = 'http://' + self.serverFile
+    # addr = 'http://' + self.serverFile
     try:
-      url  = urllib.urlopen(addr)
+      # url  = urllib.urlopen(addr)
+
+      addr = 'http://' + joinPath(UPDATE_SERVER_LOCATION, UPDATE_SCRIPT)
+
+      # use this if the separator is '__temp_', uploading this will put into path on the server
+      # url = self.parent._openUrl(addr, UPDATE_BASE_DIRECTORY+self.parent.version, os.path.join(self.filePath, self.fileName))
+
+      # use this if the separator is '__sep_', uploading this will put into update/basedirectory
+      url = self.parent._openUrl(addr, UPDATE_BASE_DIRECTORY+self.parent.version, self.storedAs)
+
     except:
       self.server.parent.warningMessage('Download failed','Could not connect to %s' % addr)
       return

@@ -54,13 +54,15 @@ from memops.gui.ButtonList      import ButtonList
 
 from memops.universal.Io import splitPath
 
-from ccpnmr.update.UpdateAgent import UpdateAgent, FileUpdate, UPDATE_SERVER_LOCATION, UPDATE_DIRECTORY, UPDATE_DATABASE_FILE
+from ccpnmr.update.UpdateAgent import UpdateAgent, FileUpdate, UPDATE_SERVER_LOCATION, UPDATE_DIRECTORY, UPDATE_DATABASE_FILE, UPDATE_BASE_DIRECTORY
+from ccpnmr.analysis.Version import version
+
 
 class UpdateAdministratorPopup(BasePopup, UpdateAgent):
 
   def __init__(self, parent, 
                serverLocation=UPDATE_SERVER_LOCATION,
-               serverDirectory=UPDATE_DIRECTORY,
+               serverDirectory=UPDATE_BASE_DIRECTORY+version,
                dataFile=UPDATE_DATABASE_FILE):
     
     UpdateAgent.__init__(self, serverLocation, serverDirectory, dataFile, admin=1)
@@ -299,7 +301,9 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
     if self.server:
       if (location,uid,httpDir,subDir) != self.server.identity:
         self.setServer(location)
-    
+
+    # location, directory, dataFile, httpDir, admin = False
+
     self.updateButtons()
     
     self.fileUpdate = None
