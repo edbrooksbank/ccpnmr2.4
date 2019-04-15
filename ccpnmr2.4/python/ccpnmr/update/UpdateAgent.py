@@ -378,6 +378,7 @@ class UpdateServer:
       fileName = joinPath(self.parent.tempDir, self.dataFile)
       # file     = open(fileName, 'w')
 
+      # 20190322:ED correct file opening
       with open(fileName, 'w') as file:
         file.write('%s\n' % self.parent.version)
         for x in self.fileUpdates:
@@ -428,6 +429,7 @@ class UpdateServer:
     cc = open(localFile).read()
     # ss = joinPath(self.basedir, serverFile)
 
+    # 20190322:ED get the update directory from the last element of identity
     ss = joinPath(self.identity[-1], serverFile)
 
     data = urllib.urlencode({'content': cc, 'file': ss})
@@ -448,9 +450,6 @@ class UpdateServer:
 
   def callHttpScript(self, passwd, script, data):
 
-    import ssl
-    context = ssl._create_unverified_context()
-
     auth = base64.encodestring(self.uid + ":" + passwd)[:-1]
     authheader = 'Basic %s' % auth
     uri = 'http://' + joinPath(self.location, 'cgi-bin', self.httpDir, script)
@@ -460,7 +459,7 @@ class UpdateServer:
     uu = urllib2.urlopen(req)
     print uu.read()
 
-
+  # 20190322:ED context manager to override quote_plus with quote - to match new code
   class _urlEncodeWithQuote(object):
 
     def __init__(self):
@@ -475,15 +474,14 @@ class UpdateServer:
       if self.should_patch:
         urllib.quote_plus = self.original_handler
 
+  # 20190322:ED new upload method
   def _uploadFile(self, serverUser, serverPassword, serverScript, fileData, serverDbRoot, fileStoredAs):
-    """Upload a file to the server
+    """New routine to upload a file to the server
     """
     import hashlib
     import certifi
     import urllib3
-    import ssl
 
-    # context = ssl._create_unverified_context()
     SERVER_PASSWORD_MD5 = b'c Wo\xfc\x1e\x08\xfc\xd1C\xcb~(\x14\x8e\xdc'
 
     # early check on password
@@ -495,10 +493,6 @@ class UpdateServer:
     auth = base64.encodestring(serverUser + ":" + serverPassword)[:-1]
     authheader = 'Basic %s' % auth
 
-    # context = ssl.create_default_context()
-    # context.check_hostname = False
-    # context.verify_mode = ssl.CERT_NONE
-
     headers = {'Content-type' : 'application/x-www-form-urlencoded;charset=UTF-8',
                'Authorization': authheader}
 
@@ -506,18 +500,30 @@ class UpdateServer:
     with self._urlEncodeWithQuote():
       body = urllib.urlencode({'fileData': fileData, 'fileName': fileStoredAs, 'serverDbRoot': serverDbRoot}).encode('utf-8')
 
-    # urllib3.contrib.pyopenssl.inject_into_urllib3()
-    http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
-                               ca_certs=certifi.where(),
-                               timeout=urllib3.Timeout(connect=5.0, read=5.0),
-                               retries=urllib3.Retry(1, redirect=False))
+
+
+    # # urllib3.contrib.pyopenssl.inject_into_urllib3()       # not sure if this is needed
+    # http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
+    #                            ca_certs=certifi.where(),
+    #                            timeout=urllib3.Timeout(connect=5.0, read=5.0),
+    #                            retries=urllib3.Retry(1, redirect=False))
+    #
+    # try:
+    #   response = http.request('POST', serverScript,
+    #                           headers=headers,
+    #                           body=body,
+    #                           preload_content=False)
+    #   result = response.read().decode('utf-8')
+
 
     try:
-      response = http.request('POST', serverScript,
-                              headers=headers,
-                              body=body,
-                              preload_content=False)
+      request = urllib2.Request(serverScript,
+                                headers=headers,
+                                data=body
+                                )
+      response = urllib2.urlopen(request)
       result = response.read().decode('utf-8')
+
 
       if result.startswith(BAD_DOWNLOAD):
         print 'Error reading from server.'
@@ -527,7 +533,10 @@ class UpdateServer:
     except Exception, es:
       print 'Error reading from server:', str(es)
 
+  # 20190322:ED new download method
   def _downloadFile(self, serverScript, serverDbRoot, fileName):
+    """New routine to read a file from the server
+    """
     import ssl
 
     context = ssl._create_unverified_context()
@@ -550,13 +559,15 @@ class UpdateServer:
       return None
 
   def _openUrl(self, serverScript, serverDbRoot, fileName):
+    """Header to open a url
+    """
     import ssl
 
     context = ssl._create_unverified_context()
     fileName = os.path.join(serverDbRoot, fileName)
 
     addr = '%s?fileName=%s' % (serverScript, fileName)
-    return urllib.urlopen(addr, context=context)
+    return urllib2.urlopen(addr, context=context)
 
   def getFileUpdates(self):
   
@@ -571,6 +582,7 @@ class UpdateServer:
       # addr = 'http://' + joinPath(self.url,self.dataFile)
       # url  = urllib.urlopen(addr)
 
+      # 20190322:ED use the new openUrl method
       addr = 'http://' + joinPath(UPDATE_SERVER_LOCATION, UPDATE_SCRIPT)
       url = self._openUrl(addr, UPDATE_BASE_DIRECTORY+self.parent.version, self.dataFile)
 
@@ -664,6 +676,7 @@ class FileUpdate:
 
     # self.storedAs   = '__temp_'.join(filePath.split('/')) + '_' + fileName
 
+    # 20190322:ED different separator, __temp_ will split into directory tree on the server, __sep_ will put single file in update path
     fullPath = os.path.join(filePath, fileName)
     self.storedAs   = '__sep_'.join(fullPath.split('/'))
 
@@ -700,6 +713,7 @@ class FileUpdate:
     try:
       # url  = urllib.urlopen(addr)
 
+      # 20190322:ED use the new openUrl method
       addr = 'http://' + joinPath(UPDATE_SERVER_LOCATION, UPDATE_SCRIPT)
 
       # use this if the separator is '__temp_', uploading this will put into path on the server

@@ -320,13 +320,24 @@ def getCcpForgeUrls(molType,ccpCode,sourceName=None):
   Creates the URL info for ChemComp(Coord) downloads from CcpForge
   """
 
+  # ccpForge repository
+
   # ccpForgeUrl = "http://ccpforge.cse.rl.ac.uk/gf/project/ccpn-chemcomp/scmcvs/?action=browse&root=ccpn-chemcomp&pathrev=MAIN&path=/"
   # checkOutDir = "~checkout~"
   # archiveDir = "ccpn-chemcomp/data/pdbe/chemComp/archive/"
 
+  # github repository
+
   ccpForgeUrl = "https://api.github.com/repos/edbrooksbank/CcpNmr-ChemComps/contents/"
   checkOutDir = ""
   archiveDir = "data/pdbe/chemComp/archive/"
+
+  # sourceForge repository
+
+  # ccpForgeUrl = "git://git.code.sf.net/p/ccpn-chemcomps/code/ci/master/tree/"
+  # checkOutDir = ""
+  # archiveDir = "data/pdbe/chemComp/archive/"
+  # queryDir = "?format=raw"
 
   # https: // api.github.com / repos / {user} / {repo_name} / contents / {path_to_file}
 

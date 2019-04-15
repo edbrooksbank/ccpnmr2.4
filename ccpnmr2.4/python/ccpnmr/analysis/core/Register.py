@@ -41,7 +41,7 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 """
 
 TIMEOUT = 2.0 # seconds
-REGISTER_URL = 'http://www2.ccpn.ac.uk/cgi-bin/register/register'
+REGISTER_URL = 'http://www.ccpn.ac.uk/cgi-bin/register/register'
 
 from ccpnmr.analysis import Version
 from memops.universal.Url import fetchUrl

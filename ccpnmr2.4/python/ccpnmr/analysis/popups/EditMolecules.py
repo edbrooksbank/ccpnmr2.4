@@ -1120,7 +1120,7 @@ class EditMoleculesPopup(BasePopup):
         chemComp = getChemComp(self.project, molType, ccpCode, download=True)
 
         # 20190321:ED read the chemCompCoord files before view update
-        # assumes that existance of chemComp implies existance of Coord files, otherwise will test on every click
+        # assumes that existence of chemComp implies existence of Coord files, otherwise will test on every click
         self._chooseChemCompCoord(obj, row, col)
 
     if chemComp:
