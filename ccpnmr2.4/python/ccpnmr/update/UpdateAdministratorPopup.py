@@ -438,15 +438,20 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
             gitCmd = 'diff --name-only %s %s' % (self._lineEditBase.get(), self._lineEditUpdate.get())
             _files = runGitCommand(gitCmd)
             if _files:
+
                 # check errors first, and add to the list
-                [self._allFiles.add(os.path.join(localDir, path)) for path in _files.split()]
+                # [self._allFiles.add(os.path.join(localDir, path)) for path in _files.split()]
+                [self._allFiles.add(os.path.join(os.getcwd(), path)) for path in _files.split()]
+
                 filter = self._filterEntry.get()
                 if filter:
                   # simple filter by file extension
                   self._allFiles = [filePath for filePath in self._allFiles if os.path.splitext(filePath)[-1].lower() == filter]
 
-    # populate the list with the files
-    self._branchList.setItems(list(self._allFiles))
+    # # populate the list with the files
+    n = len(self.installRoot)
+    self._allFiles = [filePath[n+1:] for filePath in self._allFiles]
+    self._branchList.setItems(self._allFiles)
 
     # restore the current working directory
     os.chdir(currentPath)
@@ -456,13 +461,13 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
     """Add the selected files to the server list
     """
     branchFiles = self._branchList.getSelectedItems()
-    selectedFilePaths = [os.path.join(os.getcwd(), item) for item in branchFiles]
+    selectedFilePaths = [os.path.join(self.installRoot, item) for item in branchFiles]
 
     filePaths = [fileUpdate.installedFile for fileUpdate in self.server.fileUpdates]
 
     n = len(self.installRoot)
     for ii, filePath in enumerate(selectedFilePaths):
-
+        # colour depending on whether on the server
       if self.installRoot != filePath[:n]:
         showWarning('Warning', 'Install root %s not found in file path %s' % (self.installRoot, filePath))
         continue
@@ -477,8 +482,7 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
         else:
           language = 'None'
 
-        # fileUpdate = FileUpdate(self.server, fileName, dirName, language, isNew=True)
-        print ">>>add file ", filePath
+        fileUpdate = FileUpdate(self.server, fileName, dirName, language, isNew=True)
 
     self.update()
 
@@ -515,12 +519,24 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
     """
     branchFiles = self._branchList.getItems()
     filePaths = [os.path.join(fileUpdate.filePath, fileUpdate.fileName) for fileUpdate in self.server.fileUpdates]
+
     if self._filterEntry.get():
       filter = self._filterEntry.get()
       filePaths = [filePath for filePath in filePaths if filePath.endswith(filter)]
 
     for ii, item in enumerate(branchFiles):
         # colour depending on whether on the server
+
+        # # remove the leading fileroot
+        # n = len(self.installRoot)
+        # for ii, filePath in enumerate(selectedFilePaths):
+        #
+        #   if self.installRoot != filePath[:n]:
+        #     showWarning('Warning', 'Install root %s not found in file path %s' % (self.installRoot, filePath))
+        #     continue
+        #
+        #   filePath = filePath[n + 1:]
+
         if item in filePaths:
           self._branchList.itemconfig(ii, {'fg': 'black'})
         else:
