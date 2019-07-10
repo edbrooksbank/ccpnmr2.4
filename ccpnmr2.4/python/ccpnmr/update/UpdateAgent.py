@@ -479,8 +479,8 @@ class UpdateServer:
     """New routine to upload a file to the server
     """
     import hashlib
-    import certifi
-    import urllib3
+    # import certifi
+    # import urllib3
 
     SERVER_PASSWORD_MD5 = b'c Wo\xfc\x1e\x08\xfc\xd1C\xcb~(\x14\x8e\xdc'
 
