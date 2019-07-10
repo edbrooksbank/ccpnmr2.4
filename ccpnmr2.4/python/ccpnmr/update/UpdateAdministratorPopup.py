@@ -419,8 +419,6 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
 
     # need to make sure that the working directory is set to the base directory of the project
 
-    p = re.compile('ab*', re.IGNORECASE)
-
     # clear the lists
     self._branchList.clear()
     self._allFiles = set()
@@ -444,7 +442,8 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
                 [self._allFiles.add(os.path.join(localDir, path)) for path in _files.split()]
                 filter = self._filterEntry.get()
                 if filter:
-                  self._allFiles = [filePath for filePath in self._allFiles if filePath.endswith(filter)]
+                  # simple filter by file extension
+                  self._allFiles = [filePath for filePath in self._allFiles if os.path.splitext(filePath)[-1].lower() == filter]
 
     # populate the list with the files
     self._branchList.setItems(list(self._allFiles))
@@ -456,17 +455,63 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
   def _addSelectedToCommits(self):
     """Add the selected files to the server list
     """
-    # NOT CHECKED YET
-    return
-
-    branchFiles = self._branchList.getSelectedTexts()
+    branchFiles = self._branchList.getSelectedItems()
     selectedFilePaths = [os.path.join(os.getcwd(), item) for item in branchFiles]
 
-    self.addFiles(selectedFilePaths)
-    self.updateTable.setObjects(self.updateFiles)
+    filePaths = [fileUpdate.installedFile for fileUpdate in self.server.fileUpdates]
+
+    n = len(self.installRoot)
+    for ii, filePath in enumerate(selectedFilePaths):
+
+      if self.installRoot != filePath[:n]:
+        showWarning('Warning', 'Install root %s not found in file path %s' % (self.installRoot, filePath))
+        continue
+
+      filePath = filePath[n + 1:]
+
+      if filePath:
+        dirName, fileName = splitPath(filePath)
+
+        if fileName[-3:] == '.py':
+          language = 'python'
+        else:
+          language = 'None'
+
+        # fileUpdate = FileUpdate(self.server, fileName, dirName, language, isNew=True)
+        print ">>>add file ", filePath
+
+    self.update()
+
+    # return
+    #
+    # branchFiles = self._branchList.getSelectedTexts()
+    # selectedFilePaths = [os.path.join(os.getcwd(), item) for item in branchFiles]
+    #
+    # self.addFiles(selectedFilePaths)
+    # self.updateTable.setObjects(self.updateFiles)
+    #
+    #
+    # for filePath in filePaths:
+    #   if self.installRoot != filePath[:n]:
+    #     showWarning('Warning', 'Install root %s not found in file path %s' % (self.installRoot, filePath))
+    #     continue
+    #
+    #   filePath = filePath[n + 1:]
+    #
+    #   if filePath:
+    #     dirName, fileName = splitPath(filePath)
+    #
+    #     if fileName[-3:] == '.py':
+    #       language = 'python'
+    #     else:
+    #       language = 'None'
+    #
+    #     fileUpdate = FileUpdate(self.server, fileName, dirName, language, isNew=True)
+    #
+    # self.update()
 
   def _checkBranchServer(self):
-    """Add the selected files to the server list
+    """colour the files depending on whether they are already on the server
     """
     branchFiles = self._branchList.getItems()
     filePaths = [os.path.join(fileUpdate.filePath, fileUpdate.fileName) for fileUpdate in self.server.fileUpdates]
@@ -481,10 +526,8 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
         else:
           self._branchList.itemconfig(ii, {'fg': 'red'})
 
-    # listbox.itemconfig(3, {'fg': 'blue'})
-
   def editFilter(self, *args):
-    """return pressed in the filter box
+    """return pressed in the filter box - update the filter list
     """
     self._fillCompareList()
 
