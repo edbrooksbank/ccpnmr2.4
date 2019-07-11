@@ -40,7 +40,6 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 """
 import os, sys
 import Tkinter
-import re
 from subprocess import Popen, PIPE
 
 from memops.gui.BasePopup       import BasePopup
