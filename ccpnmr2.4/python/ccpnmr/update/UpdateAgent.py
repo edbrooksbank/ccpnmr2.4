@@ -562,7 +562,11 @@ class UpdateServer:
   def _openUrl(self, serverScript, serverDbRoot, fileName):
     """Header to open a url
     """
-    import ssl
+    try:
+      import ssl
+    except Exception as es:
+      print 'ssl not imported', str(es)
+      return
 
     context = ssl._create_unverified_context()
     fileName = os.path.join(serverDbRoot, fileName)
