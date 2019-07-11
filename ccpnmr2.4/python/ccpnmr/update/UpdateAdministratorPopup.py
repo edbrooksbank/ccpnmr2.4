@@ -589,6 +589,37 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
       self.queryFiles()
       self._fillCompareList()
 
+  def _removeFileFromServer(self, filePath):
+    """remove a file from the server database
+    """
+    serverPassword = self.askPassword('Password', 'Enter password for %s on server' % self.serverUser)
+
+    # if not serverPassword:
+    #     return
+    # try:
+    #     self.commitUpdateDb(serverPassword, self.updateFiles)
+    # except Exception as e:
+    #     self.showError('Database Error', 'Commit of database to server exception: %s' % e)
+    #     return
+
+    self._removeDbFiles(serverPassword, [filePath])
+
+    # update the display
+    self.queryFiles()
+    self._fillCompareList()
+
+  def _removeDbFiles(self, serverPassword, removeFiles):
+    """remove files
+    """
+    SERVER_REMOVE_SCRIPT = 'cgi-bin/updateadmin/__actionFile'
+
+    # in theory this could be done at the server end, only that would mean looking
+    # through the existing db file to see which file timestamps needed updating
+    # and then appending new files, so much more complicated (but less bandwidth)
+
+    for removeFile in removeFiles:
+        self._actionUpdateDb(serverPassword, SERVER_REMOVE_SCRIPT, removeFile.fileStoredAs)
+
 
 if __name__ == '__main__':
 
