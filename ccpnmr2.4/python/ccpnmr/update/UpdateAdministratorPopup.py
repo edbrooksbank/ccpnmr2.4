@@ -167,7 +167,7 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
 
     row += 1
     texts = ['Add\nFiles','Remove\nFiles','Remove\nAll','Query\nServer','Commit\nSelected','Synchronise\nAll','Commit\nNew', 'Quit']
-    commands = [self.addFile, self.removeFile, self.removeAll, self.queryFiles, self.synchroniseSelected, self.synchroniseServer, self.updateServer, self.quit]
+    commands = [self.addFile, self.removeFiles, self.removeAll, self.queryFiles, self.synchroniseSelected, self.synchroniseServer, self.updateServer, self.quit]
     self.buttonList = ButtonList(guiParent, texts=texts, commands=commands, expands=1)
     self.buttonList.grid(row=row, column=0, columnspan=4, sticky='ew')
 
@@ -280,21 +280,46 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
       self.update()
      
 
-  def removeFile(self):
-  
-    if self.fileUpdate:
-      self.fileUpdate.delete()
-     
-      self.update() 
+  def removeFiles(self):
+
+    selectedUpdates = self.scrolledMatrix.currentObjects
+
+    if selectedUpdates and self.server:
+      passwd = self.server._checkPassword()
+
+      if not passwd:
+        return
+
+      for fileUpdate in list(selectedUpdates):
+        self.server._removeFileFromServer(fileUpdate, passwd)
+        fileUpdate.delete()
+
+      # update the server database
+      self.synchroniseServer()
+
+      # update the display
+      self.queryFiles()
+      self._fillCompareList()
 
   def removeAll(self):
   
     if self.server:
+      passwd = self.server._checkPassword()
+
+      if not passwd:
+        return
+
       for fileUpdate in list(self.server.fileUpdates):
+        self.server._removeFileFromServer(fileUpdate, passwd)
         fileUpdate.delete()
 
-      self.update() 
- 
+      # update the server database
+      self.synchroniseServer()
+
+      # update the display
+      self.queryFiles()
+      self._fillCompareList()
+
   def selectAll(self):
   
     if self.server:
@@ -588,37 +613,6 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
       # update the display
       self.queryFiles()
       self._fillCompareList()
-
-  def _removeFileFromServer(self, filePath):
-    """remove a file from the server database
-    """
-    serverPassword = self.askPassword('Password', 'Enter password for %s on server' % self.serverUser)
-
-    # if not serverPassword:
-    #     return
-    # try:
-    #     self.commitUpdateDb(serverPassword, self.updateFiles)
-    # except Exception as e:
-    #     self.showError('Database Error', 'Commit of database to server exception: %s' % e)
-    #     return
-
-    self._removeDbFiles(serverPassword, [filePath])
-
-    # update the display
-    self.queryFiles()
-    self._fillCompareList()
-
-  def _removeDbFiles(self, serverPassword, removeFiles):
-    """remove files
-    """
-    SERVER_REMOVE_SCRIPT = 'cgi-bin/updateadmin/__actionFile'
-
-    # in theory this could be done at the server end, only that would mean looking
-    # through the existing db file to see which file timestamps needed updating
-    # and then appending new files, so much more complicated (but less bandwidth)
-
-    for removeFile in removeFiles:
-        self._actionUpdateDb(serverPassword, SERVER_REMOVE_SCRIPT, removeFile.fileStoredAs)
 
 
 if __name__ == '__main__':

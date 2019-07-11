@@ -374,51 +374,52 @@ class UpdateServer:
     self.deleteFile(passwd, '__temp_*')
 
     added = 0
-    if self.fileUpdates:
-      fileName = joinPath(self.parent.tempDir, self.dataFile)
-      # file     = open(fileName, 'w')
+    # if self.fileUpdates:
 
-      # 20190322:ED correct file opening
-      with open(fileName, 'w') as file:
-        file.write('%s\n' % self.parent.version)
-        for x in self.fileUpdates:
-          if (not x.isNew) and refresh and (x in fileUpdates):
-            if not x.getIsUpToDate():
-              x.timestamp()
-              x.isNew = True
+    fileName = joinPath(self.parent.tempDir, self.dataFile)
+    # file     = open(fileName, 'w')
 
-          data = fieldSep.join([x.fileName, x.filePath, x.storedAs, x.language, x.date, x.details, str(x.priority)])
-          file.write('%s\n' % data)
+    # 20190322:ED correct file opening
+    with open(fileName, 'w') as file:
+      file.write('%s\n' % self.parent.version)
+      for x in self.fileUpdates:
+        if (not x.isNew) and refresh and (x in fileUpdates):
+          if not x.getIsUpToDate():
+            x.timestamp()
+            x.isNew = True
 
-          if x.isNew:
-            copyfile(x.installedFile, x.tempFile)
-            # self.uploadFile(passwd, x.tempFile,x.storedAs)
+        data = fieldSep.join([x.fileName, x.filePath, x.storedAs, x.language, x.date, x.details, str(x.priority)])
+        file.write('%s\n' % data)
 
-            # 20190322:ED write update files to the server
-            try:
-              with open(x.tempFile, 'rb') as fp:
-                fileData = fp.read()
-            except:
-              print 'error reading file, not unicode'
-              fileData = ''
-            self._uploadFile('ccpn', passwd, 'https://www.ccpn.ac.uk/cgi-bin/updateadmin/uploadFile', fileData, self.identity[-1], x.storedAs)
-            added += 1
+        if x.isNew:
+          copyfile(x.installedFile, x.tempFile)
+          # self.uploadFile(passwd, x.tempFile,x.storedAs)
 
-      # file.close()
+          # 20190322:ED write update files to the server
+          try:
+            with open(x.tempFile, 'rb') as fp:
+              fileData = fp.read()
+          except:
+            print 'error reading file, not unicode'
+            fileData = ''
+          self._uploadFile('ccpn', passwd, 'https://www.ccpn.ac.uk/cgi-bin/updateadmin/uploadFile', fileData, self.identity[-1], x.storedAs)
+          added += 1
 
-      # self.uploadFile(passwd, fileName,self.dataFile)
+    # file.close()
 
-      # 20190322:ED write update file database to the server
-      try:
-        with open(fileName, 'rb') as fp:
-          fileData = fp.read()
-      except Exception, es:
-        print 'error reading file, not unicode', str(es)
-        fileData = ''
-      self._uploadFile('ccpn', passwd, 'https://www.ccpn.ac.uk/cgi-bin/updateadmin/uploadFile', fileData, self.identity[-1], self.dataFile)
+    # self.uploadFile(passwd, fileName,self.dataFile)
 
-    else:
-      self.deleteFile(passwd, self.dataFile)
+    # 20190322:ED write update file database to the server
+    try:
+      with open(fileName, 'rb') as fp:
+        fileData = fp.read()
+    except Exception, es:
+      print 'error reading file, not unicode', str(es)
+      fileData = ''
+    self._uploadFile('ccpn', passwd, 'https://www.ccpn.ac.uk/cgi-bin/updateadmin/uploadFile', fileData, self.identity[-1], self.dataFile)
+
+    # else:
+    #   self.deleteFile(passwd, self.dataFile)
     
     self.parent.warningMessage('Notice','Server Update of %d files' % added)
     
@@ -656,6 +657,23 @@ class UpdateServer:
       
     self.parent.server = None  
     del self
+
+  def _checkPassword(self):
+    if self.parent.isGraphical:
+      serverPassword = askPassword('Password Request', 'Enter password for %s@%s' % (self.uid, self.location))
+      if not serverPassword:
+        return False
+
+      return serverPassword
+
+  def _removeFileFromServer(self, fileUpdate, passwd):
+    """remove a file from the server database
+    """
+    if passwd:
+      self._uploadFile('ccpn', passwd, 'https://www.ccpn.ac.uk/cgi-bin/updateadmin/__actionFile', fileUpdate.storedAs, self.identity[-1], '')
+
+    else:
+      self.parent.warningMessage('Warning', 'Password must be specified when setting updates in non graphical mode')
 
 
 class FileUpdate:
