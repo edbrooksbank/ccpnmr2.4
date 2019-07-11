@@ -62,7 +62,7 @@ from ccpnmr.update.UpdateAgent import UpdateAgent, FileUpdate, UPDATE_SERVER_LOC
 from ccpnmr.analysis.Version import version
 
 
-SERVER_USER = 'ccpn'
+SERVERUSER = 'ccpn'
 BASEBRANCH = 'master'
 UPDATEBRANCH = 'ccpnmr2.4.3.b1'
 DEFAULTFILTER = ''
@@ -95,6 +95,7 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
 
     self.fileTypes = [  FileType('Python', ['*.py']), FileType('C', ['*.c']), FileType('All', ['*'])]
     self.fileUpdate = None
+    self._serverVersion = None
 
     BasePopup.__init__(self, parent=parent, title='CcpNmr Update Administrator', quitFunc=self.quit)
 
@@ -136,8 +137,9 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
 
     label = Label(guiParent, text='Sub-directory:')
     label.grid(row=row, column=2, sticky='w')
-    self.subDirEntry = Entry(guiParent, text=subDir)
+    self.subDirEntry = Label(guiParent, text=subDir)
     self.subDirEntry.grid(row=row, column=3, stick='w')
+    # self.subDirEntry.bind('<Return>', self.editSubDirectory)
 
     row += 1
     self.localVerLabel = Label(guiParent, text='Local version: %s' % self.version)
@@ -147,6 +149,7 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
     label.grid(row=row, column=2, sticky='w')
     self.serverVersionEntry = Entry(guiParent, text=version)
     self.serverVersionEntry.grid(row=row, column=3, stick='w')
+    self.serverVersionEntry.bind('<Return>', self.editServerVersion)
 
     row += 1
     guiParent.grid_rowconfigure(row, weight=1)
@@ -381,38 +384,36 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
 
     row += 1
     label = Label(frame, text='Base Branch:')
-    label.grid(row=row, column=0)
+    label.grid(row=row, column=0, stick='w')
     self._lineEditBase = Entry(frame, text=BASEBRANCH)
-    self._lineEditBase.grid(row=row, column=1)
+    self._lineEditBase.grid(row=row, column=1, stick='w')
     # self._lineEditBase.returnPressed.connect(self.editCompareBranches)
 
     row += 1
     label = Label(frame, text='Updates Branch:')
-    label.grid(row=row, column=0)
+    label.grid(row=row, column=0, stick='w')
     self._lineEditUpdate = Entry(frame, text=UPDATEBRANCH)
-    self._lineEditUpdate.grid(row=row, column=1)
+    self._lineEditUpdate.grid(row=row, column=1, stick='w')
     # self._lineEditUpdate.returnPressed.connect(self.editCompareBranches)
 
     row += 1
     label = Label(frame, text='Filter by ExtensionType:')
-    label.grid(row=row, column=0)
+    label.grid(row=row, column=0, stick='w')
     self._filterEntry = Entry(frame, text=DEFAULTFILTER)
-    self._filterEntry.grid(row=row, column=1)
+    self._filterEntry.grid(row=row, column=1, stick='w')
     self._filterEntry.bind('<Return>', self.editFilter)
 
     row += 1
     self._branchList = ScrolledListbox(frame, xscroll=False, selectmode=Tkinter.EXTENDED)
     self._branchList.grid(row=row, column=0, rowspan=1, columnspan=2, sticky='nsew')
     # make the list expand to fill the space
-    frame.grid_columnconfigure(0, weight=1)
     frame.grid_rowconfigure(row, weight=1)
 
     row += 1
-
     texts = ['Check Server', 'Add Selected Files']
     commands = [self._checkBranchServer, self._addSelectedToCommits]
-    buttonList = ButtonList(frame, texts=texts, commands=commands, expands=1)
-    buttonList.grid(row=row, column=0, rowspan=1, columnspan=2, sticky='ew')
+    buttonList = ButtonList(frame, texts=texts, commands=commands)    #, expands=1)
+    buttonList.grid(row=row, column=0, rowspan=1, columnspan=2)   #, sticky='ew')
     self._fillCompareList()
 
   def _fillCompareList(self, currentPath = os.getcwd()):
@@ -546,6 +547,47 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
     """return pressed in the filter box - update the filter list
     """
     self._fillCompareList()
+
+  def editSubDirectory(self, *args):
+    """Edit the path on the server
+    """
+    self._updateServerSettings()
+
+  def editServerVersion(self, *args):
+    """Change the serverVersion to update different branch
+    """
+    self._updateServerSettings()
+
+  def _updateServerSettings(self):
+    """Update the settings so that admin points to different server location
+    """
+    from ccpnmr.analysis import Version
+
+    if self.server:
+      newVersion = self.serverVersionEntry.get()
+      self.server.parent.version = newVersion
+      self.server.version = newVersion
+      Version.version = newVersion
+
+      UpdateAgent.__init__(self, serverLocation=UPDATE_SERVER_LOCATION,
+                            serverDirectory=UPDATE_BASE_DIRECTORY+newVersion,
+                            dataFile=UPDATE_DATABASE_FILE, admin=1)
+
+      # update text boxes
+      if self.server:
+        location, uid, httpDir, subDir = self.server.identity
+        version = self.server.version or 'None'
+
+        self.serverEntry.set(location)
+        self.uidEntry.set(uid)
+        self.httpDirEntry.set(httpDir)
+        self.subDirEntry.set(subDir)
+        self.localVerLabel.set('Local version: %s' % self.version)
+        self.serverVersionEntry.set(version)
+
+      # update the display
+      self.queryFiles()
+      self._fillCompareList()
 
 
 if __name__ == '__main__':
