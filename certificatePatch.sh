@@ -51,10 +51,8 @@ fi
 
 # current workaround for homebrew bug - DistutilsOptionError: must supply either home or prefix/exec-prefix — not both
 
-/bin/cat <<EOF >${SETUPCFG}
-[install]
-prefix=
-EOF
+echo "[install]" > ${SETUPCFG}
+echo "prefix=" >> ${SETUPCFG}
 
 # install new modules
 
