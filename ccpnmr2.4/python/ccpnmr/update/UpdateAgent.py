@@ -562,144 +562,24 @@ class UpdateServer:
   def _openUrl(self, serverScript, serverDbRoot, fileName):
     """Header to open a url
     """
-    # # early check on password
-    # m = hashlib.md5()
-    # m.update(serverPassword.encode('utf-8'))
-    # if m.digest() != SERVER_PASSWORD_MD5:
-    #     raise Exception('incorrect password')
-    #
-    # ss = serverUser + ":" + serverPassword
-    # auth = base64.encodebytes(ss.encode('utf-8'))[:-1]
-    # authheader = 'Basic %s' % auth
-    #
-    # context = ssl.create_default_context()
-    # context.check_hostname = False
-    # context.verify_mode = ssl.CERT_NONE
-    #
-    # headers = {'Content-type' : 'application/x-www-form-urlencoded;charset=UTF-8',
-    #            'Authorization': authheader}
-    # body = urlencode({'fileData': fileData, 'fileName': fileStoredAs, 'serverDbRoot': serverDbRoot},
-    #                  quote_via=quote).encode('utf-8')
-    #
-    # urllib3.contrib.pyopenssl.inject_into_urllib3()
-    # http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
-    #                            ca_certs=certifi.where(),
-    #                            timeout=urllib3.Timeout(connect=5.0, read=5.0),
-    #                            retries=urllib3.Retry(1, redirect=False))
-    #
-    # try:
-    #     response = http.request('POST', serverScript,
-    #                             headers=headers,
-    #                             body=body,
-    #                             preload_content=False)
-    #     result = response.read().decode('utf-8')
     try:
+      # 20190712:ED urllib3 version with where() certificate - definitely works
+      # seems to fix problems on MacOS
       import ssl
-      # from urllib.parse import urlencode, quote
-      # from urllib.request import urlopen
       import urllib3.contrib.pyopenssl
       import certifi
-
-      if self.parent.isGraphical:
-        self.parent.warningMessage('Warning', '...after import')
-
-      context = ssl.create_default_context()
-      context.check_hostname = False
-      context.verify_mode = ssl.CERT_NONE
-
-      if self.parent.isGraphical:
-        self.parent.warningMessage('Warning', '...after context')
 
       fileName = os.path.join(serverDbRoot, fileName)
       addr = '%s?fileName=%s' % (serverScript, fileName)
 
-      if self.parent.isGraphical:
-        self.parent.warningMessage('Warning', '...after address')
-
-      headers = {'Content-type' : 'application/x-www-form-urlencoded;charset=UTF-8'}
       urllib3.contrib.pyopenssl.inject_into_urllib3()
-
-      if self.parent.isGraphical:
-        self.parent.warningMessage('Warning', '...after inject')
-
       http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
                                  ca_certs=certifi.where(),
                                  timeout=urllib3.Timeout(connect=5.0, read=5.0),
                                  retries=urllib3.Retry(1, redirect=False))
-
-      if self.parent.isGraphical:
-        self.parent.warningMessage('Warning', '...after poolmanager')
-
       response = http.request('GET', addr,
-                              headers=headers,
                               preload_content=False)
       return response
-      # result = response.read().decode('utf-8')
-
-    # try:
-    #
-    #   import urllib2
-    #   import ssl
-    #   import random
-    #
-    #   fileName = os.path.join(serverDbRoot, fileName)
-    #   addr = '%s?fileName=%s' % (serverScript, fileName)
-    #
-    #   # context = ssl._create_unverified_context()
-    #
-    #   context = ssl.create_default_context()
-    #   context.check_hostname = False
-    #   context.verify_mode = ssl.CERT_NONE
-    #
-    #   handler = urllib2.HTTPSHandler(context=context, debuglevel=1)
-    #   opener = urllib2.build_opener(handler)
-    #   urllib2.install_opener(opener)
-    #
-    #   opener.addheaders = [('User-agent', 'Mozilla/5.0' + str(random.randrange(1000000)))]
-    #
-    #   if self.parent.isGraphical:
-    #     self.parent.warningMessage('Warning', '...about to open')
-    #
-    #   uu = opener.open(addr)
-    #   return uu
-    #
-
-
-      # req = urllib2.Request(addr, headers={'User-Agent':'Mozilla/5.0'})
-      # uu = urllib2.urlopen(req, context=context)
-      # return uu
-
-
-      #
-      # import urllib3
-      #
-      # fileName = os.path.join(serverDbRoot, fileName)
-      # addr = '%s?fileName=%s' % (serverScript, fileName)
-      # return urllib.urlopen(addr)
-
-      # auth = base64.encodestring(self.uid + ":" + 'downloadFile')[:-1]
-      # authheader = 'Basic %s' % auth
-      #
-      # uri = addr                        #'http://' + joinPath(self.location, 'cgi-bin', self.httpDir, script)
-      # req = urllib2.Request(uri)
-      # req.add_header("Authorization", authheader)
-      # req.add_header('User-agent', 'Mozilla/5.0')
-      #
-      # # req.add_data(data)
-      # uu = urllib2.urlopen(req)
-      # return uu
-      #
-      #
-      # import ssl
-      #
-      # context = ssl._create_unverified_context()
-      # fileName = os.path.join(serverDbRoot, fileName)
-      # addr = '%s?fileName=%s' % (serverScript, fileName)
-      # return urllib.urlopen(addr, context=context)
-
-
-
-
 
     except Exception as es:
       if self.parent.isGraphical:
