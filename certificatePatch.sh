@@ -13,7 +13,7 @@
 
 # modules to import
 
-PIPMODULES=(urllib3 pyopenssl certifi idna)
+PIPMODULES="urllib3 pyopenssl certifi idna"
 SETUPCFG="./setup.cfg"
 
 # available functions
@@ -56,13 +56,12 @@ echo "prefix=" >> ${SETUPCFG}
 
 # install new modules
 
-for thisModule in ${PIPMODULES[*]}; do
-  pip install ${thisModule} --target ./ccpnmr2.4/python --upgrade
-  error_check
-done
+pip install --target ./ccpnmr2.4/python --upgrade ${PIPMODULES}
+error_check
 
 # clean up to keep pip working
 
 rm -rf ${SETUPCFG}
+error_check
 echo "finished."
 
