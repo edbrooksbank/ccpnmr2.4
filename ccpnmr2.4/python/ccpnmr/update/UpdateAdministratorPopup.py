@@ -471,7 +471,7 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
                 filter = self._filterEntry.get()
                 if filter:
                   # simple filter by file extension
-                  self._allFiles = [filePath for filePath in self._allFiles if os.path.splitext(filePath)[-1].lower() == filter]
+                  self._allFiles = [filePath for filePath in self._allFiles if os.path.splitext(filePath)[-1].lower() in filter.split()]
 
     # # populate the list with the files - must be in the installRoot path
     n = len(self.installRoot)
@@ -547,7 +547,7 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
 
     if self._filterEntry.get():
       filter = self._filterEntry.get()
-      filePaths = [filePath for filePath in filePaths if filePath.endswith(filter)]
+      filePaths = [filePath for filePath in filePaths if os.path.splitext(filePath)[-1].lower() in filter.split()]    #if filePath.endswith(filter)]
 
     for ii, item in enumerate(branchFiles):
         # colour depending on whether on the server
