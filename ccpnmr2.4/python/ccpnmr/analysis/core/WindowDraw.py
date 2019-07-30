@@ -974,12 +974,13 @@ class WindowDraw:
       handler = handler.cHandler
 
     profile = getAnalysisProfile(view.root)
-    bgColor = hexToRgb(profile.bgColor)
+    profileBgColor = hexToRgb(profile.bgColor)
     parent = self.parent
     while not hasattr(parent, 'setupCWinPeakList'):
       parent = parent.parent
     setupCWinPeakList = parent.setupCWinPeakList
     
+    analysisPeakLists = set()
     for winPeakList in view.windowPeakLists:
       #print 'drawViewTilePeaks2:', winPeakList.analysisPeakList.peakList.serial, firstFloat, lastFloat, center, thickness
       if not hasattr(winPeakList, 'cWinPeakList'):
@@ -1003,7 +1004,18 @@ class WindowDraw:
             winPeakList.cWinPeakList.setIsTextDrawn(1)
             (name, size) = font.split()[:2]
             self.setHandlerFont(handler, name, size)
+          analysisPeakList = winPeakList.analysisPeakList
+          if analysisPeakList not in analysisPeakLists:
+            color = analysisPeakList.printColor
+            if color and color[0] != '#': # assume it is a name
+              scheme = profile.findFirstColorScheme(name=color)
+              if scheme:
+                color = scheme.colors[0]
+            analysisPeakList.peakList.cPeakList.setColor(hexToRgb(color))
+            analysisPeakLists.add(analysisPeakList)
+          bgColor = (1.0, 1.0, 1.0)
         else:
+          bgColor = profileBgColor
           self.setHandlerFont(handler, spectrumFontName, spectrumFontSize)
           
         winPeakList.cWinPeakList.drawPeaks(handler, xdim, ydim, xpix, ypix,
@@ -1014,6 +1026,10 @@ class WindowDraw:
           winPeakList.cWinPeakList.setIsSymbolDrawn(winPeakList.isSymbolDrawn)
           winPeakList.cWinPeakList.setIsTextDrawn(winPeakList.isAnnotationDrawn)
       #print 'drawViewTilePeaks3'
+    
+    for analysisPeakList in analysisPeakLists:
+      color = analysisPeakList.symbolColor
+      analysisPeakList.peakList.cPeakList.setColor(hexToRgb(color))
 
   def calcPeakScale(self, axisPanel, axisMapping, size, fromUnit, toUnit='point'):
 
@@ -1168,8 +1184,14 @@ class WindowDraw:
       # TBD: switch positive and negative if isAliased
       #print 'drawViewB', self.windowPane.name
       
-      posColors = analysisSpectrum.posColors
-      negColors = analysisSpectrum.negColors
+      if hasattr(analysisSpectrum, 'printPositiveColors'):
+        posColors = analysisSpectrum.printPositiveColors
+      else:
+        posColors = analysisSpectrum.posColors
+      if hasattr(analysisSpectrum, 'printNegativeColors'):
+        negColors = analysisSpectrum.printNegativeColors
+      else:
+        negColors = analysisSpectrum.negColors
       
       rgbPos = [hexToRgb(c) for c in posColors]
       rgbNeg = [hexToRgb(c) for c in negColors]

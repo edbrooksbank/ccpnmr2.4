@@ -359,9 +359,9 @@ class EditExperimentPopup(BasePopup):
     frameA.grid_columnconfigure(0, weight=1)
     frameA.grid_rowconfigure(0, weight=1)
 
-    self.detailsEntry = Entry(self,text='', returnCallback = self.setDetails, width=12)
+    self.detailsEntry = Entry(self,text='', returnCallback = self.setDetails, width=30)
     self.acqDimPulldown = PulldownList(self, callback=self.setAcqDim)
-    self.nameEntry    = Entry(self,text='', returnCallback = self.setName   , width=10)
+    self.nameEntry    = Entry(self,text='', returnCallback = self.setName, width=20)
     self.shiftListPulldown = PulldownList(self, callback=self.setShiftList)
     self.shiftRefSelect  = MultiWidget(self, CheckButton, callback=self.setShiftRefs,  minRows=0, useImages=False)
     self.molSystemSelect = MultiWidget(self, CheckButton, callback=self.setMolSystems, minRows=0, useImages=False)
@@ -980,7 +980,7 @@ class EditExperimentPopup(BasePopup):
   def getName(self, experiment):
 
     if experiment :
-      width = max(10, len(experiment.name))
+      width = max(20, len(experiment.name))
       self.nameEntry.config(width=width)
       self.nameEntry.set(experiment.name)
 

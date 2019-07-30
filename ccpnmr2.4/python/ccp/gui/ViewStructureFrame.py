@@ -566,9 +566,9 @@ class ViewStructureFrame(ScrolledCanvas):
       newBond = StructBond.StructBond
       
       model = self.model
-      ensembleAtoms = model.structureEnsemble.orderedAtoms
-      modelCoordinates = model.coordinates
       if model:
+        ensembleAtoms = model.structureEnsemble.orderedAtoms
+        modelCoordinates = model.coordinates
  
         cAtomDict = {}
         cBondDict = {}

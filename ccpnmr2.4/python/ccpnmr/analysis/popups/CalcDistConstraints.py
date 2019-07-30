@@ -88,6 +88,9 @@ GROUP_TIP_TEXTS = {'Matched':tip + 'the peaks that were successfully matched to 
                    'Too Distal':tip + 'the peaks that were excluded because they only match assignments that are too far apart given the stated guide structure',
                    'Unmatchable':tip + 'the peaks that were excluded because they do not match any chemical shifts in the stated ranges'}
 
+USE_REF_INTENSITY = 'Use ref intensity'
+USE_TABLE_INTENSITY = 'Use table intensities'
+
 class ResidueRowObject:
   def __init__(self, dataDims,chain,startRes,endRes):
     self.dataDims = dataDims
@@ -438,27 +441,33 @@ class CalcDistConstraintsPopup(BasePopup):
      
     peakFrame = self.peakFrame = LabelFrame(optFrame, text='Peak Normalisation')
     peakFrame.grid(row=3, column=0, columnspan=6, sticky='nsew')
-    peakFrame.grid_rowconfigure(1, weight=1)
+    peakFrame.grid_rowconfigure(3, weight=1)
     peakFrame.grid_columnconfigure(1, weight=1)
 
+    label = Label(peakFrame, text='Table below allows you to specify alternatives to ref intensity (cells highlighted in green are used)', grid=(0, 0), gridSpan=(1,2))
+    
+    tipTexts = ('Always use the ref intensity no matter what the table below says', 'Use the setting for each peak as specified in the table below')
+    self.intensityChoiceButton = RadioButtons(peakFrame, entries=(USE_REF_INTENSITY, USE_TABLE_INTENSITY),
+                                              tipTexts=tipTexts, grid=(1, 0))
+    
+    tipTexts = ['Update the table (but most changes should be recognised automatically)',
+                'Set distance category to be used for selected rows']
+    texts = ['Refresh\nTable', 'Set Distance\nTo Use...']
+    commands = [self.updatePeakFrameMatrix, self.setWhichDistance]
+    buttons = ButtonList(peakFrame, commands=commands, texts=texts, tipTexts=tipTexts)
+    buttons.grid(row=2, column=0, sticky='w')
+
     frame2 = Frame(peakFrame)
-    frame2.grid(row=0, column=0, sticky='w')
+    frame2.grid(row=2, column=1, sticky='e')
     frame2.grid_rowconfigure(0, weight=1)
     frame2.grid_columnconfigure(1, weight=1)
-
+    
     label = Label(frame2, text='HSQC Peak List: ')
     label.grid(row=0, column=0, sticky='e')
 
     tipText = 'Selects which HSQC peak list is used for analysis'
     self.hsqcPeakListPulldown = PulldownList(frame2, grid=(0,1), tipText=tipText,
                                              callback=self.changeHsqcPeakList)
-
-    tipTexts = ['Update the table (but most changes should be recognised automatically)',
-                'Set distance category to be used for selected rows']
-    texts = ['Refresh\nTable', 'Set Distance\nTo Use...']
-    commands = [self.updatePeakFrameMatrix, self.setWhichDistance]
-    buttons = ButtonList(peakFrame, commands=commands, texts=texts, tipTexts=tipTexts)
-    buttons.grid(row=0, column=1, sticky='w')
 
     self.whichUsePulldown = PulldownList(self, callback=self.setWhichUse)
     tipTexts = ['The peak',
@@ -498,7 +507,7 @@ class CalcDistConstraintsPopup(BasePopup):
                                       editWidgets=editWidgets, tipTexts=tipTexts,
                                       editSetCallbacks=editSetCallbacks,
                                       editGetCallbacks=editGetCallbacks)
-    self.peaksMatrix.grid(row=1, column=0, columnspan=2, sticky='nsew')
+    self.peaksMatrix.grid(row=3, column=0, columnspan=2, sticky='nsew')
 
     # Res frame
  

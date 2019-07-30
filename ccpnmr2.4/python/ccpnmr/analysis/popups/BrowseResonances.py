@@ -65,7 +65,8 @@ from ccpnmr.analysis.core.AssignmentBasic import assignResonanceType, getResonan
                                             makeResonanceGuiName, assignAtomsToRes, mergeResonances, \
                                             addSpinSystemResonance, removeSpinSystemResonance, assignResonanceResidue, \
                                             swapProchiralResonance, splitResonance, clearResonancePeakDimContribs, \
-                                            getShiftLists, getResidueResonances, getOnebondResonances
+                                            getShiftLists, getResidueResonances, getOnebondResonances, \
+                                            updateResonanceAnnotation
 
 from ccpnmr.analysis.core.WindowBasic import getWindowPaneName, displayStrips, gotoResonancePosition, \
                                              windowPaneHasValueAxis
@@ -349,19 +350,22 @@ class BrowseResonancesPopup(BasePopup):
                 'A user-editable name for the resonance, often displayed if atom assignments are absent',
                 'The total number of peaks assigned (via their dimensions) to a resonance',
                 'The number of peaks assigned to a resonance, considering only the selected shift list',
-                'The serial number of the spin system in which the resonance resides']
+                'The serial number of the spin system in which the resonance resides',
+                'The resonance details']
                    
     colHeadings = ['#',"Shift","SD",'Assign\nName','Residue',
                    'Isotope','Other\nName','All\nPeaks',
-                   'Shift List\nPeaks','Spin\nSystem #']
+                   'Shift List\nPeaks','Spin\nSystem #','Details']
                    
+    self.detailsEntry = Entry(self, width=10, returnCallback=self.setDetails)
+    
     editWidgets      = [None,self.shiftValueEntry,None,None,
-                        None,None,self.nameEntry,None,None,None]
+                        None,None,self.nameEntry,None,None,None,self.detailsEntry]
     editGetCallbacks = [None,self.getShiftValue,  None,None,
                         None,None,self.getName  ,self.showPeaks,
-                        self.showShiftListPeaks,None]
+                        self.showShiftListPeaks,None,self.getDetails]
     editSetCallbacks = [None,self.setShiftValue,  None,None,
-                        None,None,self.setName  ,None,None,None]
+                        None,None,self.setName  ,None,None,None,self.setDetails]
 
     self.scrolledMatrix = ScrolledMatrix(guiFrame, justifyList=justifyList,
                                          initialRows=16, headingList=colHeadings,
@@ -812,6 +816,20 @@ class BrowseResonancesPopup(BasePopup):
       value = self.nameEntry.get().strip() or None
       self.resonance.setName(value)
         
+  def getDetails(self, resonanceShift=None):
+    
+    resonance, shift = resonanceShift
+    if resonance:
+      self.detailsEntry.set(resonance.details or '')
+  
+  def setDetails(self, *args):
+    
+    if self.resonance:
+      details = self.detailsEntry.get().strip() or None
+      if details != self.resonance.details:
+        self.resonance.details = details
+        updateResonanceAnnotation(self.resonance)
+      
   def updateChains(self):
   
     if self.resonances is not None:
@@ -1301,7 +1319,7 @@ class BrowseResonancesPopup(BasePopup):
   
     if self.resonances:
       if obj is self.shiftList:
-        self.udateAfter()
+        self.updateAfter()
       return
   
     index = 0
@@ -1659,7 +1677,8 @@ class BrowseResonancesPopup(BasePopup):
               resonance.name,
               len(total),
               len(sList),
-              spinSystemSerial]
+              spinSystemSerial,
+              resonance.details]
  
       textMatrixAppend( data )
       colorMatrixAppend( [color, None, None, None, None,
@@ -1747,7 +1766,7 @@ class ResonanceInfoPopup(BasePopup):
 
   def body(self, guiFrame):
 
-    guiFrame.expandGrid(2,0)
+    guiFrame.expandGrid(3,0)
     
     tipText='The number and atomic assignment of the resonance record that information is displayed for'
     self.mainLabel = Label(guiFrame, text='', grid=(0,0),
@@ -1761,9 +1780,14 @@ class ResonanceInfoPopup(BasePopup):
                                    tipTexts=tipTexts)
     buttonList.buttons[0].config(bg='#B0FFB0')
     
+    detailsFrame = Frame(guiFrame, grid=(1,0), gridSpan=(1,2), sticky='ew')
+    label = Label(detailsFrame, grid=(0,0), text='Details:')
+    text = self.resonance.details or '' if self.resonance else ''
+    self.detailsEntry = Entry(detailsFrame, text=text, returnCallback=self.updateResonanceDetails, grid=(0,1), sticky='ew')
+    
     tipText='A table of the peak dimensions, and hence positions, to which the current resonance is assigned'
     div = LabelDivider(guiFrame, text='Peak Assignments',
-                       gridSpan=(1,2), grid=(1,0), tipText=tipText)
+                       gridSpan=(1,2), grid=(2,0), tipText=tipText)
 
     tipTexts = ['The peak list of the peak to which the current resonance is assigned (experiment:spectrum:list number)',
                 'The serial number of the peak, within its peak list, to which the current resonance is assigned ',
@@ -1776,7 +1800,7 @@ class ResonanceInfoPopup(BasePopup):
                    'Position','Assignment',
                    'Shift List',]
 
-    self.peakDimTable = ScrolledMatrix(guiFrame, grid=(2,0),
+    self.peakDimTable = ScrolledMatrix(guiFrame, grid=(3,0),
                                        headingList=headingList,
                                        multiSelect=True, gridSpan=(1,2), 
                                        callback=self.selectPeakDim,
@@ -1784,20 +1808,28 @@ class ResonanceInfoPopup(BasePopup):
 
     tipText='A table of the chemical shift values associated with the current resonance'
     div = LabelDivider(guiFrame, text='Chemical Shifts',
-                       gridSpan=(1,2), grid=(3,0), tipText=tipText)
+                       gridSpan=(1,2), grid=(4,0), tipText=tipText)
 
     headingList = ['Shift List','Shift','SD']
     tipTexts = ['The shift list that records a chemical shift value for the resonance',
                 'The (averaged) value of the chemical shift in this specific shift list',
                 'The standard deviation in the averaged chemical shift value']
-    self.shiftTable = ScrolledMatrix(guiFrame, grid=(4,0),
+    self.shiftTable = ScrolledMatrix(guiFrame, grid=(5,0),
                                      headingList=headingList,
                                      multiSelect=False, gridSpan=(1,2), 
                                      callback=self.selectShift,
                                      tipTexts=tipTexts)
    
+    self.curateNotifiers(self.registerNotify)
+    
     self.updateAfter()
              
+  def destroy(self):
+  
+    self.curateNotifiers(self.unregisterNotify)
+
+    BasePopup.destroy(self)
+    
   def selectShift(self, obj, row, col):
   
     self.shift = obj
@@ -1808,26 +1840,7 @@ class ResonanceInfoPopup(BasePopup):
 
   def curateNotifiers(self, notifyFunc):
 
-    for func in ('__init__', 'delete'):
-      notifyFunc(self.updateContrib, 'ccp.nmr.Nmr.PeakDimContrib', func)
-      notifyFunc(self.updateShift, 'ccp.nmr.Nmr.Shift', func)
-      notifyFunc(self.updateResonanceSet, 'ccp.nmr.Nmr.ResonanceSet', func)
-      notifyFunc(self.updateResonance, 'ccp.nmr.Nmr.Resonance', func)
-        
-    notifyFunc(self.updateResonance, 'ccp.nmr.Nmr.Resonance', 'setResonanceGroup')
-    notifyFunc(self.updateResonanceSet, 'ccp.nmr.Nmr.ResonanceSet', 'addResonance')
-    notifyFunc(self.updateShift, 'ccp.nmr.Nmr.Shift', 'setValue')
-    notifyFunc(self.updateShift, 'ccp.nmr.Nmr.Shift', 'setError')
-
-    #for func in ('setDetails', 'setIsotopeCode', 'setName'):
-    #  notifyFunc(self.updateAfter, 'ccp.nmr.Nmr.Resonance', func)
-
-    for func in ('delete','__init__','setWeight','setPossibility'):
-      notifyFunc(self.updateResidueProb, 'ccp.nmr.Nmr.ResidueProb', func)
-    
-    for func in ('setCcpCode', 'addResonance', 'setName',
-                 'removeResonance', 'setResonances','delete'):
-      notifyFunc(self.updateSpinSystem, 'ccp.nmr.Nmr.ResonanceGroup', func)
+    notifyFunc(self.updateDetailsEntry, 'ccp.nmr.Nmr.Resonance', 'setDetails')
 
   def updateContrib(self, peakDimContrib):
 
@@ -1868,10 +1881,26 @@ class ResonanceInfoPopup(BasePopup):
       self.waiting = True
       self.after_idle(self.update)
       
+  def updateDetailsEntry(self, obj):
+    
+    if self.resonance is obj:
+      self.detailsEntry.set(self.resonance.details or '')
+      
+  def updateResonanceDetails(self, *args, **kw):
+    
+    if self.resonance:
+      details = self.detailsEntry.get().strip() or None  # empty string not allowed by API, hence None
+      if details != self.resonance.details:
+        self.resonance.details = details
+        updateResonanceAnnotation(self.resonance)
+      
   def update(self, resonance=None):
     
+    self.updateResonanceDetails()
+      
     if resonance:
       self.resonance = resonance
+      self.updateDetailsEntry(resonance)
 
     if self.resonance:
       serial = self.resonance.serial

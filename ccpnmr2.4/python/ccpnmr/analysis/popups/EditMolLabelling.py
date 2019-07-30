@@ -594,7 +594,7 @@ class EditMolLabellingPopup(BasePopup):
         self.mixture.setExperiments(selected)
         self.mixtureMatrix.keyPressEscape()
 
-  def deleteMixture(self):
+  def deleteMixture(self, *event):
   
     msg = 'Really delete selected sample?'
     if self.mixture and showWarning('Confirm', msg, parent=self):
@@ -629,7 +629,7 @@ class EditMolLabellingPopup(BasePopup):
   
     self.molFracWeightEntry.set(molFraction.weight)
 
-  def deleteMolFraction(self):
+  def deleteMolFraction(self, *event):
   
     if self.molFraction:
       molLabel = self.molFraction.molLabel

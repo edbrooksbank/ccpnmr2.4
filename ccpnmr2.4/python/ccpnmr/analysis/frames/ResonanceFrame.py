@@ -284,6 +284,13 @@ class ResonanceFrame(Frame):
             if resonance not in limitedResonances:
               continue
  
+          # wb104, 13 Apr 2016, added below (could check this instead in if statement
+          # but the problem is that shift.delta also needs to exist further down
+          # and also both attributes get deleted at bottom of the loop)
+
+          if not hasattr(shift, 'isDiffAliasing'):
+            continue
+
           if shift.isDiffAliasing:
             colors = [None,None,'#d0d0a0',None,None,None]
           else:

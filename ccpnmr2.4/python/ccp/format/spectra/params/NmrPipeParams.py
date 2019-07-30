@@ -114,7 +114,7 @@ class NmrPipeParams(ExternalParams):
       m = nuc.find(chr(0))
       if m >= 0:
         nuc = nuc[:m]
-      if nuc == 'ID': # TBD: do not know if this is necessary or sufficient
+      if nuc == 'ID' or nuc == 'TAU': # TBD: do not know if this is necessary or sufficient
         self.nuc[i] = None
       else:
         self.nuc[i] = standardNucleusNameFromPipe(nuc)

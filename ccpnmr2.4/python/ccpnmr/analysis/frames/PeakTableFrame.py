@@ -69,6 +69,23 @@ UNIT_PPM = 'ppm'
 UNIT_HZ = 'Hz'
 UNITS = [UNIT_PPM, UNIT_HZ, UNIT_POINTS]
 
+def _getPeakDimAnnotation(peakDim):
+  # 23 May 2016: add molSystem to peak table assignment information if doMolSystemsAnnotations
+  analysisProject = peakDim.root.currentAnalysisProject
+  annotation = peakDim.annotation
+  if analysisProject.doMolSysAnnotations:
+    molSystem = None
+    for contrib in peakDim.peakDimContribs:
+      if contrib.resonance.resonanceSet:
+        atom = contrib.resonance.resonanceSet.findFirstAtomSet().findFirstAtom()
+        molSystem = atom.topObject
+        break
+    if molSystem:
+      molSysCode = '%s:' % (molSystem.code)
+      annotation = molSysCode + annotation
+
+  return annotation
+
 class PeakTableFrame(Frame):
 
   def __init__(self, parent, analysis, nmrProject=None, peakList=None,
@@ -77,6 +94,11 @@ class PeakTableFrame(Frame):
     self.nmrProject = nmrProject
     self.analysisApp = analysis
     self.analysisProject = analysis.analysisProject
+    
+    widget = parent
+    while widget.__class__.__name__ != 'AnalysisPopup':
+      widget = widget.parent
+    self.topPopup = widget
     
     self.peak = None
     self.peaks = peaks or []
@@ -1138,7 +1160,8 @@ class PeakTableFrame(Frame):
         else:
           value = ppm2pnt(peakDim.value, peakDim.dataDimRef)
  
-        annotation = peakDim.annotation
+        #annotation = peakDim.annotation
+        annotation = _getPeakDimAnnotation(peakDim)
         if annotation:
           annotation = ' ' + annotation
 
@@ -1366,7 +1389,9 @@ class PeakTableFrame(Frame):
       if i >= len(dims):
         data.append(None)
       else:
-        data.append( dims[i].annotation )
+        #data.append( dims[i].annotation )
+        annotation = _getPeakDimAnnotation(dims[i])
+        data.append(annotation)
 
     heightIntensity = peak.findFirstPeakIntensity(intensityType='height')
     volumeIntensity = peak.findFirstPeakIntensity(intensityType='volume')
@@ -1547,7 +1572,11 @@ class PeakTableFrame(Frame):
   def peakRemove(self, *event):
 
     if self.scrolledMatrix.currentObjects:
-      PeakBasic.deletePeak(self.scrolledMatrix.currentObjects)
+      # 3 Sep 2015: changed the below because the PeakBasic call
+      # does not update the current objects in Analysis.py
+      # and this crashes the programme
+      ###PeakBasic.deletePeak(self.scrolledMatrix.currentObjects)
+      self.topPopup.queryDeletePeaks(self.scrolledMatrix.currentObjects, self)
    
     """
    

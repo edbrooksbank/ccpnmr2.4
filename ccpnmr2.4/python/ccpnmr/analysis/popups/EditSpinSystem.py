@@ -636,8 +636,7 @@ class EditSpinSystemPopup(BasePopup):
 
     if self.spinSystem:
       text = self.detailsText.getText().strip()
-      if text:
-        self.spinSystem.setDetails( text )
+      self.spinSystem.details = text or None
       
   def getName(self, spinSystem):
 

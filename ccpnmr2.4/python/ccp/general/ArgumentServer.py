@@ -108,6 +108,20 @@ class ArgumentServer:
 
     return fileName
 
+  def getDirectory(self, dismiss_text='Cancel', selected_file_must_exist=False):
+
+    if self.inGui:
+      module = importModule('memops.gui.FileSelectPopup')
+      popup = module.FileSelectPopup(self.parent,
+                                     dismiss_text=dismiss_text,
+                                     selected_file_must_exist=selected_file_must_exist)
+      directory = popup.getDirectory(needFileSelected=False)
+      popup.destroy()
+    else:
+      directory = raw_input('Enter directory: ').strip()
+
+    return directory
+
   def getProgressBar(self, text='', progress=0, total=100,
                      width=200, height=15, transient=True):
   

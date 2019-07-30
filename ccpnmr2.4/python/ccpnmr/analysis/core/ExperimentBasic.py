@@ -86,6 +86,192 @@ COMMON_REF_EXPTS = set(['H', 'C', 'N', 'F', 'P','H[N]', 'H[C]', 'H[N[CO]]',
                         'H_H.ROESY', 'CC',
                         ])
 
+from operator import itemgetter
+from heapq import nlargest
+from itertools import repeat, ifilter
+
+# Added for use in filtering RefgExperiments. Pre-Python-2.7 version of collections.Counter
+class Counter(dict):
+    '''Dict subclass for counting hashable objects.  Sometimes called a bag
+    or multiset.  Elements are stored as dictionary keys and their counts
+    are stored as dictionary values.
+
+    >>> Counter('zyzygy')
+    Counter({'y': 3, 'z': 2, 'g': 1})
+
+    '''
+
+    def __init__(self, iterable=None, **kwds):
+        '''Create a new, empty Counter object.  And if given, count elements
+        from an input iterable.  Or, initialize the count from another mapping
+        of elements to their counts.
+
+        >>> c = Counter()                           # a new, empty counter
+        >>> c = Counter('gallahad')                 # a new counter from an iterable
+        >>> c = Counter({'a': 4, 'b': 2})           # a new counter from a mapping
+        >>> c = Counter(a=4, b=2)                   # a new counter from keyword args
+
+        '''
+        self.update(iterable, **kwds)
+
+    def __missing__(self, key):
+        return 0
+
+    def most_common(self, n=None):
+        '''List the n most common elements and their counts from the most
+        common to the least.  If n is None, then list all element counts.
+
+        >>> Counter('abracadabra').most_common(3)
+        [('a', 5), ('r', 2), ('b', 2)]
+
+        '''
+        if n is None:
+            return sorted(self.iteritems(), key=itemgetter(1), reverse=True)
+        return nlargest(n, self.iteritems(), key=itemgetter(1))
+
+    def elements(self):
+        '''Iterator over elements repeating each as many times as its count.
+
+        >>> c = Counter('ABCABC')
+        >>> sorted(c.elements())
+        ['A', 'A', 'B', 'B', 'C', 'C']
+
+        If an element's count has been set to zero or is a negative number,
+        elements() will ignore it.
+
+        '''
+        for elem, count in self.iteritems():
+            for _ in repeat(None, count):
+                yield elem
+
+    # Override dict methods where the meaning changes for Counter objects.
+
+    @classmethod
+    def fromkeys(cls, iterable, v=None):
+        raise NotImplementedError(
+            'Counter.fromkeys() is undefined.  Use Counter(iterable) instead.')
+
+    def update(self, iterable=None, **kwds):
+        '''Like dict.update() but add counts instead of replacing them.
+
+        Source can be an iterable, a dictionary, or another Counter instance.
+
+        >>> c = Counter('which')
+        >>> c.update('witch')           # add elements from another iterable
+        >>> d = Counter('watch')
+        >>> c.update(d)                 # add elements from another counter
+        >>> c['h']                      # four 'h' in which, witch, and watch
+        4
+
+        '''
+        if iterable is not None:
+            if hasattr(iterable, 'iteritems'):
+                if self:
+                    self_get = self.get
+                    for elem, count in iterable.iteritems():
+                        self[elem] = self_get(elem, 0) + count
+                else:
+                    dict.update(self, iterable) # fast path when counter is empty
+            else:
+                self_get = self.get
+                for elem in iterable:
+                    self[elem] = self_get(elem, 0) + 1
+        if kwds:
+            self.update(kwds)
+
+    def copy(self):
+        'Like dict.copy() but returns a Counter instance instead of a dict.'
+        return Counter(self)
+
+    def __delitem__(self, elem):
+        'Like dict.__delitem__() but does not raise KeyError for missing values.'
+        if elem in self:
+            dict.__delitem__(self, elem)
+
+    def __repr__(self):
+        if not self:
+            return '%s()' % self.__class__.__name__
+        items = ', '.join(map('%r: %r'.__mod__, self.most_common()))
+        return '%s({%s})' % (self.__class__.__name__, items)
+
+    # Multiset-style mathematical operations discussed in:
+    #       Knuth TAOCP Volume II section 4.6.3 exercise 19
+    #       and at http://en.wikipedia.org/wiki/Multiset
+    #
+    # Outputs guaranteed to only include positive counts.
+    #
+    # To strip negative and zero counts, add-in an empty counter:
+    #       c += Counter()
+
+    def __add__(self, other):
+        '''Add counts from two counters.
+
+        >>> Counter('abbb') + Counter('bcc')
+        Counter({'b': 4, 'c': 2, 'a': 1})
+
+
+        '''
+        if not isinstance(other, Counter):
+            return NotImplemented
+        result = Counter()
+        for elem in set(self) | set(other):
+            newcount = self[elem] + other[elem]
+            if newcount > 0:
+                result[elem] = newcount
+        return result
+
+    def __sub__(self, other):
+        ''' Subtract count, but keep only results with positive counts.
+
+        >>> Counter('abbbc') - Counter('bccd')
+        Counter({'b': 2, 'a': 1})
+
+        '''
+        if not isinstance(other, Counter):
+            return NotImplemented
+        result = Counter()
+        for elem in set(self) | set(other):
+            newcount = self[elem] - other[elem]
+            if newcount > 0:
+                result[elem] = newcount
+        return result
+
+    def __or__(self, other):
+        '''Union is the maximum of value in either of the input counters.
+
+        >>> Counter('abbb') | Counter('bcc')
+        Counter({'b': 3, 'c': 2, 'a': 1})
+
+        '''
+        if not isinstance(other, Counter):
+            return NotImplemented
+        _max = max
+        result = Counter()
+        for elem in set(self) | set(other):
+            newcount = _max(self[elem], other[elem])
+            if newcount > 0:
+                result[elem] = newcount
+        return result
+
+    def __and__(self, other):
+        ''' Intersection is the minimum of corresponding counts.
+
+        >>> Counter('abbb') & Counter('bcc')
+        Counter({'b': 1})
+
+        '''
+        if not isinstance(other, Counter):
+            return NotImplemented
+        _min = min
+        result = Counter()
+        if len(self) < len(other):
+            self, other = other, self
+        for elem in ifilter(self.__contains__, other):
+            newcount = _min(self[elem], other[elem])
+            if newcount > 0:
+                result[elem] = newcount
+        return result
+
 
 def selectPreferredRefExperiment(refExperiments, experiment=None):
   """
@@ -101,7 +287,7 @@ def selectPreferredRefExperiment(refExperiments, experiment=None):
 
   ccp.nmr.NmrExpPrototype.RefExperiment
   """
-  
+
   if not refExperiments:
     return None
   
@@ -1375,76 +1561,74 @@ def getFilteredRefExperiments(experiment, category=None):
   List of NmrExpPrototype.RefExperiments
   """
 
-  project = experiment.root
+  shiftMeasurements = ('Shift','shift','MQShift')
+
+  # NOTE we only compare shift and MQ shift nuclei, and treat everything else as, in effect, 'other;
+
+  # Get isotopes per experiment dimension (list of Counters)
   isotopes = []
   for expDim in experiment.expDims:
-    dimIsotopes = []
-    
+    dimIsotopes = Counter()
+    isotopes.append(dimIsotopes)
+  
     for expDimRef in expDim.expDimRefs:
       isotopes0 = expDimRef.isotopeCodes
-      
-      if isotopes0:
-        dimIsotopes.append(' '.join(sorted(isotopes0)))
-        
-    if dimIsotopes:
-      dimIsotopes.sort()
-      isotopes.append(dimIsotopes)
-      
-  #isotopes.sort()
+      if isotopes0 and expDimRef.measurementType in shiftMeasurements:
+        dimIsotopes[' '.join(sorted(isotopes0))] += 1
   
+    if not dimIsotopes:
+      # Set value for empty dimensions
+      # We do it this way to identify the dimension for matching (empty would always match)
+      dimIsotopes[None] += 1
+
   refExperiments = []
-  
-  numDims = 0
-  for expDim in experiment.expDims:
-    if expDim.expDimRefs:
-      numDims += 1
+
+  numDims = experiment.numDim
   
   for refExperiment in getPossibleRefExperiments(experiment, category):
 
-    if numDims == len(refExperiment.refExpDims):
-      
+    if len(refExperiment.refExpDims) == numDims:
+
+      # Get isotopes per RefExperiment dimension (list of Counters)
       refIsotopes = []
       for refExpDim in refExperiment.refExpDims:
-        dimIsotopes = []
+        dimIsotopes =  Counter()
+        refIsotopes.append(dimIsotopes)
+
         for refExpDimRef in refExpDim.refExpDimRefs:
           expMeasurement = refExpDimRef.expMeasurement
-          if expMeasurement.measurementType in ('Shift','shift','MQShift'):
+          if expMeasurement.measurementType in shiftMeasurements:
+            # We only count shift and MQshift dimensions
             iCodes = [ass.isotopeCode for ass in expMeasurement.atomSites]
-            dimIsotopes.append(' '.join(sorted(iCodes)))
-        dimIsotopes.sort()
-        refIsotopes.append(dimIsotopes)
-      #refIsotopes.sort() 
-      
-      # remove identical elements
-      iso2 = []
+            if expMeasurement.measurementType == 'MQShift' and len(set(iCodes)) == 1:
+              # RASMUS HACK. Correctly experiments ought to have all relevant nuclei,
+              # but in practice e.g. '13C','13C' DQ come in with isotopeCode just '13C'
+              # So to catch these (without requiring users to set dimensions correctly)
+              # we do this
+              dimIsotopes[iCodes[0]] += 1
+            else:
+              dimIsotopes[' '.join(sorted(iCodes))] += 1
+
+        if not dimIsotopes:
+          # Set value for empty dimensions
+          # We do it this way to identify the dimension for matching (empty would always match)
+          dimIsotopes[None] += 1
+
+
+      # remove matching elements
       for iso in isotopes:
-        if iso in refIsotopes:
-          # isotope collection exactly equal to something. Proceed
-          refIsotopes.remove(iso)
-        else:
-          iso2.append(iso)
-      
-      # check for matches among remainder
-      for iso in iso2:
         for riso in refIsotopes:
-          if len(iso) < len(riso) and frozenset(iso).issubset(riso):
-            # isotope set is subset of reference isotope collection. 
-            #Proceed
+          if not list((iso-riso).elements()):
+            # Checks if there is any element in iso that is not matched by one in riso
             refIsotopes.remove(riso)
             break
 
-          if len(iso) == len(riso) == 1 and ( riso[0].count(iso[0]) > 1):
-            # To cope with spectra not intially being aware of DQ ref types
-            # with dual/quad isotope on axis 
-            refIsotopes.remove(riso)
-            break
-        else:
-          # isotope did not match anything in reference exp. Skip
-          break
-      else:
-        # all isotope collections matched. add to possibles
-        #if refIsotopes == isotopes:
+      # The lengths were the same. If all refIsotopes were removed, the two lists match
+      if not refIsotopes:
         refExperiments.append(refExperiment)
+
+  #for rx in refExperiments:
+  #  print ('@~@~ matching:', rx.name)
 
   return refExperiments
    
@@ -1600,10 +1784,11 @@ def calculateNoiseInBox(dataSource, boxMin, boxMax):
   values = numpy.array(values)
 
   n = len(values)
-  noise = numpy.std(values, ddof=1)
+  if n > 2:
+    noise = dataSource.scale * numpy.std(values, ddof=1)
 
-  dataSource.noiseLevel = noise
-  print 'Set noise level for spectrum %s:%s to %f' % (dataSource.experiment.name, dataSource.name, noise)
+    dataSource.noiseLevel = noise
+    print 'Set noise level for spectrum %s:%s to %f' % (dataSource.experiment.name, dataSource.name, noise)
 
 def getMinMaxValues(dataSource):
   """
@@ -2757,4 +2942,6 @@ def getRegionStats(spectrum, region):
   else:
     avg = std = 0
 
-  return ntotal, avg, std
+  scale = spectrum.scale
+
+  return ntotal, scale*avg, scale*std

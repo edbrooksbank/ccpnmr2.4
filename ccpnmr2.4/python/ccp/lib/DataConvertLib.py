@@ -350,7 +350,8 @@ def findMatchingMolSystemAtom(atomName, residue, namingSystem, excludeAtoms,
     if atom and atom not in excludeAtoms:
       return atom
   #   
-  return None
+  #return None
+  return residue.findFirstAtom(name=atomName)
 
 
 def priorityOrderedNamingSystems(chemComp, prefNamingSystemName=None):

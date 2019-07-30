@@ -1294,8 +1294,12 @@ def initResonance(resonance, doMerge=True):
             else:
               assignSpinSystemResidue(spinSystem,residue)    
               
-          else:
-            assignSpinSystemResidue(spinSystem,residue)    
+          else:  # 24 Nov 2017: with the else, ended up with problem when had mixed DNA/RNA terms
+          #elif spinSystem.residue:
+            try:  # 27 Nov 2017: make it a bit less dramatic
+              assignSpinSystemResidue(spinSystem,residue)
+            except Implementation.ApiError, e:
+              pass # this can happen when have mixed molType in spinSystem, so just give up
                            
       else:
         addSpinSystemResonance(spinSystem, resonance)
@@ -1850,6 +1854,8 @@ def makeResonanceGuiName(resonance, fullName=True, doAtoms=None):
     chain = ''
   
   guiName = '%s%s%s%s' % (molSystem,chain,residue,name)
+  if resonance.details:
+    guiName = '%s:%s' % (guiName, resonance.details[:4])
   resonance.guiName = guiName
   resonance.label = name
   

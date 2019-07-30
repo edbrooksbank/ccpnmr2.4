@@ -5029,7 +5029,7 @@ class WindowFrame(Frame, WindowDraw):
       a0 = float(s0 - o)
       a1 = float(s1 - o)
       first = int(math.floor(a0))
-      last = min(n, int(math.ceil(a1+1)))
+      last = min(dataDim.numPoints, int(math.ceil(a1+1)))
       if first >= last:
         continue
 

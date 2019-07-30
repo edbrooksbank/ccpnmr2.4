@@ -620,6 +620,38 @@ class AnalysisPopup(BasePopup, Analysis):
                    'Delete %sselected %s%s?' % (s2, className, s1), parent=originator):
         self.deleteSelected()
 
+  def deletePeaks(self, peaks):
+
+    peaks = set(peaks)
+    self.selected_objects = list(set(self.selected_objects) - peaks)
+    # the below should not be done because the C deletion notifier does this
+    #self.currentPeaks = list(set(self.currentPeaks) - peaks)
+    #if self.currentPeak in peaks:
+    #  self.currentPeak = None
+      
+    for peak in peaks:
+      peak.delete()
+      
+    self.updateSelectionPopups(self.currentPeaks)
+    
+  def queryDeletePeaks(self, peaks, originator=None):
+
+    if not originator:
+      originator = self
+
+    if peaks:
+      n = len(peaks)
+      
+      if n == 1:
+        s1 = s2 = ''
+      else:
+        s1 = 's'
+        s2 = str(n) + ' '
+        
+      if showYesNo('Delete Peak%s' % s1,
+                   'Delete %sPeak%s?' % (s2, s1), parent=originator):
+        self.deletePeaks(peaks)
+
   def toggleSpectrum(self, window, shortcut=None, spectrum=None):
 
     assert shortcut or spectrum
@@ -956,11 +988,11 @@ class AnalysisPopup(BasePopup, Analysis):
                      image=self.iconTool, compound='left',
                      command=self.viewSelectedPeaks,
                      tipText='A table of the peaks currently selected in spectrum windows')
-    # dans menu option
-    menu.add_command(label='Peak Separator', 
-                     image=self.iconTool, compound='left',
-                     command=self.peakSeparatorParams,
-                     tipText='Separate merged peaks using peak models')
+    ## dans menu option
+    #menu.add_command(label='Peak Separator', 
+    #                 image=self.iconTool, compound='left',
+    #                 command=self.peakSeparatorParams,
+    #                 tipText='Separate merged peaks using peak models')
     menu.add_separator()
     menu.add_command(label='Peak Finding',    shortcut='F',  
                      image=self.iconPrefs, compound='left',
@@ -1706,12 +1738,6 @@ class AnalysisPopup(BasePopup, Analysis):
 
     analysisProfile = self.analysisProfile
     # TBD: remove check when attributes in released API
-
-    # test to unregister - need to load a project though
-    analysisProfile.userName = None
-    analysisProfile.userOrganisation = None
-    analysisProfile.userEmail= None
-
     if hasattr(analysisProfile, 'userName'):
       if isRegistered(analysisProfile):
         if not self.printedRegistration:

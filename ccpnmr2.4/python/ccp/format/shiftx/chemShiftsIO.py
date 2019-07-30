@@ -52,6 +52,8 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 ===========================REFERENCE END===============================
 """
 
+import string
+
 # Import general functions
 from memops.universal.Util import returnFloats, returnFloat
 from memops.universal.Util import returnInt
@@ -112,6 +114,7 @@ class ShiftxChemShiftFile(ShiftxGenericFile):
     fin = open(self.name, 'rU')
 
     headerCols = []
+    colLen = 0
     
     line = fin.readline()
     
@@ -128,7 +131,7 @@ class ShiftxChemShiftFile(ShiftxGenericFile):
       
       cols = line.split()
       
-      if cols[0].count('NUM'):
+      if cols[0].upper().count('NUM'):
         headerCols = line.split()
         colLen = len(headerCols)
         
@@ -149,9 +152,9 @@ class ShiftxChemShiftFile(ShiftxGenericFile):
           
           for i in range(2,colLen):
             atomName = headerCols[i]
-            value = returnFloat(cols[i],default=None,verbose=False)
+            value = returnFloat(cols[i],default=0.00,verbose=False)
             
-            # Ignore if value is 0.00. This is stupid but has to be done because format is set up this way.
+            # Ignore if value is 0.00. This is not good but has to be done because format is set up this way.
             if value != 0.00:
 
               self.chemShifts.append(self.shiftClass(self,value,atomName,seqCode,resLabel,self.defaultMolCode))

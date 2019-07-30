@@ -175,6 +175,8 @@ def getPrintOption(appObject, key, defaultValue):
     value = getattr(appObject, name)
     if key in ('FileName', 'OtherHeight', 'OtherWidth', 'TickOutside') and value is None:
       value = defaultValue
+  elif key in ('PositiveColors', 'NegativeColors'):
+    value = appObject.root.application.getValues(appObject, keyword=name, defaultValues=defaultValue)
   else:
     value = appObject.root.application.getValue(appObject, keyword=name, defaultValue=defaultValue)
 
@@ -194,6 +196,8 @@ def setPrintOption(appObject, key, value):
       if key != 'TickPlacement':
         print 'Warning: print option "%s" not stored in data model as "%s" because of exception: %s' % (key, value, str(e))
 
+  elif key in ('PositiveColors', 'NegativeColors'):
+    appObject.root.application.setValues(appObject, keyword=name, values=value)
   else:
     appObject.root.application.setValue(appObject, keyword=name, value=value)
 

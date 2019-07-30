@@ -389,11 +389,16 @@ class BrukerAcqParData(BrukerGenericFile,GenericAcqParData):
     
     if self.parFiles['acqus'].headerDict.has_key("TITLE"):
       title = self.parFiles['acqus'].headerDict["TITLE"]
-      for softwareName in ("XWIN-NMR","TOPSPIN"):
+      for softwareName in ("XWIN-NMR","TOPSPIN","TopSpin"):
         if softwareName in title:
           self.software = softwareName
       
-      versionSearch = self.patt[self.format + "Version"].search(title)
+      if 'TopSpin' in title: # from Bruker 3.5 or so
+        import re
+        patt = re.compile("TopSpin\s*(\d+\.*\d*)")
+      else:
+        patt = self.patt[self.format + "Version"]
+      versionSearch = patt.search(title)
       
       processed = False
       
@@ -401,7 +406,7 @@ class BrukerAcqParData(BrukerGenericFile,GenericAcqParData):
         self.version = versionSearch.group(1)
         
         # do special processing if this is TOPSPIN >= 2.1
-        if self.software == 'TOPSPIN':
+        if self.software in ('TOPSPIN', 'TopSpin'):
           try:
             floatVersion = float(self.version)
             if floatVersion >= 2.1:

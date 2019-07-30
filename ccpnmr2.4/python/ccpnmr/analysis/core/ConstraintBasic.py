@@ -1634,8 +1634,14 @@ def exportAriaTbl(constraints, fileName):
         valRange = [unit_converter[('point', unit)](1.0, dataDimRef),
                     unit_converter[('point', unit)](1.0+dataDimRef.dataDim.numPoints, dataDimRef) ]
         valRange.sort()
-        minFreq = expDimRef.minAliasedFreq if expDimRef.minAliasedFreq is not None else valRange[0]
-        maxFreq = expDimRef.maxAliasedFreq if expDimRef.maxAliasedFreq is not None else valRange[1]
+        if expDimRef.minAliasedFreq is None:
+          minFreq = valRange[0]
+        else:
+          minFreq = expDimRef.minAliasedFreq
+        if expDimRef.maxAliasedFreq is None:
+          maxFreq = valRange[1]
+        else:
+          maxFreq = expDimRef.maxAliasedFreq
         possiblePpms.append(getAliasedPeakDimPositions(peakDim, [(minFreq, maxFreq)], returnPpms=True))
       else:
         possiblePpms.append([value])

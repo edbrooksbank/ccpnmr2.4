@@ -413,19 +413,22 @@ def findSameAssignmentPeaks(peak, peakList=None, onlyFullyAssigned=True):
             candidates.add(peak2)
       
   else:
-    for dim in resonances:
+    for n, dimResonances in enumerate(resonances):
       peaks = set([])
     
-      for resonance in dim:
+      for resonance in dimResonances:
         for contrib in resonance.peakDimContribs:
           peak2 = contrib.peakDim.peak
           if (not peakList) or (peak2.peakList is peakList):
             peaks.add( contrib.peakDim.peak)
-
-      if candidates:
+            
+      if n > 0:
         candidates = candidates.intersection(peaks)
       else:
         candidates = peaks
+        
+      if not candidates:
+        break
 
   return list(candidates)
 
@@ -2137,16 +2140,21 @@ def setupPeakFit(peak, fitMethod=None, doFit=True, doOtherFit=True):
         for peakDim in peak.sortedPeakDims():
           peakDim.position = int(math.floor(peakDim.position+0.5)) + center[dim]
           dim = dim + 1
+          
+        # not very elegant but ought to be what we want
+        peak.fitMethod = getMethod(peak.root, task='fit peak',
+                                   procedure='%s peak fit' % fitMethod,
+                                   parameters=(('method', fitMethod),))
     if doOtherFit:
       setupPeakHeight(peak)
       setupPeakLinewidth(peak)
   else:
     fitPeaks([peak], fitMethod, updatePosition=doFit)
 
-  # not very elegant but ought to be what we want
-  peak.fitMethod = getMethod(peak.root, task='fit peak',
-                             procedure='%s peak fit' % fitMethod,
-                             parameters=(('method', fitMethod),))
+    # not very elegant but ought to be what we want
+    peak.fitMethod = getMethod(peak.root, task='fit peak',
+                               procedure='%s peak fit' % fitMethod,
+                               parameters=(('method', fitMethod),))
 
 def fitPeaks(peaks, fitMethod, updatePosition=True):
   """ Fit peaks using the specified fitMethod.
@@ -2440,6 +2448,8 @@ def findPeakVolume(peak, volumeMethod=None):
       else:
         mult = math.pi / 2
       for peakDim in peak.peakDims:
+        if peakDim.dataDim.className != 'FreqDataDim':
+          continue
         lineWidth = peakDim.lineWidth
         if not lineWidth:
           return None

@@ -1526,10 +1526,24 @@ class EditAssignmentPopup(BasePopup):
         if not showOkCancel('Confirm', msg % data, parent=self):
           return False                
         
-        msg = 'Re-assign all other %d%s resonances ( %s) to the residue %d%s?'
-        data = (spinSystem.residue.seqCode,
-                getResidueCode(spinSystem.residue),
-                resText,residue.seqCode,ccpCode) 
+        molSystems = residue.root.sortedMolSystems()
+        chains = []
+        for molSystem in molSystems:
+          chains.extend(molSystem.sortedChains())
+        if len(chains) > 1:
+          if len(molSystems) > 1:
+            m1 = '%s:' % spinSystem.residue.chain.molSystem.code
+            m2 = '%s:' % residue.chain.molSystem.code
+          else:
+            m1 = m2 = ''
+          c1 = '%s:' % spinSystem.residue.chain.code
+          c2 = '%s:' % residue.chain.code
+        else:
+          m1 = m2 = c1 = c2 = ''
+     
+        msg = 'Re-assign all other %s%s%d%s resonances (%s) to the residue %s%s%d%s?'
+        data = (m1, c1, spinSystem.residue.seqCode, getResidueCode(spinSystem.residue),
+                resText, m2, c2, residue.seqCode, ccpCode) 
         if not showYesNo('Question', msg % data , self):
           AssignmentBasic.removeSpinSystemResonance(spinSystem, resonance)
 

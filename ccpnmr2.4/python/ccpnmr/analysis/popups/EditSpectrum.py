@@ -421,13 +421,13 @@ class EditSpectrumPopup(BasePopup):
       frameA.grid_rowconfigure(0, weight=1)
       frameA.grid_columnconfigure(0, weight=1)
  
-      self.expNameEntry  = Entry(self, width=10,
+      self.expNameEntry  = Entry(self, width=20,
                                  returnCallback=self.setExperimentName)
-      self.specNameEntry = Entry(self, width=10,
+      self.specNameEntry = Entry(self, width=20,
                                  returnCallback=self.setSpectrumName)
       self.peakListPulldown = PulldownList(self, callback=self.setActivePeakList)
-      self.scaleEntry = FloatEntry(self, returnCallback=self.setScale, width=5)
-      self.noiseEntry = FloatEntry(self, returnCallback=self.setNoise, width=10)
+      self.scaleEntry = FloatEntry(self, returnCallback=self.setScale, width=10)
+      self.noiseEntry = FloatEntry(self, returnCallback=self.setNoise, width=15)
  
       headingList = ['#', 'Experiment', 'Spectrum', 'Dimensions', 'Active\nPeak List',
                      'Num Peak\nLists', 'Scale', 'Noise\nLevel', 'Data Type',
@@ -946,7 +946,7 @@ class EditSpectrumPopup(BasePopup):
                activePl,
                len(spec.peakLists),
                spec.scale,
-               spec.noiseLevel,
+               self.getSpectrumNoise(spec),
                spec.dataType,
                spec.isSimulated and 'Yes' or 'No',
                path]
@@ -980,7 +980,7 @@ class EditSpectrumPopup(BasePopup):
   
   def getExperimentName(self, spectrum):
 
-    width = max(10, len(spectrum.experiment.name))
+    width = max(20, len(spectrum.experiment.name))
     self.expNameEntry.config(width=width)
     self.expNameEntry.set(spectrum.experiment.name)
 
@@ -1006,6 +1006,8 @@ class EditSpectrumPopup(BasePopup):
   
   def getSpectrumName(self, spectrum):
 
+    width = max(20, len(spectrum.name))
+    self.specNameEntry.config(width=width)
     self.specNameEntry.set(spectrum.name)
 
   def setSpectrumName(self, *extra):
@@ -1049,12 +1051,19 @@ class EditSpectrumPopup(BasePopup):
 
     self.peakListPulldown.setup(names, peakLists, index)
 
-  def getNoise(self, spectrum):
+  def getSpectrumNoise(self, spectrum):
 
     noise = spectrum.noiseLevel
     if noise is None:
       noise = getNoiseEstimate(spectrum)
+      spectrum.noiseLevel = noise
     
+    return noise
+    
+  def getNoise(self, spectrum):
+
+    noise = self.getSpectrumNoise(spectrum)
+
     self.noiseEntry.set(noise)
 
   def setNoise(self, *extra):
