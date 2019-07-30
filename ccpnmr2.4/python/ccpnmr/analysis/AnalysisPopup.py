@@ -1738,6 +1738,12 @@ class AnalysisPopup(BasePopup, Analysis):
 
     analysisProfile = self.analysisProfile
     # TBD: remove check when attributes in released API
+
+    # # test to unregister - need to load a project though
+    # analysisProfile.userName = None
+    # analysisProfile.userOrganisation = None
+    # analysisProfile.userEmail= None
+
     if hasattr(analysisProfile, 'userName'):
       if isRegistered(analysisProfile):
         if not self.printedRegistration:
