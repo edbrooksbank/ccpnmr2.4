@@ -473,9 +473,9 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
                   # simple filter by file extension
                   self._allFiles = [filePath for filePath in self._allFiles if os.path.splitext(filePath)[-1].lower() == filter]
 
-    # # populate the list with the files
+    # # populate the list with the files - must be in the installRoot path
     n = len(self.installRoot)
-    self._allFiles = [filePath[n+1:] for filePath in self._allFiles]
+    self._allFiles = [filePath[n+1:] for filePath in self._allFiles if filePath.startswith(self.installRoot)]
     self._branchList.setItems(self._allFiles)
 
     # restore the current working directory
