@@ -21,13 +21,35 @@ SETUPCFG="./setup.cfg"
 error_check() {
   # check whether any OS errors occurred after the last operation, if so -> exit
   if [[ $? != 0 ]]; then
+    rm -rf ${SETUPCFG}
     exit
   fi
 }
 
-command_exists () {
+command_exists() {
   # check whether the given command exists
   command -v "$1" > /dev/null 2>&1;
+}
+
+detect_os() {
+  # detect the current OS type
+  unameOut="$(uname -s)"
+  case "${unameOut}" in
+      Linux*)     MACHINE=Linux;;
+      Darwin*)    MACHINE=MacOSX;;
+      CYGWIN*)    MACHINE=Windows;;
+      IRIX*)      MACHINE=Irix;;
+      Sun*)       MACHINE=Solaris;;
+      *)          MACHINE="UNKNOWN:${unameOut}"
+  esac
+}
+
+isDirInPath() {
+  # check whether the PATH contains a given directory
+  case ":$PATH:" in
+    *:"$1":*) return 0 ;;
+    *) return 1 ;;
+  esac
 }
 
 # check whether pip exists
@@ -38,7 +60,7 @@ if ! command_exists pip; then
     wget -c --no-check-certificate https://bootstrap.pypa.io/get-pip.py
     error_check
   elif command_exists curl; then
-    curl https://bootstrap.pypa.io/get-pip.py
+    curl -O -L https://bootstrap.pypa.io/get-pip.py
     error_check
   fi
 
@@ -53,6 +75,15 @@ fi
 
 echo "[install]" > ${SETUPCFG}
 echo "prefix=" >> ${SETUPCFG}
+
+# check whether PATH contains /Library/... (on MacOSX)
+
+detect_os
+if [[ ${MACHINE} == *"MacOSX"* ]]; then
+  if ! isDirInPath "/Library/Frameworks/Python.framework/Versions/2.7/bin"; then
+    PATH=${PATH}:/Library/Frameworks/Python.framework/Versions/2.7/bin
+  fi
+fi
 
 # install new modules
 
