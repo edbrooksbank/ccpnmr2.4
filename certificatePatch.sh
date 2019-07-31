@@ -13,7 +13,7 @@
 
 # modules to import
 
-PIPMODULES="urllib3 pyopenssl certifi idna"
+PIPMODULES="urllib3 pyopenssl certifi idna requests"
 SETUPCFG="./setup.cfg"
 
 # available functions
