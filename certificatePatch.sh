@@ -36,7 +36,7 @@ detect_os() {
   unameOut="$(uname -s)"
   case "${unameOut}" in
       Linux*)     MACHINE=Linux;;
-      Darwin*)    MACHINE=MacOSX;;
+      Darwin*)    MACHINE=MacOS;;
       CYGWIN*)    MACHINE=Windows;;
       IRIX*)      MACHINE=Irix;;
       Sun*)       MACHINE=Solaris;;
@@ -62,6 +62,9 @@ if ! command_exists pip; then
   elif command_exists curl; then
     curl -O -L https://bootstrap.pypa.io/get-pip.py
     error_check
+  else
+    echo "Error downloading pip"
+    exit
   fi
 
   # install pip
@@ -79,7 +82,7 @@ echo "prefix=" >> ${SETUPCFG}
 # check whether PATH contains /Library/... (on MacOSX)
 
 detect_os
-if [[ ${MACHINE} == *"MacOSX"* ]]; then
+if [[ ${MACHINE} == *"MacOS"* ]]; then
   if ! isDirInPath "/Library/Frameworks/Python.framework/Versions/2.7/bin"; then
     PATH=${PATH}:/Library/Frameworks/Python.framework/Versions/2.7/bin
   fi
