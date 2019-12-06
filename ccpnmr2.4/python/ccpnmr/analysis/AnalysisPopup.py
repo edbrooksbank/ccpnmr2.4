@@ -705,6 +705,10 @@ class AnalysisPopup(BasePopup, Analysis):
     importsMenu.add_command(label='NMR-STAR 3.1', shortcut='N', command=self.importNmrStar31 )
     importsMenu.add_command(label='PDB 3.20', shortcut='P',command=self.importPdb )
     importsMenu.add_command(label='Coordinates (PDB-style)', shortcut='C',command=self.importCoordinates )
+    importsMenu.add_command(label='Nef', command=self.importNefFile)
+
+    exportsMenu = Menu(self.menubar, tearoff=False)
+    exportsMenu.add_command(label='Nef', command=self.exportNefFile)
 
     # Preferences submenu
 
@@ -754,8 +758,14 @@ class AnalysisPopup(BasePopup, Analysis):
     menu.add_command(label='Open Spectra', shortcut='t',   
                      image=self.iconOpenFile, compound='left',
                      command=self.openSpectrum,
-                     tipText='Open spectrum data fom disk, creating a default CCPN project if needed')
-    menu.add_command(label='Save', shortcut='S',   
+                     tipText='Open spectrum data from disk, creating a default CCPN project if needed')
+
+    menu.add_command(label='Load Nef',
+                     image=self.iconOpenFile, compound='left',
+                     command=self.loadNefFile,
+                     tipText='Open Nef file from disk, creating a default CCPN project if needed')
+
+    menu.add_command(label='Save', shortcut='S',
                      image=self.iconSave, compound='left',
                      command=self.saveProject,
                      tipText='Save the current CCPN project on disk')
@@ -763,10 +773,15 @@ class AnalysisPopup(BasePopup, Analysis):
                      image=self.iconSaveAs, compound='left',
                      command=self.saveAsProject,
                      tipText='Save the current CCPN project under a different name (project directory)')
-    menu.add_cascade(label='Import', shortcut='I',   
+
+    menu.add_cascade(label='Import', shortcut='I',
                      image=self.iconImport, compound='left',
                      menu=importsMenu)
-    menu.add_command(label='Close', shortcut='C',   
+    menu.add_cascade(label='Export',
+                     image=self.iconImport, compound='left',
+                     menu=exportsMenu)
+
+    menu.add_command(label='Close', shortcut='C',
                      image=self.iconClose, compound='left',
                      command=self.closeProject,
                      tipText='Close the current CCPN project')
@@ -809,15 +824,25 @@ class AnalysisPopup(BasePopup, Analysis):
     
     self.menubar.add_cascade(label=ProjectMenu, shortcut='j', menu=menu)
     self.menus[ProjectMenu] = menu
-    self.menu_items[ProjectMenu] = ['New', 'Open Project', 'Open Spectra',
-                                    'Save', 'Save As', 'Import', 'Close', 
-				    'Quit', 'Summary', 'Preferences', 'Register', 'Validate', 
+    self.menu_items[ProjectMenu] = ['New', 'Open Project', 'Open Spectra', 'Load Nef',
+                                    'Save', 'Save As', 'Import', 'Export', 'Close',
+				                    'Quit', 'Summary', 'Preferences', 'Register', 'Validate',
                                     'Backup', 'Archive', updateText, 'Help']
     
     # Menus that area active in absence of a project
-    for ii in (0,1,2,7,15,17):
+    # for ii in (0,1,2,7,15,17):
+    for ii in (0,1,2,3,9,17,19):
       self.fixedActiveMenus[(ProjectMenu,ii)] = True
-    
+
+  def loadNefFile(self):
+    print '>>>Load Nef file'
+
+  def importNefFile(self):
+    print '>>>Import Nef file'
+
+  def exportNefFile(self):
+    print '>>>Export Nef file'
+
   def openWindowGroup(self, spectrumWindowGroup=None):
 
     if spectrumWindowGroup:
