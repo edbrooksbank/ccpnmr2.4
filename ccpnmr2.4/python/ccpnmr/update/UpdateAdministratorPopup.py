@@ -438,7 +438,56 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
     commands = [self._checkBranchServer, self._addSelectedToCommits]
     buttonList = ButtonList(frame, texts=texts, commands=commands)    #, expands=1)
     buttonList.grid(row=row, column=0, rowspan=1, columnspan=2)   #, sticky='ew')
+
+    row += 1
+    zipFrame = Frame(frame)
+    zipFrame.grid(row=row, column=0, rowspan=1, columnspan=2, sticky='ew')
+
+    label = Label(zipFrame, text='Zip Name')
+    label.grid(row=0, column=0, stick='w')
+
+    self._zipNameEntry = Entry(zipFrame, text=DEFAULTFILTER)
+    self._zipNameEntry.grid(row=0, column=1, stick='ew')
+
+    texts = ['tgz', 'zip']
+    commands = [self.makeTgz, self.makeZip]
+    buttonList = ButtonList(zipFrame, texts=texts, commands=commands)
+    buttonList.grid(row=0, column=2, sticky='e')
+    zipFrame.columnconfigure(1, weight=1)
+
     self._fillCompareList()
+
+  def _makeCompressed(self, ext, funcNames):
+    import subprocess
+
+    # get the current working path - (should be ./ccpnmr)
+    zipName = (self._zipNameEntry.get()).strip()
+
+    if not zipName:
+      showWarning('Warning', 'Zip Name is not defined')
+      return
+
+    outFile = os.path.join('.', zipName+ext)
+
+    # need to concatenate path / ccpnmr2.4 / file / .extension
+    fileList = [os.path.join('.', 'ccpnmr2.4', fp) for fp in self._allFiles]
+
+    if fileList:
+      # generate the call list for compressing the files
+      callList = funcNames + [outFile] + fileList
+      subprocess.call(callList)
+
+    else:
+      showWarning('Warning', 'File list is empty')
+      return
+
+  def makeTgz(self):
+    print '>>>makeTgz - ', repr(self._zipNameEntry.get())
+    self._makeCompressed('.tgz', ['tar', '-czf'])
+
+  def makeZip(self):
+    print '>>>makeZip - ', repr(self._zipNameEntry.get())
+    self._makeCompressed('.zip', ['zip', '-rq'])
 
   def _fillCompareList(self, currentPath = os.getcwd()):
 
@@ -570,6 +619,7 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
   def editFilter(self, *args):
     """return pressed in the filter box - update the filter list
     """
+    print '>>>editFilter - ', repr(self._filterEntry.get())
     self._fillCompareList()
 
   def editSubDirectory(self, *args):
@@ -580,6 +630,7 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
   def editServerVersion(self, *args):
     """Change the serverVersion to update different branch
     """
+    print '>>>editServerVersion - ', repr(self.serverVersionEntry.get())
     self._updateServerSettings()
 
   def _updateServerSettings(self):

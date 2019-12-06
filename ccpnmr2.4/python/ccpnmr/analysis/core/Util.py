@@ -815,6 +815,9 @@ def getSpectrumContourLevels(spectrum):
     # problem with using array of floats instead of string containing array
     # is that former means notifier gets updated for each level being added
     # (and removed) so get multiple updates which is disconcerting
+    if not hasattr(spectrum.root, 'application'):
+      return []
+
     application = spectrum.root.application
     #levels = application.getValues(spectrum,  keyword='contourLevel')
     levels = application.getValue(spectrum,  keyword='contourLevel',

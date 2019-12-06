@@ -96,7 +96,7 @@ class Menu(Tkinter.Menu, Base):
     if not kw.get('activebackground'):
       kw['activebackground'] = '#D0B0A0'
 
-    if not kw.get('activeforekground'):
+    if not kw.get('activeforeground'):
       kw['activeforeground'] = '#400000'
       
     if not kw.get('activeborderwidth'):
