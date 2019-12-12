@@ -87,7 +87,7 @@ def main(projectDir=None, cache_size=64, glDirect=None):
 
   root = Tkinter.Tk()
   root.withdraw()
-  root.option_add("*Background", "grey90")
+  # root.option_add("*Background", "grey90")
   root.option_add("*Font", "Helvetica -12")
   root.option_add("*Dialog.msg.wrapLength", '6i')
   

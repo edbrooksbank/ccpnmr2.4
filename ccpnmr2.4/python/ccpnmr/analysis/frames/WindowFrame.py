@@ -3633,7 +3633,7 @@ class WindowFrame(Frame, WindowDraw):
     text = '%6s, %6s %s' % (xtext,ytext,tt)
     windowPopup.setLocationLabel(text)
 
-  def drawCanvasCrosshairs(self, canvas, xs, ys, originatingWindowFrame):
+  def drawCanvasCrosshairs(self, canvas, xs, ys, originatingWindowFrame, color=(1, 0, 0)):
 
     scrolled_window = self.scrolled_window
     if scrolled_window.isDeleting:
@@ -3687,6 +3687,15 @@ class WindowFrame(Frame, WindowDraw):
           handler.drawLine(0, y, 1, y)
 
     # ordinary crosshairs
+
+    # NOTE:ED - use the foreground colour here, but check that Xor works
+    # wrong place
+    # project = window.root
+    # profile = Util.getAnalysisProfile(project)
+    # color = inverseGrey(profile.bgColor)
+    # handler.setColor(hexToRgb(color))
+    fg = self.windowPopup.analysisProfile.fgColor
+    handler.setColor(hexToRgb(fg))
 
     for x in xs:
       x = float(x - x0) / (x1 - x0)
@@ -4767,7 +4776,7 @@ class WindowFrame(Frame, WindowDraw):
 
     except WindowTimeoutException:
 
-      #print 'drawCanvasReal: about to single buffer doCanvas', self.windowPane.name
+      print 'drawCanvasReal: about to single buffer doCanvas', self.windowPane.name
       canvas.doubleBuffer = False
       handler.setIsDoubleBuffer(0)
 

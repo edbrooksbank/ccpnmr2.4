@@ -929,7 +929,7 @@ class WindowDraw:
           if hasattr(analysisSpectrum, 'sliceColors'):
             sliceColors = analysisSpectrum.sliceColors
           else:
-            sliceColors = (sliceColors,)
+            sliceColors = (analysisSpectrum.sliceColor,)
           n = len(sliceColors)
           for (i, component) in enumerate(components):
             handler.setColor(hexToRgb(sliceColors[i%n]))
@@ -1490,7 +1490,7 @@ class WindowDraw:
     for mark in self.windowPane.topObject.sortedMarks():
       drawMark(handler, mark, x0, x1, y0, y1)
 
-    handler.resetLineWidth() # reset to default
+    # handler.resetLineWidth() # reset to default
 
   def drawRuler(self, handler, ruler, x0, x1, y0, y1):
 
@@ -1519,7 +1519,7 @@ class WindowDraw:
     for ruler in self.windowPane.topObject.sortedRulers():
       drawRuler(handler, ruler, x0, x1, y0, y1)
 
-    handler.resetLineWidth() # reset to default
+    # handler.resetLineWidth() # reset to default
 
   def drawDeltaMarker(self, handler, x0, x1, y0, y1, color):
 
@@ -1694,19 +1694,19 @@ class WindowDraw:
     allViews.sort(self.compareViewOrder)
     allViews.reverse()
 
-    #print 'doCanvas1'
+    # print 'doCanvas1'
     for view in allViews:
       #if (view.analysisSpectrum.dataSource.numDim >= 2):
       self.drawView(handler, object, view, row, col)
 
-    #print 'doCanvas2'
+    # print 'doCanvas2'
     for view in allViews:
       #if (view.analysisSpectrum.dataSource.numDim >= 2):
       self.drawViewPeaks(handler, view, row, col)
 
     ###self.drawPeakClusters(handler, row, col)
 
-    #print 'doCanvas3'
+    # print 'doCanvas3'
     xPanel = windowPane.findFirstAxisPanel(label='x')
     yPanel = windowPane.findFirstAxisPanel(label='y')
     (x0, x1) = self.findAxisRegion(xPanel, col)
@@ -1720,7 +1720,7 @@ class WindowDraw:
           if self.isViewVisible(view) and analysisSpectrum.useBoundingBox:
             self.drawViewBox(handler, view, x0, x1, y0, y1)
 
-    #print 'doCanvas4'
+    # print 'doCanvas4'
     self.drawMarks(handler, x0, x1, y0, y1)
     self.drawRulers(handler, x0, x1, y0, y1)
 
@@ -1732,6 +1732,7 @@ class WindowDraw:
 
     xaxisType = xPanel.axisType
     yaxisType = yPanel.axisType
+
     #print 'doCanvas5'
     if xaxisType == yaxisType:
       self.drawDiagonal(handler, x0, x1, y0, y1, color)
@@ -1745,7 +1746,7 @@ class WindowDraw:
             spectrum = analysisSpectrum.dataSource
             experiment = spectrum.experiment
             spinningRate = experiment.spinningRate
-            if spinningRate: 
+            if spinningRate:
               dataDim = view.findFirstAxisMapping(label='x').analysisDataDim.dataDim
               dataDimRef = ExperimentBasic.getPrimaryDataDimRef(dataDim)
               expDimRef = dataDimRef.expDimRef
@@ -1784,8 +1785,8 @@ class WindowDraw:
         strip = col
     else:
       if len(yPanel.axisRegions) > 1:
-        strip = row  
-    
+        strip = row
+
     if strip >= 0:
       if window.isCanvasLabelShown or window.isCanvasMidpointShown:
         if window.isCanvasLabelShown:

@@ -705,10 +705,11 @@ class AnalysisPopup(BasePopup, Analysis):
     importsMenu.add_command(label='NMR-STAR 3.1', shortcut='N', command=self.importNmrStar31 )
     importsMenu.add_command(label='PDB 3.20', shortcut='P',command=self.importPdb )
     importsMenu.add_command(label='Coordinates (PDB-style)', shortcut='C',command=self.importCoordinates )
-    importsMenu.add_command(label='Nef', command=self.importNefFile)
 
-    exportsMenu = Menu(self.menubar, tearoff=False)
-    exportsMenu.add_command(label='Nef', command=self.exportNefFile)
+    # # NOTE:ED not needed
+    # importsMenu.add_command(label='Nef', command=self.importNefFile)
+    # exportsMenu = Menu(self.menubar, tearoff=False)
+    # exportsMenu.add_command(label='Nef', command=self.exportNefFile)
 
     # Preferences submenu
 
@@ -777,9 +778,11 @@ class AnalysisPopup(BasePopup, Analysis):
     menu.add_cascade(label='Import', shortcut='I',
                      image=self.iconImport, compound='left',
                      menu=importsMenu)
-    menu.add_cascade(label='Export',
-                     image=self.iconImport, compound='left',
-                     menu=exportsMenu)
+
+    # # NOTE:ED not needed
+    # menu.add_cascade(label='Export',
+    #                  image=self.iconImport, compound='left',
+    #                  menu=exportsMenu)
 
     menu.add_command(label='Close', shortcut='C',
                      image=self.iconClose, compound='left',
@@ -825,23 +828,14 @@ class AnalysisPopup(BasePopup, Analysis):
     self.menubar.add_cascade(label=ProjectMenu, shortcut='j', menu=menu)
     self.menus[ProjectMenu] = menu
     self.menu_items[ProjectMenu] = ['New', 'Open Project', 'Open Spectra', 'Load Nef',
-                                    'Save', 'Save As', 'Import', 'Export', 'Close',
+                                    'Save', 'Save As', 'Import', 'Close',
 				                    'Quit', 'Summary', 'Preferences', 'Register', 'Validate',
                                     'Backup', 'Archive', updateText, 'Help']
     
     # Menus that area active in absence of a project
     # for ii in (0,1,2,7,15,17):
-    for ii in (0,1,2,3,9,17,19):
+    for ii in (0,1,2,3,8,16,18):
       self.fixedActiveMenus[(ProjectMenu,ii)] = True
-
-  def loadNefFile(self):
-    print '>>>Load Nef file'
-
-  def importNefFile(self):
-    print '>>>Import Nef file'
-
-  def exportNefFile(self):
-    print '>>>Export Nef file'
 
   def openWindowGroup(self, spectrumWindowGroup=None):
 
@@ -1910,6 +1904,39 @@ class AnalysisPopup(BasePopup, Analysis):
   def openSpectrum(self):
 
     self.openPopup('open_spectrum', OpenSpectrumPopup)
+
+  def loadNefFile(self):
+
+    from ccpnmr.v2io.NefIo import loadNefFile as _loadNefFile
+
+    if self.project:
+      if not self.closeProject():
+        return
+
+    fileTypes = [FileType('STAR', ['*.nef']),
+                 FileType('All', ['*'])]
+
+    fileSelectPopup = FileSelectPopup(self, file_types=fileTypes,
+                                      title='Load Nef file', dismiss_text='Cancel',
+                                      selected_file_must_exist=True, multiSelect=False, )
+
+    fileName = fileSelectPopup.getFile()
+
+    if fileName:
+
+      try:
+        project = _loadNefFile(fileName, overwriteExisting=True)
+        self.initProject(project)
+
+      except Exception as es:
+        print str(es)
+
+  # # NOTE:ED not needed
+  # def importNefFile(self):
+  #   print '>>>Import Nef file'
+  #
+  # def exportNefFile(self):
+  #   print '>>>Export Nef file'
 
   def editSpectrum(self, spectrum=None):
 

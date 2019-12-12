@@ -87,20 +87,22 @@ class Menu(Tkinter.Menu, Base):
 
     self.font = kw.get('font')
 
-    if not kw.get('bg'):
-      kw['bg'] = 'grey85'
+    # cannot set any colours here otherwise overrides the MacOS defaults
 
-    if not kw.get('borderwidth'):
-      kw['borderwidth'] = 1
-      
-    if not kw.get('activebackground'):
-      kw['activebackground'] = '#D0B0A0'
-
-    if not kw.get('activeforeground'):
-      kw['activeforeground'] = '#400000'
-      
-    if not kw.get('activeborderwidth'):
-      kw['activeborderwidth'] = 1
+    # if not kw.get('bg'):
+    #   kw['bg'] = 'grey85'
+    #
+    # if not kw.get('borderwidth'):
+    #   kw['borderwidth'] = 1
+    #
+    # if not kw.get('activebackground'):
+    #   kw['activebackground'] = '#D0B0A0'
+    #
+    # if not kw.get('activeforeground'):
+    #   kw['activeforeground'] = '#400000'
+    #
+    # if not kw.get('activeborderwidth'):
+    #   kw['activeborderwidth'] = 1
       
     self.label = kw.get('label')
     self.kind = 'menu'
@@ -344,15 +346,23 @@ if __name__ == '__main__':
   menubar = Menu(root)
  
   menu = Menu(menubar, tearoff=0)
-  menu.add_command(label='New', shortcut='N', command=new)
+
+  # cannot set any coloours here otherwise overrides the MacOS defaults
+
+  menu.add_command(label='New', shortcut='N', command=new, )
   menu.add_command(label='Pick', shortcut='P', command=pick)
   menu.add_command(label='Pick1', shortcut='1', command=pick, tipText='Tip A')
   menu.add_command(label='Pick2', shortcut='2', command=pick, tipText='Tip B')
   menu.add_command(label='Pick3', shortcut='3', command=pick, tipText='Tip C')
   menubar.add_cascade(label='Project', shortcut='P', menu=menu)
- 
+
+  # menu.entryconfig(0, activeforeground='#3E4149', foreground='#10FF30', label='NEEEEEEW', state = Tkinter.NORMAL)
+  # menu.entryconfig(1, foreground='#10FF30', state = Tkinter.DISABLED)
+  menu.entryconfig(3, state = Tkinter.DISABLED)
+  menu.entryconfig(4, state = Tkinter.DISABLED)
+
   menu = Menu(menubar, tearoff=0)
-  menu.add_command(label='New', shortcut='N', command=new)
+  menu.add_command(label='Enter Full Screen', shortcut='E', command=new)
   menubar.add_cascade(label='View', shortcut='V', menu=menu)
  
   root.config(menu=menubar)
