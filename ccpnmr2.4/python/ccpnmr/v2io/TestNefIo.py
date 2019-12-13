@@ -107,6 +107,12 @@ def selectFile():
         filePath = os.path.join(testPath, testFile)
         print 'Running Test:', func.__name__, testFile
         if os.path.isfile(filePath):
+
+            # test = NefImporter(errorLogging=el.NEF_STANDARD)
+            # test.loadFile(filePath)
+            # valid = test.isValid
+            # log = test.validErrorLog
+
             loadNefFile(path=filePath, overwriteExisting=True)
 
         return
