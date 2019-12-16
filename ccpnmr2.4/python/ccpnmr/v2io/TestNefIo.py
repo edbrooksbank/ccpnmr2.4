@@ -1,6 +1,12 @@
 """
 Module Documentation here
 """
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 #=========================================================================================
 # Licence, Reference and Credits
 #=========================================================================================
@@ -37,6 +43,7 @@ import unittest
 import decorator
 from unittest import TestCase, skip
 from ccpnmr.v2io.NefIo import loadNefFile
+from ccpnmr.nef.NefImporter import NefImporter
 
 
 CCPNTestPath = '/Users/ejb66/PycharmProjects/Git/NEF/data_1_1/'
@@ -86,6 +93,7 @@ PDBStatTestFiles = ('BeR31/BeR31_2k2e.nef',
                     'WR73/WR73_2loy.nef',
                     'ZR18/ZR18_1pqx.nef',
                     )
+NEFVALIDATIONFILE = '/Users/ejb66/PycharmProjects/Git/NEF/specification/mmcif_nef.dic'
 
 
 def selectFile():
@@ -105,13 +113,23 @@ def selectFile():
         testFile = testList[int(testID[0][1])]
 
         filePath = os.path.join(testPath, testFile)
-        print 'Running Test:', func.__name__, testFile
+        print('Running Test:', func.__name__, testFile)
         if os.path.isfile(filePath):
 
-            # test = NefImporter(errorLogging=el.NEF_STANDARD)
-            # test.loadFile(filePath)
-            # valid = test.isValid
-            # log = test.validErrorLog
+            test = NefImporter(errorLogging='silent')
+            test.loadFile(filePath)
+            test.loadValidateDictionary(NEFVALIDATIONFILE)
+            valid = test.isValid
+            if not valid:
+                print('~~~~~~~~~~~~~~~~~~~~~~\nValid Nef:', valid)
+                print('Error in Nef:', test.validErrorLog)
+                print('Error in Nef:')
+                for k, v in test.validErrorLog.items():
+                    print('  >>>', k)
+                    for err in v:
+                        print('  >>>        ', err)
+                print('~~~~~~~~~~~~~~~~~~~~~~')
+            self.assertTrue(valid, 'Error validating nef file.')
 
             loadNefFile(path=filePath, overwriteExisting=True)
 
