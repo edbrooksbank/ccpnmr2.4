@@ -138,7 +138,7 @@ def selectFile():
     return theDecorator
 
 
-class AllChecks(TestCase):
+class AllCCPNChecks(TestCase):
 
     def setUp(self):
         pass
@@ -200,6 +200,11 @@ class AllChecks(TestCase):
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+class AllCASDChecks(TestCase):
+
+    def setUp(self):
+        pass
+
     @selectFile()
     def test_loadCASD0(self):
         """2l9r_docr.nef"""
@@ -251,6 +256,11 @@ class AllChecks(TestCase):
         pass
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+class AllPDBChecks(TestCase):
+
+    def setUp(self):
+        pass
 
     @selectFile()
     def test_loadPDBStat0(self):

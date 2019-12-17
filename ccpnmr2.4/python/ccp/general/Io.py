@@ -60,9 +60,10 @@ software development. Bioinformatics 21, 1678-1684.
 #
 
 import os, urllib, re
-
+import pandas as pd
 from memops.universal import Io as uniIo
 from memops.universal import Util as uniUtil
+from memops.universal.Url import fetchUrl
 from memops.general.Implementation import ApiError
 from memops.general.Io import findCcpXmlFile, getCcpFileString
 from memops.api import Implementation
@@ -71,6 +72,7 @@ from memops.format.xml import XmlIO
 from ccp.general.Constants import chemCompServer, chemCompWebPath
 from ccp.general.Constants import standardResidueCcpCodes
 from ccp.general.Util import setCurrentStore
+
 
 def getDataPath(*args):
   
@@ -314,6 +316,34 @@ def getChemCompCoord(project, sourceName, molType, ccpCode, download=True, showE
 
   return chemCompCoord
 
+def getCcpForgeSubPath(molType, ccpCode, sourceName=None):
+  """
+  Creates the subPath info for ChemComp(Coord) downloads from CcpForge
+  """
+  ccpForgeUrl = "https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/"
+  indexDir = "index"
+  indexFile = "index.csv"
+  ccpForgeIndexUrl = ccpForgeUrl + uniIo.joinPath(indexDir, indexFile)
+
+  if not sourceName:
+    fileType = 'ChemComp'
+    subPath = getChemCompArchiveXmlFilePath("", molType, ccpCode)
+    fileSearchString = "%s\+%s\+" % (molType, getCcpFileString(ccpCode))
+
+  else:
+    fileType = 'ChemCompCoord'
+    subPath = getChemCompCoordArchiveXmlFilePath("", sourceName, molType, ccpCode)
+    fileSearchString = "%s\+%s\+%s\+" % (getCcpFileString(sourceName), molType, getCcpFileString(ccpCode))
+
+  # need opposite
+  # if fileType == 'ChemComp':
+  #   (tmpMolType, tmpCcpCode, suffix) = chemCompXmlFile.split("+")
+  # else:
+  #   (tmpSourceName, tmpMolType, tmpCcpCode, suffix) = chemCompXmlFile.split("+")
+
+  return (fileType, ccpForgeUrl, ccpForgeIndexUrl, fileSearchString)
+
+
 def getCcpForgeUrls(molType,ccpCode,sourceName=None):
   
   """
@@ -435,7 +465,8 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
   result = None
   
   (fileType, ccpForgeDirUrl, ccpForgeDownloadUrl) = getCcpForgeUrls(molType,ccpCode,sourceName=sourceName)
-  
+  (_, ccpForgeUrl, ccpForgeIndexUrl, searchString) = getCcpForgeSubPath(molType,ccpCode,sourceName=sourceName)
+
   if sourceName:
     # For displaying error info
     sourceText = "%s, " % sourceName
@@ -445,23 +476,50 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
   try:
 
     # Get the file list, needs to be decomposed to get direct links
-    r1 = urllib.urlopen(ccpForgeDirUrl)
+    # r1 = urllib.urlopen(ccpForgeDirUrl)
+
+    # dirData = fetchUrl(ccpForgeDirUrl)
+    # fetchUrl(u'https://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/data/pdbe/chemComp/archive/')
+
+    # read the index file form the chemcomp website and then get the file location from the index
+    df = pd.read_csv(ccpForgeIndexUrl)
+    urlLocation = None
+    if df is not None:
+      found = df[df['file'].str.match(searchString)]
+      if found is not None and found.size:
+
+        if found.shape[0] != 1:
+          raise ValueError('Error: too many search results')
+
+        xmlPath = found['path'].to_numpy()[0]
+        xmlFile = found['file'].to_numpy()[0]
+        urlLocation = ccpForgeUrl+os.path.join(xmlPath, xmlFile)
+      else:
+        raise
+    else:
+      raise
+
+    # r1 = urllib.urlopen(urlLocation)
 
     try:
-      dirData = r1.read()
-      r1.close()
 
-      # 20190321:ED skip if no directory has been found
-      import json
+      # https: // raw.githubusercontent.com / VuisterLab / CcpNmr - ChemComps / master / data / pdbe / chemComp / archive / ChemComp / protein /
+      # protein % 2 B004 % 2 Bpdbe_ccpnRef_2010 - 0 9 - 23 - 14 - 41 - 20 - 237_00001. xml
 
-      dirDataObj = json.loads(dirData)
-      if isinstance(dirDataObj, dict) and "message" in dirDataObj:
-        # check response from gitHub
-        if dirDataObj['message'] == 'Not Found':
-          return None
-
-      # continue with load
-      (urlLocation, chemCompXmlFile) = findCcpForgeDownloadLink(dirData,fileType,ccpCode,ccpForgeDownloadUrl)
+      # dirData = r1.read()
+      # r1.close()
+      #
+      # # 20190321:ED skip if no directory has been found
+      # import json
+      #
+      # dirDataObj = json.loads(dirData)
+      # if isinstance(dirDataObj, dict) and "message" in dirDataObj:
+      #   # check response from gitHub
+      #   if dirDataObj['message'] == 'Not Found':
+      #     return None
+      #
+      # # continue with load
+      # (urlLocation, chemCompXmlFile) = findCcpForgeDownloadLink(dirData,fileType,ccpCode,ccpForgeDownloadUrl)
       
       if urlLocation:
  
@@ -476,7 +534,8 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
             if not os.path.exists(saveChemCompPath):
               os.makedirs(saveChemCompPath)
   
-            chemCompFile = uniIo.joinPath(saveChemCompPath,chemCompXmlFile)
+            # chemCompFile = uniIo.joinPath(saveChemCompPath,chemCompXmlFile)
+            chemCompFile = uniIo.joinPath(saveChemCompPath, xmlFile)
             fout = open(chemCompFile,'w')
             fout.write(data)
             fout.close()
