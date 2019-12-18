@@ -495,7 +495,7 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
         xmlFile = found['file'].to_numpy()[0]
         urlLocation = ccpForgeUrl+os.path.join(xmlPath, xmlFile)
       else:
-        raise
+        return None         # nothing found, need to skip here to match original version
     else:
       raise
 
