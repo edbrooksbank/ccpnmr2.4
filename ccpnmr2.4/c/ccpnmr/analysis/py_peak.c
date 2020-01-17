@@ -483,7 +483,7 @@ PyObject *new_py_peak(Peak peak)
     if (!peak)
         RETURN_CHECK_OBJ_ERROR("allocating Peak object");
 
-#ifdef WIN32
+#ifdef WIN64
     Peak_type.ob_type = &PyType_Type;
 #endif
 
@@ -574,7 +574,7 @@ static PySequenceMethods Peak_sequence_methods =
 
 static PyTypeObject Peak_type =
 {
-#ifdef WIN32
+#ifdef WIN64
     1, NULL,
 #else
     PyObject_HEAD_INIT(&PyType_Type)

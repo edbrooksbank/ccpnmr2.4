@@ -1,4 +1,4 @@
-del --force *.pyd
+del *.pyd
 copy ..\\..\\..\\c\\memops\\global\\BlockFile.pyd BlockFile.pyd
 copy ..\\..\\..\\c\\memops\\global\\FitMethod.pyd FitMethod.pyd
 copy ..\\..\\..\\c\\memops\\global\\GlHandler.pyd GlHandler.pyd

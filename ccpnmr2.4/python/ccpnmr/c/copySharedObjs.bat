@@ -1,4 +1,4 @@
-rm -f *.pyd
+del *.pyd
 copy ..\\..\\..\\c\\ccpnmr\\analysis\\ContourFile.pyd ContourFile.pyd
 copy ..\\..\\..\\c\\ccpnmr\\analysis\\ContourLevels.pyd ContourLevels.pyd
 copy ..\\..\\..\\c\\ccpnmr\\analysis\\ContourStyle.pyd ContourStyle.pyd

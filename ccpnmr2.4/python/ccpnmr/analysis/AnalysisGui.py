@@ -110,10 +110,13 @@ def main(projectDir=None, cache_size=64, glDirect=None):
   top.update_idletasks() # much faster
   top.initProject(project)
 
-  return top
+  # return top
 
-#  if isWindowsOS():
-#    root.mainloop()
+  if isWindowsOS():
+    root.mainloop()
+
+  print('Finished...')
+  return top
 
 def usage():
 
@@ -195,7 +198,7 @@ Continuing...
       except Exception, e:
         print startupExecError % (traceback.format_exc(), startupFile)
         print e
-	sys.exit()
+        sys.exit()
     else:
       print missingStartupFileError % startupFile
 

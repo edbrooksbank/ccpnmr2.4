@@ -38,6 +38,10 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 
 ===========================REFERENCE END===============================
 */
+#ifdef WIN64
+#include <Windows.h>
+#endif
+
 #ifndef _incl_gl_handler
 #define _incl_gl_handler
 

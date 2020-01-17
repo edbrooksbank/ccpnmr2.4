@@ -71,15 +71,25 @@ LINK_FLAGS = $(WIN_FLAG) $(OPT_FLAG) $(FPIC_FLAG)
 
 # linking command for C libraries into Python world
 # (used for everything except Windows)
-LINK_LIBRARIES = sh linkSharedObjs
+#LINK_LIBRARIES = sh linkSharedObjs
 
 # copying command for C libraries into Python world
 # (used only for Windows)
 COPY_LIBRARIES = copySharedObjs.bat
 
+# Clean .pyd and .so files from python path
+# (used only for Windows)
+#CLEAN_PYD = del *.pyd
+#CLEAN_SO = del *.so
+
+# Clean .pyd and .so files from python path
+# (used for everything except Windows)
+CLEAN_PYD = rm -f *.pyd
+CLEAN_SO = rm -f *.so
+
 # specify whether or not you want to compile GL
 # use below if you want to compile GL
-IGNORE_GL_FLAG =
+IGNORE_GL_FLAG = -DNDEBUG
 # use below if you want to ignore GL
 #IGNORE_GL_FLAG = -DIGNORE_GL
 

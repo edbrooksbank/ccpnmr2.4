@@ -44,7 +44,7 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 #include "macros.h"
 #include "types.h"
 
-#ifdef WIN32
+#ifdef WIN64
 extern double acosh(double x);
 #endif
 

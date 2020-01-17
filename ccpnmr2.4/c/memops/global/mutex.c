@@ -42,13 +42,13 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 
 /* this needs to go first because on IRIX this includes sys/param.h
    and that defines MIN and MAX without checking whether already defined */
-#ifndef WIN32
+#ifndef WIN64
 #include <pthread.h>
 #endif
 
 #include "mutex.h"
 
-#ifdef WIN32
+#ifdef WIN64
 
 #include <windows.h>
 

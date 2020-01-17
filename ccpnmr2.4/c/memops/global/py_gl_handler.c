@@ -40,7 +40,7 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 */
 #include "py_gl_handler.h"
 
-#ifdef WIN32
+#ifdef WIN64
 #include <windows.h>
 #endif /* end WIN32 */
 
@@ -645,7 +645,7 @@ static PySequenceMethods Gl_handler_sequence_methods =
 
 static PyTypeObject Gl_handler_type =
 {
-#ifdef WIN32
+#ifdef WIN64
     1, NULL,
 #else
     PyObject_HEAD_INIT(&PyType_Type)
@@ -715,7 +715,7 @@ PY_MOD_INIT_FUNC initGlHandler(void)
 {
     PyObject *m, *d;
 
-#ifdef WIN32
+#ifdef WIN64
     Gl_handler_type.ob_type = &PyType_Type;
 #endif
     /* create the module and add the functions */

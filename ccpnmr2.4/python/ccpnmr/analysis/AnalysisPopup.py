@@ -2862,7 +2862,7 @@ class AnalysisPopup(BasePopup, Analysis):
 
   def destroy(self):
   
-    Analysis.destroy(self)
+    # Analysis.destroy(self)
     BasePopup.destroy(self)
 
   def quit(self):
@@ -2885,7 +2885,7 @@ class AnalysisPopup(BasePopup, Analysis):
     # where the commend line was getting screwed up on exit.
     if os.name == 'posix':
       os.system('stty sane')
-      
+
     sys.exit(0)
 
   def projectSummary(self):

@@ -42,7 +42,7 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 
 #ifndef IGNORE_GL
 
-#ifdef WIN32
+#ifdef WIN64
 #include <windows.h>
 #include <tkPlatDecls.h>
 #else
@@ -50,7 +50,7 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 #endif /* end WIN32 */
 
 #include <GL/gl.h>
-#ifdef WIN3
+#ifdef WIN64
 #include <GL/glu.h>
 #endif
 
@@ -119,7 +119,7 @@ typedef struct Gl_handler_p
     Tk_Window tk_win;
     Tcl_Interp *interp;
     Display *display;
-#ifdef WIN32
+#ifdef WIN64
     HWND hWnd;
     HGLRC hGLRC;
 #else
@@ -435,7 +435,7 @@ Gl_handler new_gl_handler(Tcl_Interp *interp, Tk_Window tk_win, Bool direct, Boo
     Gl_handler gl_handler;
     Gl_handler_p gl_handler_p;
     Display *display;
-#ifdef WIN32
+#ifdef WIN64
     HWND hWnd;
     HGLRC hGLRC;
     int  iPixelFormat;
@@ -471,7 +471,7 @@ that called GetDC. The number of DCs is limited only by available memory.
     /* below seems to crash GL on some systems (at least OSX...) */
     /* glGetError(); */ /* remove existing errors */
 
-#ifdef WIN32
+#ifdef WIN64
     memset( &pfd, 0, sizeof(PIXELFORMATDESCRIPTOR) );
     pfd.nSize       = sizeof(PIXELFORMATDESCRIPTOR);   // size of this pfd 
     pfd.nVersion    = 1;                               // version number 
@@ -559,7 +559,7 @@ that called GetDC. The number of DCs is limited only by available memory.
     gl_handler_p->tk_win = tk_win;
     gl_handler_p->interp = interp;
     gl_handler_p->display = display;
-#ifdef WIN32
+#ifdef WIN64
     gl_handler_p->hWnd = hWnd;
     gl_handler_p->hGLRC = hGLRC;
 #else
@@ -618,7 +618,7 @@ void delete_gl_handler(Gl_handler gl_handler)
     {
         end_gl_handler(gl_handler);
 
-#ifdef WIN32
+#ifdef WIN64
         if (gl_handler_p->hGLRC)
         {
             if( wglMakeCurrent(NULL, NULL) == FALSE)
@@ -826,7 +826,7 @@ Bool make_current_gl_handler(Gl_handler gl_handler)
     /* below seems to crash GL on some systems (at least OSX...) */
     /* glGetError(); */ /* remove existing errors */
 
-#ifdef WIN32
+#ifdef WIN64
     HDC hDC;
     if((hDC = GetDC(gl_handler_p->hWnd)) == NULL) 
     	printf("make_current_gl_handler: GetDC failed\n");
@@ -871,7 +871,7 @@ Bool make_current_gl_handler(Gl_handler gl_handler)
 
 void swap_buffers_gl_handler(Gl_handler gl_handler)
 {
-#ifdef WIN32
+#ifdef WIN64
     HDC hDC;
 #endif
     Gl_handler_p gl_handler_p = (Gl_handler_p) gl_handler;
@@ -882,7 +882,7 @@ void swap_buffers_gl_handler(Gl_handler gl_handler)
     if (!make_current_gl_handler(gl_handler))
         return;
 
-#ifdef WIN32
+#ifdef WIN64
     if((hDC = GetDC(gl_handler_p->hWnd)) == NULL) 
         printf("swap_buffers_gl_handler: GetDC failed\n");
     /* SwapBuffers(hDC); */

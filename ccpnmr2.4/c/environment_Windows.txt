@@ -23,7 +23,7 @@ RM = DEL /f
 # compiler flags
 
 # Windows specific flag
-WIN_FLAG = /DWIN64 /DNDEBUG
+WIN_FLAG = /DWIN64 /MD
 
 # use below for everything with malloc.h
 MALLOC_FLAG =
@@ -47,22 +47,6 @@ LINK_FLAGS = $(WIN_FLAG) $(OPT_FLAG) $(FPIC_FLAG)
 # copying command for C libraries into Python world
 COPY_LIBRARIES = copySharedObjs.bat
 
-# Clean .pyd and .so files from python path
-# (used only for Windows)
-CLEAN_PYD = del *.pyd
-CLEAN_SO = del *.so
-
-# use below if you want to ignore GL
-# use below if you want to compile GL
-IGNORE_GL_FLAG =
-# use below if you want to ignore GL
-#IGNORE_GL_FLAG = -DIGNORE_GL
-GL_FLAG = -DUSE_GL_FALSE
-
-GLUT_NEED_INIT = -DNEED_GLUT_INIT
-GLUT_NOT_IN_GL = -DGLUT_IN_OWN_DIR
-GLUT_FLAG = $(GLUT_NEED_INIT) $(GLUT_NOT_IN_GL)
-
 # math
 MATH_LIB =
 
@@ -72,11 +56,10 @@ PYTHON_VERSION = 27
 # for Unix do not seem to need PYTHON_LIB
 # for Windows seem to need below (or similar)
 #PYTHON_LIB = -lpython$(PYTHON_VERSION)
-#PYTHON_LIB = $(PYTHON_DIR)\libs\python27.lib $(PYTHON_DIR)\Library\lib\tk86t.lib $(PYTHON_DIR)\Library\lib\tcl86t.lib $(PYTHON_DIR)\Library\lib\freeglut.lib Gdi32.lib User32.lib
-PYTHON_LIB = $(PYTHON_DIR)\libs\python27.lib $(PYTHON_DIR)\tcl\tk85.lib $(PYTHON_DIR)\tcl\tcl85.lib $(PYTHON_DIR)\Library\lib\freeglut.lib Gdi32.lib User32.lib
+PYTHON_LIB = $(PYTHON_DIR)\libs\python27.lib
 
-#PYTHON_INCLUDE_FLAGS = /I$(PYTHON_DIR)\include /I$(PYTHON_DIR)\Lib\site-packages\numpy\core\include\numpy /I$(PYTHON_DIR)\Library\include /I$(PYTHON_DIR)\Library\include\GL
-PYTHON_INCLUDE_FLAGS = /I$(PYTHON_DIR)\include /I$(PYTHON_DIR)\Lib\site-packages\numpy\core\include\numpy /I$(PYTHON_DIR)\Library\include /I$(PYTHON_DIR)\Library\include\GL /I$(PYTHON_DIR)\Library\mingw-w64\include
+# PYTHON_INCLUDE_FLAGS = /I$(PYTHON_DIR)\include /I$(PYTHON_DIR)\Lib\site-packages /I$(PYTHON_DIR)\Lib\site-packages\numpy\core\include\numpy
+PYTHON_INCLUDE_FLAGS = /I$(PYTHON_DIR)\include /I$(PYTHON_DIR)\Lib\site-packages\numpy\core\include\numpy
 
 # for Unix do not seem to need PYTHON_LIB_FLAGS
 # PYTHON_LIB_FLAGS = -L$(PYTHON_DIR)\lib\python$(PYTHON_VERSION)\config-$(PYTHON_VERSION)m

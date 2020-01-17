@@ -320,7 +320,7 @@ PY_MOD_INIT_FUNC initMeccano()
 {
     PyObject *m, *d;
 
-#ifdef WIN32
+#ifdef WIN64
     Meccano_type.ob_type = &PyType_Type;
 #endif
     /* create the module and add the functions */

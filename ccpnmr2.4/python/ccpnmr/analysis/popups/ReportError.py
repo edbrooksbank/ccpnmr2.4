@@ -43,6 +43,7 @@ import re
 import os.path
 import traceback
 import os
+import platform
 import sys
 
 import string, Tkinter, time
@@ -113,8 +114,9 @@ class ReportErrorPopup(BasePopup):
     frame1.grid_rowconfigure(3, weight=1)
     frame1.grid_rowconfigure(4, weight=1)
     frame1.grid_rowconfigure(5, weight=1)
-    
-    Label(frame1, text='Platform: '+self.platform+' '+' '.join(os.uname()[:-1]), sticky = 'nw', grid=(0,0))
+
+    uname = platform.uname()
+    Label(frame1, text='Platform: '+self.platform+' '+' '.join(uname[:-1]), sticky = 'nw', grid=(0,0))
     Label(frame1, text='Python version: '+sys.version, sticky = 'nw', grid=(1,0))
     Label(frame1, text='Analysis version: '+self.analysisVesion, sticky = 'nw', grid=(2,0))
     
