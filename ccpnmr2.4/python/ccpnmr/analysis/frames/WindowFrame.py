@@ -161,8 +161,9 @@ class WindowFrame(Frame, WindowDraw):
       useGl = True
     elif GlHandler and TkHandler:
       graphicsHandler = profile.graphicsHandler
-      
-      if (graphicsHandler == 'OpenGL'):
+
+      # NOTE:ED - force mode to OpenGL, Tk is FAR too slow
+      if (graphicsHandler == 'OpenGL') or True:
         handlerClass = GlHandler.GlHandler
         useGl = True
       else:
