@@ -1010,6 +1010,7 @@ class WindowDraw:
         if hasattr(handler, 'hasFont'):
           thisFont = handler.hasFont()
           if thisFont and thisFont in (('Roman', 1), ('MonoRoman', 1)):
+            # CHECK THIS CONDITION
             self.setHandlerFont(handler, spectrumFontName, spectrumFontSize)
 
         winPeakList.cWinPeakList.drawPeaks(handler, xdim, ydim, xpix, ypix,
