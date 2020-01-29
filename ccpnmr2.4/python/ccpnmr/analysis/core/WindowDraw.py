@@ -1005,7 +1005,13 @@ class WindowDraw:
             self.setHandlerFont(handler, name, size)
         else:
           self.setHandlerFont(handler, spectrumFontName, spectrumFontSize)
-          
+
+        # NOTE:ED - sometimes the font is defined as a strokeFont which gives a freeGlut error
+        if hasattr(handler, 'hasFont'):
+          thisFont = handler.hasFont()
+          if thisFont and thisFont in (('Roman', 1), ('MonoRoman', 1)):
+            self.setHandlerFont(handler, spectrumFontName, spectrumFontSize)
+
         winPeakList.cWinPeakList.drawPeaks(handler, xdim, ydim, xpix, ypix,
                                  xscale, yscale, firstFloat, lastFloat,
                                  drawMethod, intensityMax, volumeMax,

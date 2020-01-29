@@ -114,8 +114,8 @@ def main(projectDir=None, cache_size=64, glDirect=None):
 
   if isWindowsOS():
     root.mainloop()
+    print('Finished...')
 
-  print('Finished...')
   return top
 
 def usage():

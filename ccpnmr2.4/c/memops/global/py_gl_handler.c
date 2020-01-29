@@ -448,6 +448,24 @@ static PyObject *resetLineWidth(PyObject *self, PyObject *args)
     return Py_None;
 }
 
+static PyObject *hasFont(PyObject *self)
+{
+    Py_Gl_handler obj = (Py_Gl_handler) self;
+    Gl_handler gl_handler = obj->gl_handler;
+    int size;
+    Line name;
+
+    if (has_font_gl_handler(gl_handler, &name, &size) == CCPN_TRUE) {
+//        Py_INCREF(Py_True);
+//        return Py_True;
+        return Py_BuildValue("(si)", name, size);
+    }
+    else {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+}
+
 static PyObject *setFont(PyObject *self, PyObject *args)
 {
     Py_Gl_handler obj = (Py_Gl_handler) self;
@@ -529,6 +547,7 @@ static struct PyMethodDef py_handler_methods[] =
     { "setWhite",	setWhite,		METH_VARARGS },
     { "setLineWidth",	setLineWidth,		METH_VARARGS },
     { "resetLineWidth",	resetLineWidth,		METH_VARARGS },
+    { "hasFont",        hasFont,                METH_VARARGS },
     { "setFont",        setFont,                METH_VARARGS },
     { "getRegion",      getRegion,              METH_VARARGS },
     { "setIsDoubleBuffer",      setIsDoubleBuffer,              METH_VARARGS },

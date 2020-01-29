@@ -1395,6 +1395,19 @@ void reset_line_width_gl_handler(Gl_handler gl_handler)
     set_line_width_gl_handler(gl_handler, DEFAULT_LINEWIDTH);
 }
 
+CcpnStatus has_font_gl_handler(Gl_handler gl_handler, CcpnString name, int *size)
+{
+    Gl_handler_p gl_handler_p = (Gl_handler_p) gl_handler;
+
+    if (gl_handler_p->glutFont != NULL) {
+        *size = gl_handler_p->glutFont->size;
+        sprintf(name, gl_handler_p->glutFont->name);
+	    return CCPN_TRUE;
+    }
+	else
+	    return CCPN_FALSE;
+}
+
 CcpnStatus set_font_gl_handler(Gl_handler gl_handler, CcpnString name, int size)
 {
     Gl_handler_p gl_handler_p = (Gl_handler_p) gl_handler;

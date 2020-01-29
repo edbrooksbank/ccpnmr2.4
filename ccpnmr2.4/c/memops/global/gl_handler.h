@@ -152,6 +152,8 @@ extern void set_line_width_gl_handler(Gl_handler gl_handler, float line_width);
 
 extern void reset_line_width_gl_handler(Gl_handler gl_handler);
 
+extern CcpnStatus has_font_gl_handler(Gl_handler gl_handler, CcpnString name, int *size);
+
 extern CcpnStatus set_font_gl_handler(Gl_handler gl_handler, CcpnString name, int size);
 
 extern void get_region_gl_handler(Gl_handler gl_handler, float *x0, float *y0,

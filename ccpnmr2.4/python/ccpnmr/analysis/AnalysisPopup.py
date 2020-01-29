@@ -2622,7 +2622,8 @@ class AnalysisPopup(BasePopup, Analysis):
     self.destroyPopups()
     # self.argServer cleaned up in below
     Analysis.closeProject(self)
- 
+    # self.closeProject()
+
     return True
 
   def destroyPopups(self):
