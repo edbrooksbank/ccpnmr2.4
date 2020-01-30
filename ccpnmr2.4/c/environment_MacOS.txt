@@ -1,4 +1,4 @@
-PYTHON_DIR = /Users/ejb66/PycharmProjects/Git/ccpnmr/miniconda
+# should work if suitably edited for Linux, Irix, Solaris, OSX, Windows
 
 # general rules:
 # *_LIB = required library or libraries (use -l or equivalen)

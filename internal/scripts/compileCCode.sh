@@ -35,10 +35,10 @@ check_darwin
 # copy the correct environment file
 
 echo "compiling C Code"
-cd "${CCPNMR_TOP_DIR}/src/c" || exit
+cd "${CCPNMR_TOP_DIR}/ccpnmr2.4/c" || exit
 
-echo "using environment_default_${MACHINE}${MACOSAPPEND}.txt"
-if [[ ! -f environment_default_${MACHINE}${MACOSAPPEND}.txt ]]; then
+echo "using environment_${MACHINE}.txt"
+if [[ ! -f environment_${MACHINE}.txt ]]; then
   echo "environment doesn't exists with this name, please copy closest and re-run compileCCode"
   exit
 fi
@@ -48,9 +48,9 @@ fi
 echo "setting up environment file"
 # CONDA_PATH="PYTHON_DIR = $(which python | rev | cut -d'/' -f3- | rev)"
 CONDA_PATH="PYTHON_DIR = ${ANACONDA3}"
-cp "environment_default_${MACHINE}${MACOSAPPEND}.txt" environment.txt
+cp "environment_${MACHINE}.txt" environment.txt
 error_check
 sed -i.bak "1 s|^.*$|${CONDA_PATH}|" environment.txt && rm -rf environment.txt.bak
 
 echo "making"
-make -B $*
+#make -B $*
