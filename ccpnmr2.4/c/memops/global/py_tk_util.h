@@ -41,6 +41,7 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 #ifndef _incl_py_tk_util
 #define _incl_py_tk_util
 
+#include <tcl.h>
 #include <tk.h>
 
 #include "Python.h"

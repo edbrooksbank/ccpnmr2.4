@@ -40,7 +40,7 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 */
 #include "py_gl_handler.h"
 
-#ifdef WIN32
+#ifdef WIN64
 #include <windows.h>
 #endif /* end WIN32 */
 
@@ -448,6 +448,24 @@ static PyObject *resetLineWidth(PyObject *self, PyObject *args)
     return Py_None;
 }
 
+static PyObject *hasFont(PyObject *self)
+{
+    Py_Gl_handler obj = (Py_Gl_handler) self;
+    Gl_handler gl_handler = obj->gl_handler;
+    int size;
+    Line name;
+
+    if (has_font_gl_handler(gl_handler, &name, &size) == CCPN_TRUE) {
+//        Py_INCREF(Py_True);
+//        return Py_True;
+        return Py_BuildValue("(si)", name, size);
+    }
+    else {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+}
+
 static PyObject *setFont(PyObject *self, PyObject *args)
 {
     Py_Gl_handler obj = (Py_Gl_handler) self;
@@ -529,6 +547,7 @@ static struct PyMethodDef py_handler_methods[] =
     { "setWhite",	setWhite,		METH_VARARGS },
     { "setLineWidth",	setLineWidth,		METH_VARARGS },
     { "resetLineWidth",	resetLineWidth,		METH_VARARGS },
+    { "hasFont",        hasFont,                METH_VARARGS },
     { "setFont",        setFont,                METH_VARARGS },
     { "getRegion",      getRegion,              METH_VARARGS },
     { "setIsDoubleBuffer",      setIsDoubleBuffer,              METH_VARARGS },
@@ -645,7 +664,7 @@ static PySequenceMethods Gl_handler_sequence_methods =
 
 static PyTypeObject Gl_handler_type =
 {
-#ifdef WIN32
+#ifdef WIN64
     1, NULL,
 #else
     PyObject_HEAD_INIT(&PyType_Type)
@@ -715,7 +734,7 @@ PY_MOD_INIT_FUNC initGlHandler(void)
 {
     PyObject *m, *d;
 
-#ifdef WIN32
+#ifdef WIN64
     Gl_handler_type.ob_type = &PyType_Type;
 #endif
     /* create the module and add the functions */

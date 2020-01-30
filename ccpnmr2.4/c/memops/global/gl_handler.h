@@ -38,6 +38,10 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 
 ===========================REFERENCE END===============================
 */
+#ifdef WIN64
+#include <Windows.h>
+#endif
+
 #ifndef _incl_gl_handler
 #define _incl_gl_handler
 
@@ -147,6 +151,8 @@ extern void set_white_gl_handler(Gl_handler gl_handler);
 extern void set_line_width_gl_handler(Gl_handler gl_handler, float line_width);
 
 extern void reset_line_width_gl_handler(Gl_handler gl_handler);
+
+extern CcpnStatus has_font_gl_handler(Gl_handler gl_handler, CcpnString name, int *size);
 
 extern CcpnStatus set_font_gl_handler(Gl_handler gl_handler, CcpnString name, int size);
 

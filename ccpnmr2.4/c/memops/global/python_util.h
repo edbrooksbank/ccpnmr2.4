@@ -63,10 +63,10 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 	{   DEBUG_CODE_HEX("py_free", obj); \
             PyObject_DEL(obj);   }
 
-#ifdef WIN32
+#ifdef WIN64
 #define PY_MOD_INIT_FUNC PyMODINIT_FUNC
 #else
-#define PY_MOD_INIT_FUNC void
+#define PY_MOD_INIT_FUNC PyMODINIT_FUNC
 #endif
             
 extern Bool valid_py_object

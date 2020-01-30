@@ -46,11 +46,11 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#ifndef WIN32
+#ifndef WIN64
 #include <sys/types.h>
 #endif /* WIN32 */
 
-#ifdef WIN32
+#ifdef WIN64
 #define  DIRECTORY_SYMBOL  '\\'
 extern int truncate(char *file, long length);
 extern void sleep(int seconds);
@@ -232,7 +232,7 @@ extern int fseek_relative_safe(FILE *fp, long int offset);
 #define  FSEEK_RELATIVE_SIZE(fp, nwords, size) \
 	 fseek(fp, (long int) ((nwords)*(size)), SEEK_CUR)
 
-#ifdef WIN32
+#ifdef WIN64
 #define  FSEEK_RELATIVE_BYTES(fp, nbytes) \
          _fseeki64(fp, (__int64) (nbytes), SEEK_CUR)
 #else /* not WIN32 */
@@ -256,7 +256,7 @@ extern int fseek_relative_safe(FILE *fp, long int offset);
 #define  FSEEK_ABSOLUTE(fp, nwords) \
 	 fseek(fp, (long int) ((nwords)*BYTES_PER_WORD), SEEK_SET)
 
-#ifdef WIN32
+#ifdef WIN64
 #define  FSEEK_ABSOLUTE_BYTES(fp, nbytes) \
         _fseeki64(fp, (__int64) (nbytes), SEEK_SET)
 #else /* not WIN32 */

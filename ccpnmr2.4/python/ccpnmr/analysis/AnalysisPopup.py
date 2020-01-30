@@ -2712,7 +2712,8 @@ class AnalysisPopup(BasePopup, Analysis):
     self.destroyPopups()
     # self.argServer cleaned up in below
     Analysis.closeProject(self)
- 
+    # self.closeProject()
+
     return True
 
   def destroyPopups(self):
@@ -2952,7 +2953,7 @@ class AnalysisPopup(BasePopup, Analysis):
 
   def destroy(self):
   
-    Analysis.destroy(self)
+    # Analysis.destroy(self)
     BasePopup.destroy(self)
 
   def quit(self):
@@ -2975,7 +2976,7 @@ class AnalysisPopup(BasePopup, Analysis):
     # where the commend line was getting screwed up on exit.
     if os.name == 'posix':
       os.system('stty sane')
-      
+
     sys.exit(0)
 
   def projectSummary(self):

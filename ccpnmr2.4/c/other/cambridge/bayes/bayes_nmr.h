@@ -44,7 +44,7 @@ for further information, please contact :
 #include <time.h>
 #include <sys/types.h>
 
-#ifdef WIN32
+#ifdef WIN64
 #include <float.h>  /* for _isnan routine */
 #endif
 

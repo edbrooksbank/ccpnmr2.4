@@ -4789,7 +4789,7 @@ class WindowFrame(Frame, WindowDraw):
 
     except WindowTimeoutException:
 
-      print 'drawCanvasReal: about to single buffer doCanvas', self.windowPane.name
+      #print 'drawCanvasReal: about to single buffer doCanvas', self.windowPane.name
       canvas.doubleBuffer = False
       handler.setIsDoubleBuffer(0)
 

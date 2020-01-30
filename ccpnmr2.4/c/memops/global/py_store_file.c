@@ -183,7 +183,7 @@ static PySequenceMethods Store_file_sequence_methods =
 
 static PyTypeObject Store_file_type =
 {
-#ifdef WIN32
+#ifdef WIN64
     1, NULL,
 #else
     PyObject_HEAD_INIT(&PyType_Type)
@@ -249,7 +249,7 @@ PY_MOD_INIT_FUNC initStoreFile(void)
 {
     PyObject *m, *d;
 
-#ifdef WIN32
+#ifdef WIN64
     Store_file_type.ob_type = &PyType_Type;
 #endif
     /* create the module and add the functions */

@@ -239,7 +239,7 @@ int bayesNMR(
     MALLOC(data, double, Ndata);
     for(i = 0; i < Ndata; i++)
     {
-#ifdef WIN32 
+#ifdef WIN64
         if( _isnan( data_flt[i]) )
 #else      
         if( isnan( data_flt[i]) )
@@ -293,7 +293,7 @@ int bayesNMR(
         Accuracy[i] = min_height;
         UserSpec->MeanData += (long double) data[i] /* * 1.0E-28*/;
     }
-#ifdef WIN32 
+#ifdef WIN64
         if( _isnan(UserSpec->MeanData) )
 #else      
         if( isnan(UserSpec->MeanData) )

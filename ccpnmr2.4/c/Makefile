@@ -90,6 +90,34 @@ ccpnmr_copies:
 other_copies:
 	cd ../python/cambridge/c && $(COPY_LIBRARIES)
 
+cleanpyd: memops_pyd ccp_pyd ccpnmr_pyd other_pyd
+
+memops_pyd:
+	cd ../python/memops/c && $(CLEAN_PYD)
+
+ccp_pyd:
+	cd ../python/ccp/c && $(CLEAN_PYD)
+
+ccpnmr_pyd:
+	cd ../python/ccpnmr/c && $(CLEAN_PYD)
+
+other_pyd:
+	cd ../python/cambridge/c && $(CLEAN_PYD)
+
+cleanso: memops_so ccp_so ccpnmr_so other_so
+
+memops_so:
+	cd ../python/memops/c && $(CLEAN_SO)
+
+ccp_so:
+	cd ../python/ccp/c && $(CLEAN_SO)
+
+ccpnmr_so:
+	cd ../python/ccpnmr/c && $(CLEAN_SO)
+
+other_so:
+	cd ../python/cambridge/c && $(CLEAN_SO)
+
 #test:
 #	$(PYTHON_DIR)/bin/python 
 

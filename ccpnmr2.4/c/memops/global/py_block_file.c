@@ -737,7 +737,7 @@ static PySequenceMethods Block_file_sequence_methods =
 
 static PyTypeObject Block_file_type =
 {
-#ifdef WIN32
+#ifdef WIN64
     1, NULL,
 #else
     PyObject_HEAD_INIT(&PyType_Type)
@@ -758,7 +758,7 @@ static PyTypeObject Block_file_type =
 
 static PyTypeObject Shape_block_file_type =
 {
-#ifdef WIN32
+#ifdef WIN64
     1, NULL,
 #else
     PyObject_HEAD_INIT(&PyType_Type)
@@ -904,7 +904,7 @@ PY_MOD_INIT_FUNC initBlockFile(void)
 {
     PyObject *m, *d;
 
-#ifdef WIN32
+#ifdef WIN64
     Block_file_type.ob_type = &PyType_Type;
 #endif
     /* create the module and add the functions */

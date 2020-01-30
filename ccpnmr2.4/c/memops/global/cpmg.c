@@ -14,7 +14,7 @@ typedef struct _CpmgParam
     float *y;
 }  Cpmg_param;
 
-#ifdef WIN32
+#ifdef WIN64
 double acosh(double x)
 {
     if (x < 1)

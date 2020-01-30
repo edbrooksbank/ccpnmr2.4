@@ -282,7 +282,7 @@ PyObject *new_py_peak_cluster(int ndim, int type)
     if (!peak_cluster)
         RETURN_OBJ_ERROR("allocating Peak_cluster object");
 
-#ifdef WIN32
+#ifdef WIN64
     Peak_cluster_type.ob_type = &PyType_Type;
 #endif
 
@@ -368,7 +368,7 @@ static PySequenceMethods Peak_sequence_methods =
 
 static PyTypeObject Peak_cluster_type =
 {
-#ifdef WIN32
+#ifdef WIN64
     1, NULL,
 #else
     PyObject_HEAD_INIT(&PyType_Type)
@@ -435,7 +435,7 @@ PY_MOD_INIT_FUNC initPeakCluster(void)
 {
     PyObject *m, *d;
 
-#ifdef WIN32
+#ifdef WIN64
     Peak_cluster_type.ob_type = &PyType_Type;
 #endif
     /* create the module and add the functions */

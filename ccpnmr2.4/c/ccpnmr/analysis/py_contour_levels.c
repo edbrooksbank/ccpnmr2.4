@@ -179,7 +179,7 @@ static PySequenceMethods Contour_levels_sequence_methods =
 
 static PyTypeObject Contour_levels_type =
 {
-#ifdef WIN32
+#ifdef WIN64
     1, NULL,
 #else
     PyObject_HEAD_INIT(&PyType_Type)
@@ -245,7 +245,7 @@ PY_MOD_INIT_FUNC initContourLevels(void)
 {
     PyObject *m, *d;
 
-#ifdef WIN32
+#ifdef WIN64
     Contour_levels_type.ob_type = &PyType_Type;
 #endif
     /* create the module and add the functions */

@@ -38,7 +38,7 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 ===========================REFERENCE END===============================
 
 */
-#ifdef WIN32
+#ifdef WIN64
 #include <windows.h>
 #include "w32func.h"
 #include "consts.h"

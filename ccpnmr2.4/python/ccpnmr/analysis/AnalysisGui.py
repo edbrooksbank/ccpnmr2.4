@@ -198,7 +198,7 @@ Continuing...
       except Exception, e:
         print startupExecError % (traceback.format_exc(), startupFile)
         print e
-      sys.exit()
+        sys.exit()
     else:
       print missingStartupFileError % startupFile
 

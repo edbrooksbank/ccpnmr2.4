@@ -226,7 +226,7 @@ static PySequenceMethods Shape_file_sequence_methods =
 
 static PyTypeObject Shape_file_type =
 {
-#ifdef WIN32
+#ifdef WIN64
     1, NULL,
 #else
     PyObject_HEAD_INIT(&PyType_Type)
@@ -293,7 +293,7 @@ PY_MOD_INIT_FUNC initShapeFile(void)
 {
     PyObject *m, *d;
 
-#ifdef WIN32
+#ifdef WIN64
     Shape_file_type.ob_type = &PyType_Type;
 #endif
     /* create the module and add the functions */

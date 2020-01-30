@@ -467,7 +467,8 @@ class Analysis:
 
     for expt in self.nmrProject.experiments:
       for spectrum in expt.dataSources:
-        self.deleteBlockFile(spectrum)
+        # NOTE:ED - causes fatal crash
+        # self.deleteBlockFile(spectrum)
 
         for peakList in spectrum.peakLists:
           self.removeCPeakList(peakList)
@@ -492,7 +493,9 @@ class Analysis:
 
     self.argServer.destroy()
     self.argumentServer = self.argServer = None
+    # NOTE:ED testing destruction error
     Analysis.destroy(self, closingProject=True)
+    # self.destroy(closingProject=True)
 
   def updateStripRegion(self, axisRegion):
 
@@ -1225,7 +1228,8 @@ class Analysis:
       return
 
     try:
-      del spectrum.block_file
+      if hasattr(spectrum, 'block_file'):
+        del spectrum.block_file
     except:
       pass
 

@@ -374,7 +374,7 @@ static PySequenceMethods Ps_handler_sequence_methods =
 
 static PyTypeObject Ps_handler_type =
 {
-#ifdef WIN32
+#ifdef WIN64
     1, NULL,
 #else
     PyObject_HEAD_INIT(&PyType_Type)
@@ -440,7 +440,7 @@ PY_MOD_INIT_FUNC initPsHandler(void)
 {
     PyObject *m, *d;
 
-#ifdef WIN32
+#ifdef WIN64
     Ps_handler_type.ob_type = &PyType_Type;
 #endif
     /* create the module and add the functions */

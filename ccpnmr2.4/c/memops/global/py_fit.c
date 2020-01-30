@@ -256,7 +256,7 @@ static PySequenceMethods Fit_method_sequence_methods =
 
 static PyTypeObject Fit_method_type =
 {
-#ifdef WIN32
+#ifdef WIN64
     1, NULL,
 #else
     PyObject_HEAD_INIT(&PyType_Type)
@@ -646,7 +646,7 @@ PY_MOD_INIT_FUNC initFitMethod(void)
 {
     PyObject *m, *d;
 
-#ifdef WIN32
+#ifdef WIN64
     Fit_method_type.ob_type = &PyType_Type;
 #endif
     /* create the module and add the functions */

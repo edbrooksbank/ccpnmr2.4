@@ -113,7 +113,7 @@ static CcpnStatus read_block_data(Block_file block_file, Block_data block_data)
     int i, j, k1, k2, m1, m2;
     Integer offset, block;
 
-#ifndef WIN32
+#ifndef WIN64
     if (!block_file->fp)
 	return CCPN_ERROR;
 #else
