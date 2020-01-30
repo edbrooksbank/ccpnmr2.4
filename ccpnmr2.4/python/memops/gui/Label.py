@@ -112,7 +112,7 @@ if (__name__ == '__main__'):
 
   root = Tkinter.Tk()
  
-  label = Label(root, text='hello world')
+  label = Label(root, text='hello world', relief='raised')
   label.grid()
   button = Button(root, text='hit me', command=func)
   button.grid()

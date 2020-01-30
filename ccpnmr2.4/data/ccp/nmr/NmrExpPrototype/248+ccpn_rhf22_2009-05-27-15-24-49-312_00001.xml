@@ -123,11 +123,16 @@
       <NMRX.ExpMeasurement.atomSites> _10</NMRX.ExpMeasurement.atomSites>
       <NMRX.ExpMeasurement.expSteps> _18 _22</NMRX.ExpMeasurement.expSteps>
     </NMRX.ExpMeasurement>
+
+<!--    # 20191219: ED removed for testing - causes warnings in Nef loader-->
+<!--
     <NMRX.ExpMeasurement _ID="_39" serial="7">
       <NMRX.ExpMeasurement.measurementType>
         <NMRX.ExpMeasurementType>Shift</NMRX.ExpMeasurementType>
       </NMRX.ExpMeasurement.measurementType>
     </NMRX.ExpMeasurement>
+-->
+
   </NMRX.NmrExpPrototype.expMeasurements>
   <NMRX.NmrExpPrototype.refExperiments>
     <NMRX.RefExperiment _ID="_40" serial="1">

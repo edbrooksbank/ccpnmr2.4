@@ -469,8 +469,8 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
 
     outFile = os.path.join('.', zipName+ext)
 
-    # need to concatenate path / ccpnmr2.4 / file / .extension
-    fileList = [os.path.join('.', 'ccpnmr2.4', fp) for fp in self._allFiles]
+    # need to concatenate path / ccpnmr2.5 / file / .extension
+    fileList = [os.path.join('.', 'ccpnmr2.5', fp) for fp in self._allFiles]
 
     if fileList:
       # generate the call list for compressing the files

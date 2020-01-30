@@ -56,6 +56,10 @@ import Tkinter
 from memops.gui.Base import Base
 from memops.gui.Color import getIntRgb
 
+DEFAULTBACKGROUND = 'grey82'
+DEFAULTMIDCOLOR = 'grey90'
+
+
 # this extends the Tkinter.Button class with a few extra functions
 class Button(Tkinter.Button, Base):
 
@@ -67,8 +71,8 @@ class Button(Tkinter.Button, Base):
 
     self.font = kw.get('font')
     if not kw.has_key('bg'):
-      kw['bg'] = 'grey82'
-      
+      kw['bg'] = DEFAULTBACKGROUND
+
     if not kw.get('activebackground'):
       kw['activebackground'] = '#D0B0A0'
 
@@ -76,11 +80,11 @@ class Button(Tkinter.Button, Base):
       kw['highlightthickness'] = 1
 
     if not kw.get('highlightbackground'):
-      kw['highlightbackground'] = 'grey90'
+      kw['highlightbackground'] = DEFAULTMIDCOLOR
 
     if not kw.get('highlightcolor'):
-      kw['highlightcolor'] = 'grey90'
-      
+      kw['highlightcolor'] = DEFAULTMIDCOLOR
+
     if kw.has_key('command'):
       self.buttonCommand = kw['command']
     else:

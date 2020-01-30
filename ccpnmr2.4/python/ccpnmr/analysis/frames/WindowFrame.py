@@ -41,7 +41,7 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 """
 import math
 import time
-
+import sys
 import Tkinter
 
 from memops.general import Implementation
@@ -162,12 +162,25 @@ class WindowFrame(Frame, WindowDraw):
     elif GlHandler and TkHandler:
       graphicsHandler = profile.graphicsHandler
       
-      if (graphicsHandler == 'OpenGL'):
+      # NOTE:ED - MacOS only works with Tk
+      #           Windows only works with OpenGL
+      #             not checked linux yet.
+      thisOS = sys.platform[:3].lower()
+      if thisOS == 'win':
         handlerClass = GlHandler.GlHandler
         useGl = True
-      else:
+      elif thisOS == 'ZZZdar':
         handlerClass = TkHandler.TkHandler
         useGl = False
+      else:
+        # linux/other version here - use graphics handler option
+        if (graphicsHandler == 'OpenGL'):
+          handlerClass = GlHandler.GlHandler
+          useGl = True
+        else:
+          handlerClass = TkHandler.TkHandler
+          useGl = False
+
     else:
       useGl = False  # arbitrary
       handlerClass = None
@@ -4672,12 +4685,12 @@ class WindowFrame(Frame, WindowDraw):
     if self.windowPopup.state() != 'normal':
       return
 
-    #if self.waitDraw:
-    #  return
+    # if self.waitDraw:
+    #   return
 
     # below does not work because get splatted by Tcl/Tk if do nothing
-    #if (hasattr(canvas, 'beingDrawn') and canvas.beingDrawn):
-    #  return
+    # if (hasattr(canvas, 'beingDrawn') and canvas.beingDrawn):
+    #   return
 
     if row is None or col is None:
       try:
@@ -4707,7 +4720,7 @@ class WindowFrame(Frame, WindowDraw):
   # overrides WindowDraw version
   def drawCanvasReal(self, canvas, row, col):
 
-    #print 'drawCanvasReal0', self.windowPane.name
+    # print 'drawCanvasReal0', self.windowPane.name
 
     canvas.drawCount = canvas.drawCount - 1
     #print 'drawCanvasReal1', self.windowPane.name, canvas.drawCount

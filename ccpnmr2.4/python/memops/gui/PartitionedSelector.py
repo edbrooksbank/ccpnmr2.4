@@ -56,14 +56,31 @@ import Tkinter
 
 from memops.gui.Frame  import Frame
 from memops.gui.Button import Button
+from memops.gui.Label import Label
 from memops.gui.Color  import invertColor, scaleColor
 from memops.gui.Canvas import Canvas
+
+DEFAULTCOLOR = 'black'
+DEFAULTMIDCOLOR = 'grey75'
+DEFAULTDARKCOLOR = 'grey30'
+DEFAULTFONT = 'Helvetica 10'
+
+# DEFAULTCOLOR = 'orange'
+# DEFAULTMIDCOLOR = 'darkgreen'
+# DEFAULTDARKCOLOR = 'blue'
+# DEFAULTFONT = 'Helvetica 24'
+
+
+def _getBackground(self):
+  # return self.cget('background')
+  return 'red'
+
 
 class PartitionedSelector(Frame):
 
   def __init__(self, parent, callback=None, toggled=True, radio=False,
               objects=None, selected=None, labels=None, colors=None, fonts=None,
-              maxRowObjects=18, toggledBg='grey75', toggledFg='grey30',
+              maxRowObjects=18, toggledBg=DEFAULTMIDCOLOR, toggledFg=DEFAULTDARKCOLOR,
               font=None, sticky='ew', buttonBorderWidth=1, buttonRelief='raised',
               docKey=None, tipText=None, *args, **kw):
   
@@ -85,7 +102,7 @@ class PartitionedSelector(Frame):
     self.maxRowObjects     = maxRowObjects
     self.buttonBorderWidth = buttonBorderWidth
     self.buttonRelief      = buttonRelief
-    self.font = font or 'Helvetica 10'
+    self.font = font or DEFAULTFONT
     self.waiting = False
     
     self.buttons = []
@@ -128,16 +145,22 @@ class PartitionedSelector(Frame):
         self.labels[i] = 'None'
       
       if i>= len(self.colors):
-        self.colors.append( self.cget('background'))
+        self.colors.append(_getBackground(self))
 
       if i>= len(self.fonts):
         self.fonts.append(self.font)
 	
       if i>= len(self.buttons):
-        command = lambda n=i, s=self: s.selectButton(n)
-        button  = Button(self,command=command,relief=self.buttonRelief,
+        # command = lambda n=i, s=self: s.selectButton(n)
+        # button  = Button(self,command=command,relief=self.buttonRelief,
+        #                  font=self.fonts[i],borderwidth=self.buttonBorderWidth)
+
+        button  = Label(self,relief=self.buttonRelief,
                          font=self.fonts[i],borderwidth=self.buttonBorderWidth)
         self.buttons.append( button )
+
+        command = lambda event, n=i, s=self: s.selectButton(n)
+        button.bind("<Button-1>", command)
 
     if len(self.buttons) > N:
       for i in range(N,len(self.buttons)):
@@ -151,10 +174,15 @@ class PartitionedSelector(Frame):
         self.state.append( 1 )
  
       self.setButtonState(i, self.state[i])
-      self.buttons[i].config(text=labels[i],font=self.fonts[i])
+
+      # NOTE:ED - swapping button for a label (tk MacOS fix) - need to test Windows/Linux
+      # self.buttons[i].config(text=labels[i],font=self.fonts[i])
+      self.buttons[i].config(font=self.fonts[i])
+      self.buttons[i].set(labels[i])
+
       self.buttons[i].grid(row=row,column=col, sticky=Tkinter.NSEW)
       self.grid_columnconfigure(col, weight = 1)
- 
+
       col +=1
       if col >= self.maxRowObjects:
         row += 1
@@ -249,15 +277,16 @@ class PartitionedSelector(Frame):
           relief = 'sunken'
 
         color = self.colors[i]
-        fg = invertColor(self,color) or 'black'
-        bg = color or self.cget('background')
+        fg = invertColor(self,color) or DEFAULTCOLOR
+        bg = color or _getBackground(self)
         bg2 = scaleColor(self,bg,0.8)
         if bg2 == bg:
           bg2 = scaleColor(self,bg,1.2)
         
-        fg2 = invertColor(self,bg2) or 'black'
-        button.config(relief=relief, background=bg, fg=fg,
-                      activebackground=bg2, activeforeground=fg2)
+        fg2 = invertColor(self,bg2) or DEFAULTCOLOR
+        button.config(relief=relief, bg=bg, fg=fg,
+                      activebackground=bg2, activeforeground=fg2,)
+                      # highlightbackground=bg2, highlightcolor=fg2)
 
       elif not self.radio:
         self.state[i] = 0
@@ -267,19 +296,20 @@ class PartitionedSelector(Frame):
           relief = 'raised'
 
         color = self.colors[i]
-        fg = self.toggledFg or 'black'
-        bg = self.toggledBg or self.cget('background')
-        fg2 = invertColor(self,color) or 'black'
-        bg2 = color or self.cget('background')
-        button.config(relief=relief, background=bg, fg=fg, 
-                      activebackground=bg2, activeforeground=fg2)
+        fg = self.toggledFg or DEFAULTCOLOR
+        bg = self.toggledBg or _getBackground(self)
+        fg2 = invertColor(self,color) or DEFAULTCOLOR
+        bg2 = color or _getBackground(self)
+        button.config(relief=relief, bg=bg, fg=fg,
+                      activebackground=bg2, activeforeground=fg2,)
+                      # highlightbackground=bg2, highlightcolor=fg2)
 
       if self.radio:
         color = self.colors[i]
-        fg = self.toggledFg or 'black'
-        bg = self.toggledBg or self.cget('background')
-        fg2 = invertColor(self,color) or 'black'
-        bg2 = color or self.cget('background')
+        fg = self.toggledFg or DEFAULTCOLOR
+        bg = self.toggledBg or _getBackground(self)
+        fg2 = invertColor(self,color) or DEFAULTCOLOR
+        bg2 = color or _getBackground(self)
         self.states = []
         for j in range(len(self.buttons)):
           if j == i:
@@ -292,8 +322,9 @@ class PartitionedSelector(Frame):
           else:
             relief = 'raised'
 
-          self.buttons[j].config(relief=relief, background=bg, fg=fg,
-                                 activebackground=bg2, activeforeground=fg2)
+          self.buttons[j].config(relief=relief, bg=bg, fg=fg,
+                                 activebackground=bg2, activeforeground=fg2,)
+                                 # highlightbackground=bg2, highlightcolor=fg2)
 
     if doCallback and self.callback:
       self.callback(self.objects[i])
@@ -324,27 +355,46 @@ class PartitionedSelector(Frame):
 
 if __name__ == '__main__':
 
-  import Tkinter
+  import os
+  import Tkinter as tk
+
+
+  path = os.path
+  gfxDir = path.join(os.getcwd(), '../../..', 'python', 'memops', 'gui', 'graphics')
+
+  root = tk.Tk()
+  newWindow = root
+
+  MakeImage = tk.PhotoImage
+  upArrow = MakeImage(file=path.join(gfxDir, 'arrowUp.gif'))
+
+  for winNum, winName in enumerate(('Window1', 'Window2')):
+
+    if winNum > 0:
+      newWindow = tk.Toplevel()
+
+    newWindow.wm_title(winName)
+
+    obj = range(14)
+    labels = ['%d   \n' % (x+1) for x in obj]
+
+    def clicked(*args):
+      print "Clicked", args
+
+    ps =  PartitionedSelector(newWindow, callback=clicked, toggled=True, radio=True, grid=(0,0),
+                              toggledBg='#0000FF', toggledFg='#80FF80',
+                              objects=obj, selected=None, labels=labels, colors=None, fonts=None,
+                              font=None, sticky='ew', buttonBorderWidth=1, buttonRelief='raised')
+
+    # add an image to the button (doesn't work with text for original button)
+    ps.buttons[0].config(image=upArrow)
+
+    colors = ['#FF0000','#FFFF00','#FF00FF','#00FFFF','#0000FF','#FF0000','#FFFF00','#FF00FF','#00FFFF','#0000FF',]
+    ps2 =  PartitionedSelector(newWindow, callback=clicked, toggled=True, radio=False, grid=(1,0),
+                              objects=obj, selected=None, labels=labels, colors=colors, fonts=None,
+                              font=None, sticky='ew', buttonBorderWidth=1, buttonRelief='sunken')
   
-  root = Tkinter.Tk()
-  
-  obj = range(10)
-  labels = ['%d' % (x+1) for x in obj]
-  
-  def clicked(*args):
-    print "Clicked", args
-  
-  ps =  PartitionedSelector(root, callback=clicked, toggled=True, radio=True, grid=(0,0),
-                            toggledBg='#000000', toggledFg='#80FF80',
-                            objects=obj, selected=None, labels=labels, colors=None, fonts=None,
-                            font=None, sticky='ew', buttonBorderWidth=1, buttonRelief='raised')
-  
-  colors = ['#FF0000','#FFFF00','#FF00FF','#00FFFF','#0000FF','#FF0000','#FFFF00','#FF00FF','#00FFFF','#0000FF',]
-  ps2 =  PartitionedSelector(root, callback=clicked, toggled=True, radio=False, grid=(1,0),
-                            objects=obj, selected=None, labels=labels, colors=colors, fonts=None,
-                            font=None, sticky='ew', buttonBorderWidth=1, buttonRelief='sunken')
-  
-  print ps2.state
+    print ps2.state
 
   root.mainloop()
 

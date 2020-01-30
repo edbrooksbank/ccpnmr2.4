@@ -508,7 +508,7 @@ class WindowPopup(BasePopup):
                 'Remove a contour level from the displayed spectra (from the top)',
                 'Cycle the contour display through positive & negative contour options; negative, positive both',
                 'Open a popup window to give greater control of contouring for individual spectra']
-    texts = [' ',' ','+1','-1','Pos/Neg','More..']
+    texts = ['','','+1','-1','Pos/Neg','More..']
     commands = [self.contourLevelsUp,
                 self.contourLevelsDown,
                 self.ncontoursIncr,

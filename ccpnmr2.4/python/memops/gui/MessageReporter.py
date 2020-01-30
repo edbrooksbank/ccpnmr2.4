@@ -53,19 +53,89 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 """
 import Tkinter, tkMessageBox
 
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# NOTE:ED - simple message queuing for the minute
+class _Messages(object):
+  """Simple class to queue a set of errors that can be 'flushed' as a compound set of errors at the end
+  """
+  def __init__(self):
+    self._initialise()
+
+  def setParent(self, parent):
+    self._parent = parent
+
+  def _initialise(self):
+    self._parent = None
+    self._errorTypes = {}
+
+  def getMessages(self, errType, title=None):
+    if errType in self._errorTypes:
+      err = self._errorTypes[errType]
+
+      if title in err:
+        return '\n'.join(err[title])
+
+      elif not title:
+        return '\n'.join(['\n'.join(err[tt]) for tt in err])
+
+    return ''
+
+  def addMessage(self, errType, title, message, parent):
+    if parent:
+      self.setParent(parent)
+
+    if errType not in self._errorTypes:
+      self._errorTypes[errType] = {}
+    err = self._errorTypes[errType]
+
+    if title not in err:
+      err[title] = (message,)
+    else:
+      err[title] += (message,)
+
+  def flushMessages(self):
+    for errType, errorList in self._errorTypes.items():
+      for title in errorList:
+        if self._parent:
+          errType(title, self.getMessages(errType, title), parent=self._parent)
+        else:
+          errType(title, self.getMessages(errType, title))
+
+    self._initialise()
+
+_queueErrors = False
+_queueMessages = _Messages()
+
+def _flushMessages():
+  _queueMessages.flushMessages()
+  _queueErrors = False
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 def showError(title, message, parent = None):
 
-  if (parent):
-    tkMessageBox.showerror(title, message, parent=parent)
+  if not _queueErrors:
+    if (parent):
+      tkMessageBox.showerror(title, message, parent=parent)
+    else:
+      tkMessageBox.showerror(title, message)
+
   else:
-    tkMessageBox.showerror(title, message)
+    _queueMessages.addMessage(tkMessageBox.showerror, title, message, parent)
+
 
 def showInfo(title, message, parent = None):
 
-  if (parent):
-    tkMessageBox.showinfo(title, message, parent=parent)
+  if not _queueErrors:
+    if (parent):
+      tkMessageBox.showinfo(title, message, parent=parent)
+    else:
+      tkMessageBox.showinfo(title, message)
+
   else:
-    tkMessageBox.showinfo(title, message)
+    _queueMessages.addMessage(tkMessageBox.showinfo, title, message, parent)
+
 
 def showOkCancel(title, message, parent = None):
 
@@ -74,6 +144,7 @@ def showOkCancel(title, message, parent = None):
   else:
     return tkMessageBox.askokcancel(title, message)
 
+
 def showYesNo(title, message, parent = None):
 
   if (parent):
@@ -81,12 +152,24 @@ def showYesNo(title, message, parent = None):
   else:
     return tkMessageBox.askyesno(title, message)
 
+
 def showWarning(title, message, parent = None):
 
-  if (parent):
-    return tkMessageBox.showwarning(title, message, parent=parent)
+  # if (parent):
+  #   return tkMessageBox.showwarning(title, message, parent=parent)
+  # else:
+  #   return tkMessageBox.showwarning(title, message)
+
+  # NOTE:ED - added simple queuing just for the minute
+  if not _queueErrors:
+    if (parent):
+      return tkMessageBox.showwarning(title, message, parent=parent)
+    else:
+      return tkMessageBox.showwarning(title, message)
+
   else:
-    return tkMessageBox.showwarning(title, message)
+    _queueMessages.addMessage(tkMessageBox.showwarning, title, message, parent)
+
 
 def showMulti(title, message, texts, objects=None, parent=None):
 
@@ -94,6 +177,7 @@ def showMulti(title, message, texts, objects=None, parent=None):
   func = popup.get()
   popup.destroy()
   return func
+
 
 class MessageReporter:
 

@@ -2349,7 +2349,9 @@ def assignAtomsToRes(atomSets,resonance,resonanceSet=None):
   
   atomSets = list(atomSets)
   nmrProject = resonance.nmrProject
- 
+
+  # NOTE:ED - could possibly insert a temporary logger here
+
   chemAtomSetRef = None
   for atomSet in atomSets:
     atom = atomSet.findFirstAtom()
@@ -2412,14 +2414,17 @@ def assignAtomsToRes(atomSets,resonance,resonanceSet=None):
     if not resonance in resonances:
       resonanceSet.addResonance(resonance)
       resonances.append(resonance)
-      
+
+      # NOTE:ED atomSets always appears to be of length 2
+      # resonances can be 2 or more
+
       if len(resonances) > len(atomSets):
         residue = atomSets[0].findFirstAtom().residue
         aName = '/'.join([ass.name for ass in atomSets])
         data  = (len(resonances), residue.seqCode, residue.ccpCode, aName)
         msg   = 'There are more resonances (%d) than atoms sets for %d%s %s'
         showWarning('Redundant resonance', msg % data)
- 
+
     for atomSet in resonanceSet.atomSets:
       if atomSet not in atomSets:
         resonanceSet.delete()
