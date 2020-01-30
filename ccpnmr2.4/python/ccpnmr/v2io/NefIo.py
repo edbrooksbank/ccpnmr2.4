@@ -561,6 +561,11 @@ class CcpnNefReader():
             ))
 
         defaultChainCode = self.defaultChainCode
+
+        # NOTE:ED temporarily disable showWarning - add to a temporary messageQueue
+        import memops.gui.MessageReporter as MemReporter
+        MemReporter._queueErrors = True
+
         for row in data:
             # get or make restraint
             serial = row.get('restraint_id')
@@ -622,6 +627,9 @@ class CcpnNefReader():
                 for tt in itertools.product(*fixedResonances):
                     getattr(restraint, newItemFuncName)(resonances=tt)
         #
+        # NOTE:ED temporarily disable showWarning - add to a temporary messageQueue
+        MemReporter._flushMessages()
+
         return restraintList
 
     importers['nef_distance_restraint_list'] = load_nef_restraint_list
@@ -1404,7 +1412,11 @@ class CcpnNefReader():
                                                                        resonanceGroup=resonanceGroup,
                                                                        details=comment)
             if serial:
-                commonUtil.resetSerial(resonance, serial)
+                try:
+                    commonUtil.resetSerial(resonance, serial)
+                except Exception as es:
+                    print(str(es))
+
             atomMap['resonances'] = [resonance]
 
             atomSets = atomMap.get('atomSets')
