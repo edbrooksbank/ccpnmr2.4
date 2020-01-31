@@ -1,4 +1,4 @@
-version = '2.4.3'
+version = '2.5.0'
 build = ''
 timestamp = 'Mon Mar  2 17:20:42 2015'
 platform = 'darwin'

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # version
-GIT_RELEASE="ccpnmr2.4.3.b1"
-RELEASE_VER="2.4.3"
+GIT_RELEASE="testCompileC"
+RELEASE_VER="2.5.0"
 
 # miniconda source
 CONDA_SOURCE="ccpnmrV2"

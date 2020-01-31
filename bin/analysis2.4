@@ -15,4 +15,8 @@ if [[ "$(uname -s)" == 'Darwin' ]]; then
 fi
 
 ANALYSIS="${CCPNMR_TOP_DIR}"/ccpnmr2.4/python/ccpnmr/analysis/AnalysisGui.py
-"${ANACONDA3}"/bin/python2.7 -i -O -W ignore::DeprecationWarning "${ANALYSIS}" $*
+if [[ "$MACHINE" == *"Win"* ]]; then
+  "${ANACONDA3}"/python -i -O -W ignore::DeprecationWarning "${ANALYSIS}" $*
+else
+  "${ANACONDA3}"/bin/python -i -O -W ignore::DeprecationWarning "${ANALYSIS}" $*
+fi

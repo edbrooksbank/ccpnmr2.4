@@ -177,7 +177,11 @@ fi
 # Copy miniconda code over:
 
 echo "copying miniconda folder"
-cd "${HOME}/miniconda3/envs" || exit
+if [[ "$MACHINE" == *"Win"* ]]; then
+  cd "${HOME}/Anaconda3/envs" || exit
+else
+  cd "${HOME}/miniconda3/envs" || exit
+fi
 
 # need to be on the correct conda source
 
