@@ -41,16 +41,12 @@ OPT_FLAG = /Ox
 CC_FLAGS = $(WIN_FLAG) $(OPT_FLAG) $(FPIC_FLAG) $(MALLOC_FLAG) $(XOR_FLAG)
 LINK_FLAGS = $(WIN_FLAG) $(OPT_FLAG) $(FPIC_FLAG)
 
-# linking command for C libraries into Python world
-# LINK_LIBRARIES = sh linkSharedObjs
-
 # copying command for C libraries into Python world
 COPY_LIBRARIES = copySharedObjs.bat
 
-# Clean .pyd and .so files from python path
+# Clean .pyd files from python path
 # (used only for Windows)
 CLEAN_PYD = del *.pyd
-CLEAN_SO = del *.so
 
 # use below if you want to ignore GL
 # use below if you want to compile GL

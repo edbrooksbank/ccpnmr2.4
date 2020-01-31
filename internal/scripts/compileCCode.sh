@@ -53,4 +53,8 @@ error_check
 sed -i.bak "1 s|^.*$|${CONDA_PATH}|" environment.txt && rm -rf environment.txt.bak
 
 echo "making"
-#make -B $*
+if [[ ${MACHINE} != *"Windows"* ]]; then
+  make -B $*
+else
+  echo "Please use 'nmake' from an x64 terminal to compile."
+fi

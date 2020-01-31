@@ -169,7 +169,7 @@ class WindowFrame(Frame, WindowDraw):
       if thisOS == 'win':
         handlerClass = GlHandler.GlHandler
         useGl = True
-      elif thisOS == 'ZZZdar':
+      elif thisOS == 'dar':
         handlerClass = TkHandler.TkHandler
         useGl = False
       else:

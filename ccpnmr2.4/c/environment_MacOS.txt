@@ -63,8 +63,8 @@ OPT_FLAG = -O
 # Some functions utilise OpenMP for multi-cpu optimisation
 # use below if you have more than one cpu
 # (these flags for GNU CC, Intel CC differs)
-#OPENMP_FLAGS = -fopenmp
-#OPENMP_LIB  = -lgomp
+OPENMP_FLAGS = -fopenmp
+OPENMP_LIB  = -lgomp
 # use below for Windows (note: after VS 2010 VCOMP.LIB is a paid upgrade,
 # but is available for free in VS 2008)
 #OPENMP_FLAGS = /OPENMP
@@ -74,14 +74,8 @@ OPT_FLAG = -O
 # (used for everything except Windows)
 LINK_LIBRARIES = sh linkSharedObjs
 
-# copying command for C libraries into Python world
-# (used only for Windows)
-#COPY_LIBRARIES = copySharedObjs.bat
-COPY_LIBRARIES = sh copySharedObjs
-
-# Clean .pyd and .so files from python path
+# Clean .so files from python path
 # (used for everything except Windows)
-CLEAN_PYD = rm -f *.pyd
 CLEAN_SO = rm -f *.so
 
 # specify whether or not you want to compile GL
@@ -99,10 +93,8 @@ GL_FLAG = -DUSE_GL_FALSE
 # use below for everything else?
 #GL_FLAG = -DUSE_GL_TRUE
 
-
 # math
-MATH_LIB = -lm
-
+MATH_LIB = -lm -lpthread
 
 # Tk
 TK_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
@@ -111,11 +103,12 @@ TK_INCLUDE_FLAGS = -I$(TK_DIR)/include
 TK_LIB_FLAGS = -L$(TK_DIR)/lib
 
 # on OSX and some other Unixes below is possible if not using provided Mesa
-GL_DIR = /usr/X11R6
+#GL_DIR = /usr/X11R6
 # use below if compiling GL, except on OSX if using framework glut
 GL_LIB = -lglut -lGLU -lGL
 # use below if compiling GL, except on OSX if using framework glut
-GL_INCLUDE_FLAGS = -I$(GL_DIR)/include
+#GL_INCLUDE_FLAGS = -I$(GL_DIR)/include
+#GL_INCLUDE_FLAGS = -I$(PYTHON_DIR)/include/GL
 
 CC_FLAGS = $(WIN_FLAG) $(OPT_FLAG) $(FPIC_FLAG) $(MALLOC_FLAG) $(XOR_FLAG) $(NOWARNING_FLAG)
 LINK_FLAGS = $(WIN_FLAG) $(OPT_FLAG) $(FPIC_FLAG)

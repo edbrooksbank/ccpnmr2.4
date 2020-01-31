@@ -570,7 +570,6 @@ static PyObject *new_py_gl_handler(PyObject *widget, Bool direct, Bool dbl_buff)
     if (!PyInstance_Check(widget))
 	    RETURN_OBJ_ERROR("argument not a Python object");
 */
-
     tcl_interp = get_tcl_interp(widget, error_msg);
     if (!tcl_interp)
         RETURN_OBJ_ERROR(error_msg);
@@ -578,9 +577,10 @@ static PyObject *new_py_gl_handler(PyObject *widget, Bool direct, Bool dbl_buff)
     tk_display_win = get_tk_window(widget, tcl_interp, error_msg);
     if (!tk_display_win)
         RETURN_OBJ_ERROR(error_msg);
- 
-    gl_handler = new_gl_handler(tcl_interp, tk_display_win, direct, dbl_buff);
 
+    // NOTE:ED - this is where it crashes glX functions have bad display, segfault results
+
+    gl_handler = new_gl_handler(tcl_interp, tk_display_win, direct, dbl_buff);
     if (!gl_handler)
 	    RETURN_OBJ_ERROR("allocating Gl_handler object");
 

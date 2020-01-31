@@ -3128,6 +3128,3 @@ def browseAtomsMacro(argServer):
 
   argServer.parent.browseAtoms()
 
-
-
-

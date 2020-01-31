@@ -1,4 +1,3 @@
-
 """
 ======================COPYRIGHT/LICENSE START==========================
 
@@ -357,7 +356,10 @@ if __name__ == '__main__':
 
   import os
   import Tkinter as tk
+  import memops.c.GlHandler as GlHandler
+  import memops.c.TkHandler as TkHandler
 
+  from memops.gui.Canvas import Canvas
 
   path = os.path
   gfxDir = path.join(os.getcwd(), '../../..', 'python', 'memops', 'gui', 'graphics')
@@ -368,33 +370,47 @@ if __name__ == '__main__':
   MakeImage = tk.PhotoImage
   upArrow = MakeImage(file=path.join(gfxDir, 'arrowUp.gif'))
 
-  for winNum, winName in enumerate(('Window1', 'Window2')):
+  cv = Canvas(newWindow, relief='raised', borderwidth=3, width=200, height=200)
 
-    if winNum > 0:
-      newWindow = tk.Toplevel()
+  # for winNum, winName in enumerate(('Window1', 'Window2')):
+  #
+  #   if winNum > 0:
+  #     newWindow = tk.Toplevel()
+  #
+  #   newWindow.wm_title(winName)
+  #
+  #   obj = range(14)
+  #   labels = ['%d   \n' % (x+1) for x in obj]
+  #
+  #   def clicked(*args):
+  #     print "Clicked", args
+  #
+  #   ps =  PartitionedSelector(cv, callback=clicked, toggled=True, radio=True, grid=(0,0),
+  #                             toggledBg='#0000FF', toggledFg='#80FF80',
+  #                             objects=obj, selected=None, labels=labels, colors=None, fonts=None,
+  #                             font=None, sticky='ew', buttonBorderWidth=1, buttonRelief='raised')
+  #
+  #   # add an image to the button (doesn't work with text for original button)
+  #   ps.buttons[0].config(image=upArrow)
+  #
+  #   colors = ['#FF0000','#FFFF00','#FF00FF','#00FFFF','#0000FF','#FF0000','#FFFF00','#FF00FF','#00FFFF','#0000FF',]
+  #   ps2 =  PartitionedSelector(newWindow, callback=clicked, toggled=True, radio=False, grid=(1,0),
+  #                             objects=obj, selected=None, labels=labels, colors=colors, fonts=None,
+  #                             font=None, sticky='ew', buttonBorderWidth=1, buttonRelief='sunken')
+  #
+  #   print ps2.state
 
-    newWindow.wm_title(winName)
+  # handlerClass = TkHandler.TkHandler
+  handlerClass = GlHandler.GlHandler
 
-    obj = range(14)
-    labels = ['%d   \n' % (x+1) for x in obj]
+  print('>>> ', handlerClass)
 
-    def clicked(*args):
-      print "Clicked", args
+  handlerArgs = ()
 
-    ps =  PartitionedSelector(newWindow, callback=clicked, toggled=True, radio=True, grid=(0,0),
-                              toggledBg='#0000FF', toggledFg='#80FF80',
-                              objects=obj, selected=None, labels=labels, colors=None, fonts=None,
-                              font=None, sticky='ew', buttonBorderWidth=1, buttonRelief='raised')
+  if not hasattr(cv, 'handler'):
+    # attach a GLHandler to the widget
+    cv.handler = handlerClass and handlerClass(cv, *handlerArgs)
 
-    # add an image to the button (doesn't work with text for original button)
-    ps.buttons[0].config(image=upArrow)
-
-    colors = ['#FF0000','#FFFF00','#FF00FF','#00FFFF','#0000FF','#FF0000','#FFFF00','#FF00FF','#00FFFF','#0000FF',]
-    ps2 =  PartitionedSelector(newWindow, callback=clicked, toggled=True, radio=False, grid=(1,0),
-                              objects=obj, selected=None, labels=labels, colors=colors, fonts=None,
-                              font=None, sticky='ew', buttonBorderWidth=1, buttonRelief='sunken')
-  
-    print ps2.state
 
   root.mainloop()
 

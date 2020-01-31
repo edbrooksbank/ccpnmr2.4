@@ -63,6 +63,24 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 #include "clipping.h"
 #include "utility.h"
 
+
+#include <mach-o/dyld.h>
+
+void * MyNSGLGetProcAddress (const char *name)
+{
+    NSSymbol symbol;
+    char *symbolName;
+    symbolName = malloc (strlen (name) + 2); // 1
+    strcpy(symbolName + 1, name); // 2
+    symbolName[0] = '_'; // 3
+    symbol = NULL;
+    if (NSIsSymbolNameDefined (symbolName)) // 4
+        symbol = NSLookupAndBindSymbol (symbolName);
+    free (symbolName); // 5
+    return symbol ? NSAddressOfSymbol (symbol) : NULL; // 6
+
+}
+
 #define  NCOLORS  3
 
 typedef struct _GlutFont
@@ -472,6 +490,7 @@ that called GetDC. The number of DCs is limited only by available memory.
     /* glGetError(); */ /* remove existing errors */
 
 #ifdef WIN64
+
     memset( &pfd, 0, sizeof(PIXELFORMATDESCRIPTOR) );
     pfd.nSize       = sizeof(PIXELFORMATDESCRIPTOR);   // size of this pfd 
     pfd.nVersion    = 1;                               // version number 
@@ -520,6 +539,22 @@ that called GetDC. The number of DCs is limited only by available memory.
     glDisable( GL_LINE_SMOOTH );
 
 #else
+
+    //~~~~~~~~~~~~~~~~~
+    // NOTE:ED - code to test the glX binding
+    printf("glXQueryVersion\n");
+    typedef bool (*glXQueryVersionProcPtr)(Display * dpy, int * Major, int * Minor);
+    glXQueryVersionProcPtr pfglXQueryVersion = NULL;
+    pfglXQueryVersion = (glXQueryVersionProcPtr) MyNSGLGetProcAddress("glXQueryVersion");
+    GLint majorGLX, minorGLX = 0;
+    if (!glXQueryVersion(display, &majorGLX, &minorGLX))
+        if (majorGLX <= 1 && minorGLX < 2) {
+            printf("GLX 1.2 or greater is required.\n");
+            return NULL;
+        }
+    printf("GLX version %i.%i\n", majorGLX, minorGLX);
+    //~~~~~~~~~~~~~~~~~
+
     if (!glXQueryExtension(display, &dummy, &dummy))
     {
       printf("glXQueryExtension failed\n");
