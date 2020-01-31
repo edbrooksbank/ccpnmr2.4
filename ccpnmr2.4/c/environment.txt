@@ -101,7 +101,7 @@ PYTHON_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
 # Tk
 #TK_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
 #TK_LIB = -ltk
-TK_LIB = $(PYTHON_DIR)/lib/libtk8.6.dylib
+TK_LIB = $(PYTHON_DIR)/lib/libtk8.5.dylib
 #TK_INCLUDE_FLAGS = -I$(TK_DIR)/include
 #TK_LIB_FLAGS = -L$(TK_DIR)/lib
 
