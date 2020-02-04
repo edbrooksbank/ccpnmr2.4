@@ -203,7 +203,7 @@ cd "${HOME}/${RELEASE}/${CCPNMRPATH}" || exit
 tar xzf "../${CONDA_SOURCE}.tgz"
 error_check
 rm -rf miniconda
-mv "${CONDA_SOURCE}" miniconda
+mv -v "${CONDA_SOURCE}" miniconda
 
 echo "removing ${CONDA_SOURCE}.tgz"
 rm -rf "../${CONDA_SOURCE}.tgz"

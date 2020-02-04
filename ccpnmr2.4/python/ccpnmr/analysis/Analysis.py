@@ -78,6 +78,18 @@ from ccpnmr.analysis.core import UnitConverter
 from ccpnmr.analysis.core import Util
 
 try:
+  # NOTE:ED - quick test to find which environment variables are missing
+  # print
+  # print 'ENVIRONMENT VARIABLES'
+  # for k, v in sorted(os.environ.items()):
+  #   if ';' in v:
+  #     print '>>>', k
+  #     vList = v.split(';')
+  #     for vl in vList:
+  #       print '      ', vl
+  #   else:
+  #     print '>>>', k, v
+  # print
   from memops.c.MemCache import MemCache
   import memops.c.StoreFile as StoreFile
   from ccpnmr.c.ContourFile import ContourFile, StoredContourFile
@@ -85,6 +97,7 @@ try:
   from ccpnmr.c.PeakCluster import PeakCluster as CPeakCluster
   from ccpnmr.c.SliceFile import SliceFile
   from ccpnmr.c.WinPeakList import WinPeakList as CWinPeakList
+
 except Exception, e:
   print 'Error, the Analysis module will not work, something is wrong with the C code.'
   print 'Exception:', e
@@ -496,6 +509,7 @@ class Analysis:
     # NOTE:ED testing destruction error
     Analysis.destroy(self, closingProject=True)
     # self.destroy(closingProject=True)
+    sys.stdout.flush()
 
   def updateStripRegion(self, axisRegion):
 
