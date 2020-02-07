@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 export CCPNMR_TOP_DIR="$(dirname $(cd $(dirname "$0"); pwd))"
 export PYTHONPATH=".:${CCPNMR_TOP_DIR}/ccpnmr2.4/python"
@@ -6,4 +6,4 @@ export LD_LIBRARY_PATH="/Users/ejb66/miniconda3/envs/ccpnmr2.4/lib"
 export DYLD_LIBRARY_PATH="/Users/ejb66/miniconda3/envs/ccpnmr2.4/lib"
 export TCL_LIBRARY="/Users/ejb66/miniconda3/envs/ccpnmr2.4/lib/tcl8.6"
 export TK_LIBRARY="/Users/ejb66/miniconda3/envs/ccpnmr2.4/lib/tk8.6"
-/Users/ejb66/miniconda3/envs/ccpnmr2.4/bin/python2.7 -O ${CCPNMR_TOP_DIR}/ccpnmr2.4/python/cambridge/dangle/DangleGui.py $*
+/Users/ejb66/miniconda3/envs/ccpnmr2.4/bin/python2.7 -O ${CCPNMR_TOP_DIR}/ccpnmr2.4/python/ccpnmr/format/gui/FormatConverter.py $*
