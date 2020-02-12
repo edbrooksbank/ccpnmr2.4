@@ -96,8 +96,6 @@ GL_FLAG = -DUSE_GL_FALSE
 # math
 MATH_LIB = -lm
 
-PYTHON_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
-
 # Tk
 #TK_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
 #TK_LIB = -ltk

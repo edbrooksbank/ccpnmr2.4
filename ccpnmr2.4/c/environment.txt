@@ -1,4 +1,4 @@
-# should work if suitably edited for Linux, Irix, Solaris, OSX, Windows
+PYTHON_DIR = /Users/ejb66/PycharmProjects/Git/ccpnmr/miniconda
 
 # general rules:
 # *_LIB = required library or libraries (use -l or equivalen)
@@ -95,8 +95,6 @@ GL_FLAG = -DUSE_GL_FALSE
 
 # math
 MATH_LIB = -lm
-
-PYTHON_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
 
 # Tk
 #TK_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
