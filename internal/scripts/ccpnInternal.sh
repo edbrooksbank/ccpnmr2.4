@@ -6,7 +6,7 @@ source ./paths.sh
 SKIP_SCRIPTS=""
 SKIP_CODES=""
 INCLUDE_DIRS="bin ccpnmr2.4 doc"
-DATA_DIR="data"
+DATA_DIR=""
 INCLUDE_FILES=""
 
 # repositories contained in the project

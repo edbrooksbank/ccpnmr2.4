@@ -780,7 +780,7 @@ class FormatConverter(BasePopup):
             return False
 
       self.destroy()
-      sys.exit(0)
+      os._exit(0)
     else:
       self.closeNoSave()
 

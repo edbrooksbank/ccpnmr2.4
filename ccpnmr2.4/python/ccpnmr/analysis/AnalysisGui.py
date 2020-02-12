@@ -58,6 +58,10 @@ if sys.platform[:3].lower() == 'win':
 try:
   from memops.universal.Io import normalisePath
 except ImportError:
+  #print
+  #print os.environ['PYTHONPATH']
+  #print
+
   print 'Error, cannot import core CCPN Python modules:'
   print 'Maybe your PYTHONPATH environment variable is not set or'
   print 'does not contain the current CCPN installation directory.'
@@ -226,4 +230,11 @@ Continuing...
       print 'Path "%s" is not a directory' % projectDir
       usage()
 
-  main(projectDir, max_size, glDirect)
+  try:
+    main(projectDir, max_size, glDirect)
+  except Exception as es:
+    # ignore any errors on exit
+    pass
+  finally:
+    # NOTE:ED - this exits correctly now
+    os._exit(0)

@@ -64,22 +64,22 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 #include "utility.h"
 
 
-#include <mach-o/dyld.h>
-
-void * MyNSGLGetProcAddress (const char *name)
-{
-    NSSymbol symbol;
-    char *symbolName;
-    symbolName = malloc (strlen (name) + 2); // 1
-    strcpy(symbolName + 1, name); // 2
-    symbolName[0] = '_'; // 3
-    symbol = NULL;
-    if (NSIsSymbolNameDefined (symbolName)) // 4
-        symbol = NSLookupAndBindSymbol (symbolName);
-    free (symbolName); // 5
-    return symbol ? NSAddressOfSymbol (symbol) : NULL; // 6
-
-}
+//#include <mach-o/dyld.h>
+//
+//void * MyNSGLGetProcAddress (const char *name)
+//{
+//    NSSymbol symbol;
+//    char *symbolName;
+//    symbolName = malloc (strlen (name) + 2); // 1
+//    strcpy(symbolName + 1, name); // 2
+//    symbolName[0] = '_'; // 3
+//    symbol = NULL;
+//    if (NSIsSymbolNameDefined (symbolName)) // 4
+//        symbol = NSLookupAndBindSymbol (symbolName);
+//    free (symbolName); // 5
+//    return symbol ? NSAddressOfSymbol (symbol) : NULL; // 6
+//
+//}
 
 #define  NCOLORS  3
 

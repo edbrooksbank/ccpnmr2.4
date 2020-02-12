@@ -1985,6 +1985,7 @@ class DataShifter(BasePopup):
     return True
 
 if __name__ == '__main__':
+  import os
 
   projDirs = sys.argv[1:]
   
@@ -2003,3 +2004,4 @@ if __name__ == '__main__':
   ds = DataShifter(guiRoot, **addKeywds)
   
   guiRoot.mainloop()
+  os._exit(0)

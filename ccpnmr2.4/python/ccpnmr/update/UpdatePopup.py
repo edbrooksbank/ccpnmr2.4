@@ -100,7 +100,9 @@ class UpdatePopup(BasePopup, UpdateAgent):
     self.fileUpdate  = None
  
     if exitOnClose:
-      quitFunc = sys.exit
+      # quitFunc = sys.exit
+      # NOTE:ED - small function to help Windows10 close properly
+      quitFunc = lambda k=0: self.destroy(); os._exit(0)
     else:
       quitFunc = None
 
@@ -144,7 +146,9 @@ class UpdatePopup(BasePopup, UpdateAgent):
 
     if self.exitOnClose:
       #txt = 'Quit'
-      cmd = sys.exit
+      # cmd = sys.exit
+      # NOTE:ED - small function to help Windows10 close properly
+      cmd = lambda k=0: self.destroy(); os._exit(0)
     else:
       #txt = 'Close'
       cmd = self.close
@@ -273,9 +277,9 @@ class UpdatePopup(BasePopup, UpdateAgent):
     
 
 if __name__ == '__main__':
+  import os
 
   root = Tkinter.Tk()
   root.withdraw()
   top = UpdatePopup(root, exitOnClose=True)
   root.mainloop()
- 

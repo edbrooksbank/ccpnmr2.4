@@ -72,6 +72,5 @@ global_py_block_file_objects:
 clean:
 	$(RM) *.$(OBJ_SUFFIX)
 
-realclean:
-	make clean
+realclean: clean
 	$(RM) *.$(DYLIB_SUFFIX)

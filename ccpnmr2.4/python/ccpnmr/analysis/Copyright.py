@@ -51,7 +51,7 @@ else:
 
 suite = 'CcpNmr'
 program = 'Analysis'
-copyright = 'Copyright 2003-2014 CCPN'
+copyright = 'Copyright 2003-2020 CCPN'
 version = getVersion(version, timestamp, name=program)
 vendorAddress = 'Department of Biochemistry, Cambridge CB2 1GA, UK'
 vendorName = 'CCPN'
