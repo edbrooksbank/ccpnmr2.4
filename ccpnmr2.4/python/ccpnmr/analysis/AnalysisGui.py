@@ -237,4 +237,5 @@ Continuing...
     pass
   finally:
     # NOTE:ED - this exits correctly now
-    os._exit(0)
+    if isWindowsOS():
+      os._exit(0)
