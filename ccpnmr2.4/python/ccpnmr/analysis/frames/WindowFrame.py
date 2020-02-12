@@ -3121,6 +3121,51 @@ class WindowFrame(Frame, WindowDraw):
     for func in ('__init__', 'delete'):
       notify(self.changedStoredContour, 'ccpnmr.Analysis.StoredContour', func)
 
+  # def _returnWidget(self, handlerReturn):
+  #   return handlerReturn
+  #
+  # def _getWidgetHandler(self, handlerClass, widget, msg_queue, args):
+  #   """Get the handler from the c code - separate thread test
+  #   """
+  #   widgetHandler = None
+  #   try:
+  #     widgetHandler = handlerClass and handlerClass(widget, *args)
+  #
+  #   except Exception as e:
+  #     msg_queue.put(lambda val=str(e): self._returnWidget(val))
+  #   else:
+  #     msg_queue.put(lambda val=widgetHandler: self._returnWidget(val))
+  #
+  # def setupWidgetHandler(self, widget, isCanvas = True):
+  #
+  #   import threading
+  #   from Queue import Queue
+  #
+  #   if not hasattr(widget, 'handler'):
+  #
+  #     msg_queue = Queue()
+  #     thread_count = threading.active_count()
+  #     t = threading.Thread(target=self._getWidgetHandler, args=(self.handlerClass, widget, msg_queue, self.handlerArgs))
+  #     t.start()
+  #     result = None
+  #     while threading.active_count() > thread_count:
+  #       event = msg_queue.get()
+  #       result = event()
+  #
+  #     if isinstance(result, str):
+  #       widget.handler = None
+  #       print(result)
+  #
+  #     else:
+  #       widget.handler = result
+  #       if result:
+  #         # widget.handler = self.handlerClass and self.handlerClass(widget, *self.handlerArgs)
+  #         if (isCanvas):
+  #           (j, i) = self.scrolled_window.getCanvasRowCol(widget)
+  #           widget.xview = self.windowPane.findFirstAxisPanel(label='x').sortedAxisRegions()[i]
+  #           widget.yview = self.windowPane.findFirstAxisPanel(label='y').sortedAxisRegions()[j]
+  #           self.setWidgetHandlerBackground(widget)
+
   def setupWidgetHandler(self, widget, isCanvas = True):
 
     if not hasattr(widget, 'handler'):

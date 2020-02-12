@@ -356,6 +356,19 @@ if __name__ == '__main__':
 
   import os
   import Tkinter as tk
+
+  import OpenGL.Tk as GLTK
+
+  b = GLTK.Opengl(height=100, width=100)
+  root = b.master
+  f = tk.Frame(root, width=100, bg='blue')
+  f.pack(side='left', fill='y')
+  b.pack(side='right', expand=1, fill='both')
+
+  root.mainloop()
+
+
+
   import memops.c.GlHandler as GlHandler
   import memops.c.TkHandler as TkHandler
 
