@@ -1,1 +1,1 @@
-@call "analysis2.4.bat"
+@call "analysis2.4"

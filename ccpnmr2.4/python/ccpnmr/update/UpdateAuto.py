@@ -56,5 +56,9 @@ def updateAuto(serverLocation=UPDATE_SERVER_LOCATION,
         print 'No updates'
     
 if __name__ == '__main__':
+  import os
 
   updateAuto()
+
+  # NOTE:ED - seems to need this to clean up in Windows10
+  os._exit(0)

@@ -685,7 +685,7 @@ The standalone version of CcpNmr Entry Completion Interface (ECI).  With it, you
     if os.name == 'posix':
       os.system('stty sane')
       
-    sys.exit(0)
+    os._exit(0)
 
   def destroy(self):
   

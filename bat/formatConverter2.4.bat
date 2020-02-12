@@ -2,6 +2,6 @@
 setlocal
 call "paths"
 
-set ENTRYMODULE="%CCPNMR_TOP_DIR%\%PYTHONFOLDER%"\python\ccpnmr\analysis\AnalysisGui.py
+set ENTRYMODULE="%CCPNMR_TOP_DIR%\%PYTHONFOLDER%"\python\ccpnmr\format\gui\FormatConverter.py
 "%ANACONDA3%"\python -i -O -W ignore::DeprecationWarning "%ENTRYMODULE%" %*
 endlocal

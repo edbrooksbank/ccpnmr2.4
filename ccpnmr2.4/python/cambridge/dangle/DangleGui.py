@@ -544,7 +544,8 @@ class DangleGui(BasePopup):
       if os.name == 'posix':
         os.system('stty sane')
  
-      sys.exit(0)
+      # sys.exit(0)
+      os._exit(0)
 
   def destroy(self):
   

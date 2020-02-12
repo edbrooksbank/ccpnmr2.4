@@ -95,6 +95,7 @@ def convertXeasyToAzara(xeasyParamFile, azaraDataFile, azaraParFile):
 if __name__ == '__main__':
 
   import sys
+  import os
 
   def usage(msg):
 
@@ -103,7 +104,8 @@ if __name__ == '__main__':
     print '     For example: HNCO.param'
     print '              or: HNCO.param HNCO.spc'
     print '              or: HNCO.param HNCO.spc HNCO.spc.par'
-    sys.exit(1)
+    # sys.exit(1)
+    os._exit(1)
 
   nargs = len(sys.argv)
   if nargs < 2 or nargs > 4:

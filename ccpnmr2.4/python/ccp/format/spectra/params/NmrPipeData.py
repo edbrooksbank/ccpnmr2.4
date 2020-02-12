@@ -163,6 +163,7 @@ if (__name__ == '__main__'):
 
   import math
   import sys
+  import os
 
   def usage(msg):
 
@@ -171,7 +172,7 @@ if (__name__ == '__main__'):
     print '     For example: myPipeData%03d.ft myAzaraData.spc'
     print '              or: myPipeData%03d.ft myAzaraData.spc 16384'
     print '              or: myPipeData%03d.ft myAzaraData.spc 4096 myAzaraParFile.par'
-    sys.exit(1)
+    os._exit(1)
 
   nargs = len(sys.argv)
   if nargs < 3 or nargs > 5:
