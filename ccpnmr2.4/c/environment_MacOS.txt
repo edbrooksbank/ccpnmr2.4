@@ -33,7 +33,7 @@ RM = rm -f
 # use below for everything except Windows
 WIN_FLAG =
 # use below for Windows
-#WIN_FLAG = /DWIN32 /MD
+#WIN_FLAG = /DWIN64 /MD
 
 # use below for everything with malloc.h
 #MALLOC_FLAG =
@@ -56,15 +56,15 @@ XOR_FLAG =
 # optimisation flag
 # use below for everything except Windows
 #OPT_FLAG = -O2
-OPT_FLAG = -O
+OPT_FLAG = -O2
 # use below for Windows
 #OPT_FLAG = /Ox
 
 # Some functions utilise OpenMP for multi-cpu optimisation
 # use below if you have more than one cpu
 # (these flags for GNU CC, Intel CC differs)
-OPENMP_FLAGS = -fopenmp
-OPENMP_LIB  = -lgomp
+#OPENMP_FLAGS = -fopenmp
+#OPENMP_LIB  = -lgomp
 # use below for Windows (note: after VS 2010 VCOMP.LIB is a paid upgrade,
 # but is available for free in VS 2008)
 #OPENMP_FLAGS = /OPENMP
@@ -94,40 +94,56 @@ GL_FLAG = -DUSE_GL_FALSE
 #GL_FLAG = -DUSE_GL_TRUE
 
 # math
-MATH_LIB = -lm -lpthread
+MATH_LIB = -lm
+
+PYTHON_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
 
 # Tk
-TK_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
-TK_LIB = -ltk8.6
-TK_INCLUDE_FLAGS = -I$(TK_DIR)/include
-TK_LIB_FLAGS = -L$(TK_DIR)/lib
+#TK_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
+#TK_LIB = -ltk
+TK_LIB = $(PYTHON_DIR)/lib/libtk8.6.dylib
+#TK_INCLUDE_FLAGS = -I$(TK_DIR)/include
+#TK_LIB_FLAGS = -L$(TK_DIR)/lib
 
 # on OSX and some other Unixes below is possible if not using provided Mesa
-#GL_DIR = /usr/X11R6
+GL_DIR = /usr/X11R6
+#GL_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
 # use below if compiling GL, except on OSX if using framework glut
-GL_LIB = -lglut -lGLU -lGL
+GL_LIB = -lGL -lGLU -lGLUT
 # use below if compiling GL, except on OSX if using framework glut
-#GL_INCLUDE_FLAGS = -I$(GL_DIR)/include
-#GL_INCLUDE_FLAGS = -I$(PYTHON_DIR)/include/GL
+GL_INCLUDE_FLAGS = -I$(GL_DIR)/include
+#GL_INCLUDE_FLAGS = -I$(PYTHON_DIR)/include -I$(PYTHON_DIR)/lib/python$(PYTHON_VERSION)/site-packages/OpenGL
+GL_LIB_FLAGS = -L$(GL_DIR)/lib
 
 CC_FLAGS = $(WIN_FLAG) $(OPT_FLAG) $(FPIC_FLAG) $(MALLOC_FLAG) $(XOR_FLAG) $(NOWARNING_FLAG)
 LINK_FLAGS = $(WIN_FLAG) $(OPT_FLAG) $(FPIC_FLAG)
-
-PYTHON_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
 
 # rest of Python
 PYTHON_VERSION = 2.7
 
 # for Unix do not seem to need PYTHON_LIB
+
 # for Windows seem to need below (or similar)
-#PYTHON_LIB = -lpython$(PYTHON_VERSION)m
+#PYTHON_LIB = -lpython$(PYTHON_VERSION)
+#PYTHON_LIB = $(PYTHON_DIR)/lib/libpython2.7.dylib $(PYTHON_DIR)/lib/libglapi.0.dylib
+#PYTHON_LIB = $(PYTHON_DIR)/lib/libpython2.7.dylib $(PYTHON_DIR)/lib/libtk8.6.dylib $(PYTHON_DIR)/lib/libtcl8.6.dylib
+PYTHON_LIB = $(PYTHON_DIR)/lib/libpython2.7.dylib
+#PYTHON_LIB = -lpython$(PYTHON_VERSION)
 PYTHON_INCLUDE_FLAGS = -I$(PYTHON_DIR)/include/python$(PYTHON_VERSION) -I$(PYTHON_DIR)/lib/python$(PYTHON_VERSION)/site-packages/numpy/core/include/numpy
 
+##########
+#PYTHON_LIB = -lpython$(PYTHON_VERSION)m
+#PYTHON_INCLUDE_FLAGS = -I$(PYTHON_DIR)/include/python$(PYTHON_VERSION)m -I$(PYTHON_DIR)/lib/python$(PYTHON_VERSION)/site-packages/numpy/core/include/numpy
+
 # for Unix do not seem to need PYTHON_LIB_FLAGS
-PYTHON_LIB_FLAGS = $(shell python-config --ldflags)
+#PYTHON_LIB_FLAGS = -L$(PYTHON_DIR)/lib/python$(PYTHON_VERSION)/config
+###########
+
+# for Unix do not seem to need PYTHON_LIB_FLAGS
+#PYTHON_LIB_FLAGS = $(shell python-config --ldflags)
 
 # for Windows seem to need below (or similar)
-#PYTHON_LIB_FLAGS = -L$(PYTHON_DIR)/libs
+#PYTHON_LIB_FLAGS = -L$(PYTHON_DIR)/lib
 
 # shared library flags
 # use below for Linux or Irix
@@ -143,6 +159,7 @@ SHARED_FLAGS = -L$(PYTHON_DIR)/lib -bundle -bundle_loader $(PYTHON_DIR)/bin/pyth
 # X11
 # use below for everything but Irix
 X11_DIR = /usr/X11R6
+#X11_DIR = /Users/ejb66/miniconda3/envs/ccpnmrV2
 # use below for Irix
 #X11_DIR = /usr
 X11_LIB = -lX11 -lXext
@@ -170,5 +187,3 @@ X11_LIB_FLAGS = -L$(X11_DIR)/lib
 #PYTHON_LIB_FLAGS =
 # for Windows seem to need below (or similar)
 # PYTHON_LIB_FLAGS = -L$(PYTHON_DIR)/libs
-
-
