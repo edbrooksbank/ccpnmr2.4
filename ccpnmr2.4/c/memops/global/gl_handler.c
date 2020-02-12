@@ -540,20 +540,20 @@ that called GetDC. The number of DCs is limited only by available memory.
 
 #else
 
-    //~~~~~~~~~~~~~~~~~
-    // NOTE:ED - code to test the glX binding
-    printf("glXQueryVersion\n");
-    typedef bool (*glXQueryVersionProcPtr)(Display * dpy, int * Major, int * Minor);
-    glXQueryVersionProcPtr pfglXQueryVersion = NULL;
-    pfglXQueryVersion = (glXQueryVersionProcPtr) MyNSGLGetProcAddress("glXQueryVersion");
-    GLint majorGLX, minorGLX = 0;
-    if (!glXQueryVersion(display, &majorGLX, &minorGLX))
-        if (majorGLX <= 1 && minorGLX < 2) {
-            printf("GLX 1.2 or greater is required.\n");
-            return NULL;
-        }
-    printf("GLX version %i.%i\n", majorGLX, minorGLX);
-    //~~~~~~~~~~~~~~~~~
+//    //~~~~~~~~~~~~~~~~~
+//    // NOTE:ED - code to test the glX binding
+//    printf("glXQueryVersion\n");
+//    typedef bool (*glXQueryVersionProcPtr)(Display * dpy, int * Major, int * Minor);
+//    glXQueryVersionProcPtr pfglXQueryVersion = NULL;
+//    pfglXQueryVersion = (glXQueryVersionProcPtr) MyNSGLGetProcAddress("glXQueryVersion");
+//    GLint majorGLX, minorGLX = 0;
+//    if (!glXQueryVersion(display, &majorGLX, &minorGLX))
+//        if (majorGLX <= 1 && minorGLX < 2) {
+//            printf("GLX 1.2 or greater is required.\n");
+//            return NULL;
+//        }
+//    printf("GLX version %i.%i\n", majorGLX, minorGLX);
+//    //~~~~~~~~~~~~~~~~~
 
     if (!glXQueryExtension(display, &dummy, &dummy))
     {
