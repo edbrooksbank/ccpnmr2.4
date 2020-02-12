@@ -5,7 +5,6 @@ source ./paths.sh
 # build paths
 SKIP_SCRIPTS=""
 SKIP_CODES=""
-INCLUDE_DIRS="bin ccpnmr2.4 doc"
 DATA_DIR=""
 INCLUDE_FILES=""
 

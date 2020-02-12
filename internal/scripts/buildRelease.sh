@@ -40,11 +40,18 @@ if [[ ${MACHINE} == *"UNKNOWN"* ]]; then
   read_choice ${#OS_LIST[@]} " select an OS from the list > "
 fi
 
+# setup correct folders for the Windows and others
+if [[ "${MACHINE}" == *"Win"* ]]; then
+  INCLUDE_DIRS="bat ccpnmr2.4 doc"
+else
+  INCLUDE_DIRS="bin ccpnmr2.4 doc"
+fi
+
 # set the new pathname
 
 RELEASE_DEFAULT=""
 read -rp "Enter name for release [${RELEASE_DEFAULT}]: " RELEASE_NAME
-RELEASE_NAME="${RELEASE_NAME:-RELEASE_DEFAULT}"
+RELEASE_NAME="${RELEASE_NAME:-$RELEASE_DEFAULT}"
 
 # remove all quotes and spaces - not needed here as an appended name
 RELEASE_NAME="$(echo "${RELEASE_NAME}" | tr -d " \'\"\`")"
@@ -177,7 +184,7 @@ fi
 # Copy miniconda code over:
 
 echo "copying miniconda folder"
-if [[ "$MACHINE" == *"Win"* ]]; then
+if [[ "${MACHINE}" == *"Win"* ]]; then
   cd "${HOME}/Anaconda3/envs" || exit
 else
   cd "${HOME}/miniconda3/envs" || exit
