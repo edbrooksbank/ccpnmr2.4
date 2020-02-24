@@ -89,9 +89,13 @@ IGNORE_GL_FLAG =
 # (this relates to glXCreateContext() call in ccpnmr/global/gl_handler.c)
 # if have problems with USE_GL_TRUE then try GL_FALSE, or vice versa
 # use below for Linux?
-GL_FLAG = -DUSE_GL_FALSE
+#GL_FLAG = -DUSE_GL_FALSE
 # use below for everything else?
-#GL_FLAG = -DUSE_GL_TRUE
+GL_FLAG = -DUSE_GL_TRUE
+
+#GLUT_NEED_INIT = -DNEED_GLUT_INIT
+#GLUT_NOT_IN_GL = -DGLUT_IN_OWN_DIR
+GLUT_FLAG = $(GLUT_NEED_INIT) $(GLUT_NOT_IN_GL)
 
 # math
 MATH_LIB = -lm
