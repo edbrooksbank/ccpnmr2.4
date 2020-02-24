@@ -1,1 +1,1 @@
-@call "xeasy2azara2.4"
+@call "xeasy2azara2.5"
