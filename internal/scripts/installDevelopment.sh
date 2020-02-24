@@ -9,7 +9,7 @@
 source ./common.sh
 source ./ccpnInternal.sh
 
-ANALYSIS_DEFAULT=${HOME}/Projects/AnalysisV3
+ANALYSIS_DEFAULT=${HOME}/Projects/ccpnmr2.5
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # start of code
