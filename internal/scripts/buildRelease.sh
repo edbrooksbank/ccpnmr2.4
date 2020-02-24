@@ -42,9 +42,9 @@ fi
 
 # setup correct folders for the Windows and others
 if [[ "${MACHINE}" == *"Win"* ]]; then
-  INCLUDE_DIRS="bat ccpnmr2.4 doc"
+  INCLUDE_DIRS="bat ccpnmr2.5 doc"
 else
-  INCLUDE_DIRS="bin ccpnmr2.4 doc"
+  INCLUDE_DIRS="bin ccpnmr2.5 doc"
 fi
 
 # set the new pathname

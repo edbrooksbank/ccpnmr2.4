@@ -90,7 +90,7 @@ fi
 
 # install new modules
 
-pip install --target ./ccpnmr2.4/python --upgrade ${PIPMODULES}
+pip install --target ./ccpnmr2.5/python --upgrade ${PIPMODULES}
 error_check
 
 # clean up to keep pip working

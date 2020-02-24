@@ -35,7 +35,7 @@ check_darwin
 # copy the correct environment file
 
 echo "compiling C Code"
-cd "${CCPNMR_TOP_DIR}/ccpnmr2.4/c" || exit
+cd "${CCPNMR_TOP_DIR}/ccpnmr2.5/c" || exit
 
 echo "using environment_${MACHINE}.txt"
 if [[ ! -f environment_${MACHINE}.txt ]]; then
