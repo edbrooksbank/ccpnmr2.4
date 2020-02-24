@@ -7,6 +7,7 @@ SKIP_SCRIPTS=""
 SKIP_CODES=""
 DATA_DIR=""
 INCLUDE_FILES=""
+SKIP_REPOSITORIES=(nefio)
 
 # repositories contained in the project
 REPOSITORY_NAMES=(ccpnmr2.4
