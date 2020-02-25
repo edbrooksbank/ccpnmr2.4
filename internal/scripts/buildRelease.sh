@@ -26,25 +26,25 @@ check_darwin
 
 echo "Checking git repositories:"
 for thisrep in ${REPOSITORY_PATHS[*]}; do
-  cd "${thisrep}" || exit
-  check_git_repository
+    cd "${thisrep}" || exit
+    check_git_repository
 done
 
 # Get the machine type to label the path
 
 detect_os
 if [[ ${MACHINE} == *"UNKNOWN"* ]]; then
-  echo "machine not in [${OS_LIST[*]}]"
-  continue_prompt "do you want to try an OS from the list?"
-  show_choices
-  read_choice ${#OS_LIST[@]} " select an OS from the list > "
+    echo "machine not in [${OS_LIST[*]}]"
+    continue_prompt "do you want to try an OS from the list?"
+    show_choices
+    read_choice ${#OS_LIST[@]} " select an OS from the list > "
 fi
 
 # setup correct folders for the Windows and others
 if [[ "${MACHINE}" == *"Win"* ]]; then
-  INCLUDE_DIRS="bat ccpnmr2.5 doc"
+    INCLUDE_DIRS="bat ${VERSIONPATH} doc"
 else
-  INCLUDE_DIRS="bin ccpnmr2.5 doc"
+    INCLUDE_DIRS="bin ${VERSIONPATH} doc"
 fi
 
 # set the new pathname
@@ -97,14 +97,14 @@ CCPNMRFILE="ccpnmr${RELEASE_VER}${RELEASE_NAME}${MACHINE}"
 
 echo "creating new directory ${HOME}/${RELEASE}"
 if [[ ! -d "${HOME}/${RELEASE}" ]]; then
-  # create the new release directory
-  mkdir -p "${HOME}/${RELEASE}"
-  error_check
+    # create the new release directory
+    mkdir -p "${HOME}/${RELEASE}"
+    error_check
 else
-  continue_prompt "directory already exists, do you want to move it and continue?"
-  DT=$(date '+%d-%m-%Y_%H:%M:%S')
-  mv "${HOME}/${RELEASE}" "${HOME}/${RELEASE}_${DT}"
-  error_check
+    continue_prompt "directory already exists, do you want to move it and continue?"
+    DT=$(date '+%d-%m-%Y_%H:%M:%S')
+    mv "${HOME}/${RELEASE}" "${HOME}/${RELEASE}_${DT}"
+    error_check
 fi
 
 # Make current build in release directory
@@ -116,23 +116,23 @@ echo "File:         ${CCPNMRFILE}"
 
 echo "creating new directory ${HOME}/${RELEASE}/${CCPNMRPATH}"
 if [[ ! -d "${HOME}/${RELEASE}/${CCPNMRPATH}" ]]; then
-  # create the new release directory
-  mkdir -p "${HOME}/${RELEASE}/${CCPNMRPATH}"
-  error_check
+    # create the new release directory
+    mkdir -p "${HOME}/${RELEASE}/${CCPNMRPATH}"
+    error_check
 else
-  continue_prompt "directory already exists, do you want to move it and continue?"
-  DT=$(date '+%d-%m-%Y_%H:%M:%S')
-  mv "${HOME}/${RELEASE}/${CCPNMRPATH}" "${HOME}/${RELEASE}/${CCPNMRPATH}_${DT}"
-  error_check
+    continue_prompt "directory already exists, do you want to move it and continue?"
+    DT=$(date '+%d-%m-%Y_%H:%M:%S')
+    mv "${HOME}/${RELEASE}/${CCPNMRPATH}" "${HOME}/${RELEASE}/${CCPNMRPATH}_${DT}"
+    error_check
 fi
 
 # Check if miniconda directory already exists
 
 if [[ -d "${HOME}/${RELEASE}/${CCPNMRPATH}/miniconda" ]]; then
-  continue_prompt "miniconda already exists, do you want to continue?"
-  DT=$(date '+%d-%m-%Y_%H:%M:%S')
-  mv "${HOME}/${RELEASE}/${CCPNMRPATH}/miniconda" "${HOME}/${RELEASE}/${CCPNMRPATH}/miniconda_${DT}"
-  error_check
+    continue_prompt "miniconda already exists, do you want to continue?"
+    DT=$(date '+%d-%m-%Y_%H:%M:%S')
+    mv "${HOME}/${RELEASE}/${CCPNMRPATH}/miniconda" "${HOME}/${RELEASE}/${CCPNMRPATH}/miniconda_${DT}"
+    error_check
 fi
 
 # Tar up the directories (skipping internal)
@@ -142,10 +142,10 @@ cd "${CCPNMR_TOP_DIR}" || exit
 echo "${HOME}/${RELEASE}/repository${RELEASE_VER}.tgz"
 
 if command_exists pigz; then
-  echo "using pigz"
-  tar --use-compress-program=pigz -cf "${HOME}/${RELEASE}/repository${RELEASE_VER}.tgz" ${INCLUDE_FILES} ${INCLUDE_DIRS} ${DATA_DIR}
+    echo "using pigz"
+    tar --use-compress-program=pigz -cf "${HOME}/${RELEASE}/repository${RELEASE_VER}.tgz" ${INCLUDE_FILES} ${INCLUDE_DIRS} ${DATA_DIR}
 else
-  tar czf "${HOME}/${RELEASE}/repository${RELEASE_VER}.tgz" ${INCLUDE_FILES} ${INCLUDE_DIRS} ${DATA_DIR}
+    tar czf "${HOME}/${RELEASE}/repository${RELEASE_VER}.tgz" ${INCLUDE_FILES} ${INCLUDE_DIRS} ${DATA_DIR}
 fi
 
 # Unpack the tgz in ${HOME}/${RELEASE}/${CCPNMRPATH}
@@ -163,8 +163,8 @@ error_check
 
 echo "removing unneeded scripts"
 if [[ -d "${HOME}/${RELEASE}/${CCPNMRPATH}/bin" ]]; then
-  cd "${HOME}/${RELEASE}/${CCPNMRPATH}/bin" || exit
-  rm -rf "${SKIP_SCRIPTS}"
+    cd "${HOME}/${RELEASE}/${CCPNMRPATH}/bin" || exit
+    rm -rf "${SKIP_SCRIPTS}"
 fi
 
 # Change version for update script (mistake, this should have been done in the repository)
@@ -177,27 +177,27 @@ fi
 
 echo "removing unneeded code"
 if [[ -d "${HOME}/${RELEASE}/${CCPNMRPATH}/src/python/ccpn" ]]; then
-  cd "${HOME}/${RELEASE}/${CCPNMRPATH}/src/python/ccpn" || exit
-  rm -rf "${SKIP_CODES}"
+    cd "${HOME}/${RELEASE}/${CCPNMRPATH}/src/python/ccpn" || exit
+    rm -rf "${SKIP_CODES}"
 fi
 
 # Copy miniconda code over:
 
 echo "copying miniconda folder"
 if [[ "${MACHINE}" == *"Win"* ]]; then
-  cd "${HOME}/Anaconda3/envs" || exit
+    cd "${HOME}/Anaconda3/envs" || exit
 else
-  cd "${HOME}/miniconda3/envs" || exit
+    cd "${HOME}/miniconda3/envs" || exit
 fi
 
 # need to be on the correct conda source
 
 echo "compressing ${CONDA_SOURCE}"
 if command_exists pigz; then
-  echo "using pigz"
-  tar --use-compress-program=pigz -cf "${CONDA_SOURCE}.tgz" "${CONDA_SOURCE}"
+    echo "using pigz"
+    tar --use-compress-program=pigz -cf "${CONDA_SOURCE}.tgz" "${CONDA_SOURCE}"
 else
-  tar czf "${CONDA_SOURCE}.tgz" "${CONDA_SOURCE}"
+    tar czf "${CONDA_SOURCE}.tgz" "${CONDA_SOURCE}"
 fi
 
 error_check
@@ -254,15 +254,15 @@ rm -rf "../${CONDA_SOURCE}.tgz"
 echo "creating final tgz/zip"
 cd "${HOME}/${RELEASE}" || exit
 if command_exists pigz; then
-  echo "using pigz"
-#  tar --use-compress-program=pigz -cf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
-  tar cf - "${CCPNMRPATH}" | pigz > "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz"
+    echo "using pigz"
+    #  tar --use-compress-program=pigz -cf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
+    tar cf - "${CCPNMRPATH}" | pigz >"${HOME}/${RELEASE}/${CCPNMRFILE}.tgz"
 else
-  tar czf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
+    tar czf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
 fi
 if command_exists 7z && [[ "$BUILD_ZIP" == true ]]; then
-  echo "using 7z"
-  #zip -r -q ${HOME}/${RELEASE}/${CCPNMRFILE}.zip ${CCPNMRPATH}
-  7z a -tzip -bd "${HOME}/${RELEASE}/${CCPNMRFILE}.zip" "${CCPNMRPATH}"
+    echo "using 7z"
+    #zip -r -q ${HOME}/${RELEASE}/${CCPNMRFILE}.zip ${CCPNMRPATH}
+    7z a -tzip -bd "${HOME}/${RELEASE}/${CCPNMRFILE}.zip" "${CCPNMRPATH}"
 fi
 echo "done"
