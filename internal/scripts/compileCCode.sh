@@ -32,6 +32,21 @@ echo "current machine: ${MACHINE}, ${BIT_COUNT}"
 
 check_darwin
 
+# make a symbolic link for the miniconda path (if it does not exists)
+
+if [[ ${MACHINE} == *"Windows"* ]]; then
+    # easier with Anaconda
+    CONDA_PATH="${HOME}/Anaconda3"
+else
+    CONDA_PATH="${HOME}/miniconda3"
+fi
+CONDA_CCPN_PATH="${CONDA_PATH}/envs/${CONDA_SOURCE}"
+cd "${CCPNMR_TOP_DIR}" || exit
+if [[ ! -d "${CONDA_CCPN_PATH}" ]]; then
+  echo "Creating miniconda symbolic link"
+  ln -s "${CONDA_CCPN_PATH}" miniconda
+fi
+
 # copy the correct environment file
 
 echo "compiling C Code"
