@@ -42,7 +42,7 @@ else
 fi
 CONDA_CCPN_PATH="${CONDA_PATH}/envs/${CONDA_SOURCE}"
 cd "${CCPNMR_TOP_DIR}" || exit
-if [[ ! -d "${CONDA_CCPN_PATH}" ]]; then
+if [[ ! -d miniconda ]]; then
   echo "Creating miniconda symbolic link"
   ln -s "${CONDA_CCPN_PATH}" miniconda
 fi
