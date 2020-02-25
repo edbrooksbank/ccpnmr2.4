@@ -25,9 +25,17 @@ check_darwin
 # Check if all the git repositories are correct
 
 echo "Checking git repositories:"
-for thisrep in ${REPOSITORY_PATHS[*]}; do
-    cd "${thisrep}" || exit
-    check_git_repository
+for ((REP = 0; REP < ${#REPOSITORY_NAMES[@]}; REP++)); do
+
+    # concatenate paths to give the correct install path
+    THIS_REP=${REPOSITORY_NAMES[${REP}]}
+    THIS_PATH=${REPOSITORY_PATHS[${REP}]}
+
+    cd "${THIS_PATH}" || exit
+    if [[ ! ${SKIP_REPOSITORIES[*]} =~ ${THIS_REP} ]]; then
+        # whatever you want to do when arr contains value
+        check_git_repository
+    fi
 done
 
 # Get the machine type to label the path
