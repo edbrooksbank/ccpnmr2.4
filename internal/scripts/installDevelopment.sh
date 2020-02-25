@@ -215,8 +215,8 @@ if [[ "${GIT_CHECKOUT}" == "True" ]]; then
 
             # only checkout if the branch exists
             if [[ "$(git ls-remote --heads "${THIS_SOURCE}/${THIS_REP}".git "${GIT_RELEASE}" | wc -l)" -eq "1" ]]; then
-                echo "checkout branch ${THIS_PATH} to ${GIT_RELEASE}"
-                git checkout "${GIT_RELEASE}"
+                echo "checkout path ${THIS_PATH} to branch ${GIT_RELEASE}"
+                git checkout "${GIT_RELEASE}" --
                 echo "reseting branch ${THIS_PATH} to origin/${GIT_RELEASE}"
                 git reset --hard origin/"${GIT_RELEASE}"
             else
