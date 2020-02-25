@@ -15,14 +15,14 @@ source ./common.sh
 
 detect_os
 if [[ "$MACHINE" == *"UNKNOWN"* ]]; then
-  echo "machine not in [${OS_LIST[*]}]"
-  continue_prompt "do you want to try an OS from the list?"
-  show_choices
-  read_choice ${#OS_LIST[@]} " select an OS from the list > "
+    echo "machine not in [${OS_LIST[*]}]"
+    continue_prompt "do you want to try an OS from the list?"
+    show_choices
+    read_choice ${#OS_LIST[@]} " select an OS from the list > "
 fi
 if [[ ${MACHINE} == *"MacOS"* ]]; then
-  # required for getting the correct path from miniconda website
-  MACOSAPPEND='X'
+    # required for getting the correct path from miniconda website
+    MACOSAPPEND='X'
 fi
 
 BIT_COUNT="$(uname -m)"
@@ -43,12 +43,12 @@ fi
 CONDA_CCPN_PATH="${CONDA_PATH}/envs/${CONDA_SOURCE}"
 cd "${CCPNMR_TOP_DIR}" || exit
 if [[ ! -d "${CONDA_CCPN_PATH}" ]]; then
-  echo "Error compiling - conda environment ${CONDA_SOURCE} does not exist"
-  exit
+    echo "Error compiling - conda environment ${CONDA_SOURCE} does not exist"
+    exit
 fi
 if [[ ! -d miniconda ]]; then
-  echo "Creating miniconda symbolic link"
-  ln -s "${CONDA_CCPN_PATH}" miniconda
+    echo "Creating miniconda symbolic link"
+    ln -s "${CONDA_CCPN_PATH}" miniconda
 fi
 
 # copy the correct environment file
@@ -58,8 +58,8 @@ cd "${CCPNMR_TOP_DIR}/ccpnmr2.5/c" || exit
 
 echo "using environment_${MACHINE}.txt"
 if [[ ! -f environment_${MACHINE}.txt ]]; then
-  echo "environment doesn't exists with this name, please copy closest and re-run compileCCode"
-  exit
+    echo "environment doesn't exists with this name, please copy closest and re-run compileCCode"
+    exit
 fi
 
 # run 'make'
@@ -73,7 +73,7 @@ sed -i.bak "1 s|^.*$|${CONDA_PATH}|" environment.txt && rm -rf environment.txt.b
 
 echo "making"
 if [[ ${MACHINE} != *"Windows"* ]]; then
-  make -B $*
+    make -B $*
 else
-  echo "Please use 'nmake' from an x64 terminal to compile."
+    echo "Please use 'nmake' from an x64 terminal to compile."
 fi
