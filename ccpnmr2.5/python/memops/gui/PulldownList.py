@@ -108,7 +108,7 @@ class PulldownList(Frame):
     self.bg     = self.cget('bg')
     self.label  = Label(self, foreground=labelColor)
     self.canvas = Canvas(self, width=12, height=12, background=self.bg)
-    self.menu   = Menu(self.canvas, tearoff=False, bg=menuBg, relief='solid',
+    self.menu   = Menu(self.canvas, tearoff=False, relief='solid', # bg=menuBg,
                        borderwidth=1, activeborderwidth=1)
     
     self.menu.images = [] # Photoimage has to remain referenced
