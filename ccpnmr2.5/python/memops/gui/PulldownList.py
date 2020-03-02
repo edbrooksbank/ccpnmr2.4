@@ -81,7 +81,8 @@ class PulldownList(Frame):
                initCallback=False, forceCallback=False, numbering=False,   
                arrowLine='#602000', arrowFill='#B05848', labelColor='#501000',
                menuBg='#F0F0FF', sticky='w', docKey=None, tipText=None,
-               categoriesLast=True, *args, **kw):
+               categoriesLast=True, fonts=None,
+               *args, **kw):
 
     Frame.__init__(self, parent, sticky=sticky, docKey=docKey, tipText=tipText, createToolTip=True, *args, **kw)
 
@@ -90,6 +91,8 @@ class PulldownList(Frame):
     self.objects       = objects or []
     self.categories    = categories or []
     self.colors        = colors or []
+    self._fonts        = fonts or []
+
     self.prefix        = prefix
     self.indent        = indent
     self.initCallback  = initCallback
@@ -103,18 +106,18 @@ class PulldownList(Frame):
     # Current selection
     self.index         = None
     self.object        = NullText
-    
+
     self.rows   = []
     self.bg     = self.cget('bg')
     self.label  = Label(self, foreground=labelColor)
     self.canvas = Canvas(self, width=12, height=12, background=self.bg)
-    self.menu   = Menu(self.canvas, tearoff=False, relief='solid', # bg=menuBg,
+    self.menu   = Menu(self.canvas, tearoff=False, relief='solid', # bg=menuBg,  # NOTE:ED removed because locks MacOS colour
                        borderwidth=1, activeborderwidth=1)
     
     self.menu.images = [] # Photoimage has to remain referenced
 
     self.setup(self.texts, self.objects, index,
-               self.colors, self.categories)
+               self.colors, self.categories, self._fonts)
 
     self.label.bind( "<Button-1>",  self._labelClick)
     self.menu.bind(  "<Leave>",     self._leave)
@@ -195,7 +198,7 @@ class PulldownList(Frame):
   
     self.setup([], [], 0)
 
-  def setup(self, texts, objects, index, colors=None, categories=None):
+  def setup(self, texts, objects, index, colors=None, categories=None, fonts=None):
           
     self.texts = texts
     nTexts = len(texts)
@@ -223,6 +226,13 @@ class PulldownList(Frame):
         categories.append(None)
       self.categories = categories  
 
+    if fonts is None:
+      self._fonts = [None] * nTexts  
+    else:
+      while len(fonts) < nTexts:
+        fonts.append(None)
+      self._fonts = fonts
+
     self._setMenuItems()
     
     self.setIndex(index or 0)
@@ -232,7 +242,7 @@ class PulldownList(Frame):
   #        
         
   def insert(self, index, text, object=None, color=None,
-             category=None, select=False):
+             category=None, select=False, font=None):
    
     index = max(0, min(len(self.texts),index))
    
@@ -240,16 +250,17 @@ class PulldownList(Frame):
     self.objects.insert(index, object)
     self.colors.insert(index, color)
     self.categories.insert(index, category)
-   
+    self._fonts.insert(index, font)
+
     self._setMenuItems()
       
     if select:  
       self.setIndex(index)
 
-  def append(self, text, object=None, color=None, category=None, select=False):
+  def append(self, text, object=None, color=None, category=None, select=False, font=None):
 
     self.insert(len(self.texts), text, object=None,
-                color=None, category=None, select=False)
+                color=None, category=None, select=False, font=None)     # NOTE:ED - not sure these should be None.. but not changing
    
   def delete(self, index, howMany=1):
 
@@ -266,6 +277,7 @@ class PulldownList(Frame):
     del self.objects[index:end]
     del self.colors[index:end]
     del self.categories[index:end]
+    del self._fonts[index:end]
 
     self._setMenuItems()
 
@@ -372,34 +384,35 @@ class PulldownList(Frame):
       text     = self.texts[i]
       color    = self.colors[i]
       category = self.categories[i]        
+      _font    = self._fonts[i]
 
       if type(category) is SET_TYPE:
         for altCat in category:
           if altCat is None:
-            topList.append((i, text, color, None))
+            topList.append((i, text, color, None, _font))
           
           else:
             if categoryDict.get(altCat) is None:
               categoryDict[altCat] = []
               if catLast:
-                catList.append((None, altCat, None, altCat))
+                catList.append((None, altCat, None, altCat, _font))
               else:
-                topList.append((None, altCat, None, altCat))
+                topList.append((None, altCat, None, altCat, _font))
  
-            categoryDict[altCat].append((i, text, color))
+            categoryDict[altCat].append((i, text, color, _font))
       
       elif category:
         if categoryDict.get(category) is None:
           categoryDict[category] = []
           if catLast:
-            catList.append((None, category, None, category))
+            catList.append((None, category, None, category, _font))
           else:
-            topList.append((None, category, None, category))
+            topList.append((None, category, None, category, _font))
         
-        categoryDict[category].append((i, text, color))
+        categoryDict[category].append((i, text, color, _font))
    
       else:
-        topList.append((i, text, color, None))
+        topList.append((i, text, color, None, _font))
    
     if catLast:
       catList.sort()
@@ -408,18 +421,17 @@ class PulldownList(Frame):
     divider = False
    
     row = 0
-    for index, text, color, cat in topList:
+    for index, text, color, cat, _fnt in topList:
       columnbreak = 0
       if row and row % 36 == 0:
         columnbreak = 1
-            
       
       if cat:
         string = (self.indent * row) + self.prefix + text
         items = []
         
         rowB = 0
-        for index2, text2, color2 in categoryDict.get(cat, []):
+        for index2, text2, color2, _fnt2 in categoryDict.get(cat, []):
           columnbreakB = 0
           if rowB and rowB % 36 == 0:
             columnbreakB = 1
@@ -433,13 +445,18 @@ class PulldownList(Frame):
           command = lambda n=index2: self.setIndex(n, True)
           if color2:
             image = self._makeColorTile(color2)
-            item2 = {'kind': 'command', 'accelerator': string2,
+            item2 = {'kind': 'command', 'accelerator': string2, 'label': string2,
                      'command': command, 'image': image,
                      'columnbreak': columnbreakB}
+            # use _fnt defined in the _font list
+            if _fnt2:
+              item2.update({'font': _fnt2})
           else:
             item2 = {'kind': 'command', 'label': string2,
                      'command': command, 'columnbreak': columnbreakB}
-          
+            if _fnt2:
+              item2.update({'font': _fnt2})
+
           items.append(item2)
           self.rows.append(row)
           rowB += 1
@@ -450,7 +467,9 @@ class PulldownList(Frame):
         
         item = {'kind':'cascade', 'label':string, 
                 'submenu':items, 'columnbreak':columnbreak}
-        
+        if _fnt:
+          item.update({'font': _fnt})
+
       else:
 
         if self.numbering:
@@ -465,10 +484,14 @@ class PulldownList(Frame):
           image = self._makeColorTile(color)
           item = {'kind': 'command', 'accelerator': string, 'command': command,
                   'image': image, 'columnbreak': columnbreak}
+          if _fnt:
+            item.update({'font': _fnt})
         else:
           item = {'kind': 'command', 'label': string,
                   'command': command, 'columnbreak': columnbreak}
-      
+          if _fnt:
+            item.update({'font': _fnt})
+
       self.menu.addMenuItem(item)
       self.rows.append(row)
        
@@ -561,6 +584,16 @@ if __name__ == '__main__':
   
   objects = [1, 2, {'color':'red'}, 'Some text', 5.376574, None, 'A', 'B', 'C']  
 
+  fonts = [None,
+           ('Lucida', 14, 'bold'),
+           ('System', 10),
+           None,
+           ('Helvetica', 12, 'italic'),
+           ('Helvetica', 14, 'italic'),
+           None,
+           ('Helvetica', 16, 'bold', 'italic'),
+           ('Courier', 8,), ]
+
   cats = [None] * len(texts)
   sec = 'SubSection'
   cats[-1] = sec
@@ -570,7 +603,7 @@ if __name__ == '__main__':
   root = Tkinter.Tk()
   pulldownMenu = PulldownList(root, callback=callback, 
                               texts=texts, objects=objects,
-                              colors=colors, categories=cats,
+                              colors=colors, categories=cats, fonts=fonts,
                               tipText='Explanation')
   pulldownMenu.grid(row=0, column=0, columnspan=3)
 

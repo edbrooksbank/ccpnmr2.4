@@ -900,13 +900,21 @@ class EditProfilesPopup(BasePopup):
     value = getattr(obj, attrName) 
    
     names = []
+    fonts= []
     categories = []
     
     for face in ('Courier','Helvetica','Lucida','System','Times'):
       for size in (8,10,12,14):
-        for mod in ('', ' bold'):
+
+        # NOTE:ED added size 14 and the italic modes for testing
+        for mod in ('', ' bold'):                                   #, ' italic', ' bold italic'):
           name = '%s %d%s' % (face,size,mod)
           names.append(name)
+          fontName = (face, size)
+          if mod:
+              for mm in mod.split():
+                fontName += (mm,)
+          fonts.append(fontName)
           categories.append(face)
           
     if value in names:
@@ -914,7 +922,7 @@ class EditProfilesPopup(BasePopup):
     else:
       index = 0
     
-    widget.setup(names,names,index,categories=categories) 
+    widget.setup(names,names,index,categories=categories,fonts=fonts)
   
   def getGraphicsHandler(self, widget, obj, attrName):
   

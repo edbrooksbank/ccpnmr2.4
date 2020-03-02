@@ -51,6 +51,7 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 ===========================REFERENCE END===============================
 """
 
+# import Tkinter as tk
 from memops.gui.Menu import Menu
 
 fontNames = ('Courier','Helvetica','Lucida','System','Times')
@@ -67,21 +68,21 @@ class FontMenu(Menu):
 
       for s in sizes:
         spec = '%s %d' % (fontName,s)
-        subMenus[fontName].add_command(label='%dpt' % s, font=spec, command=lambda s=spec: setFunc(s) )
-      
+        subMenus[fontName].add_command(label='%dpt' % s, font=(fontName, s), command=lambda s=spec: setFunc(s) )
+
       if doBold:
         for s in sizes:
           spec = '%s %d bold' % (fontName,s)
-          subMenus[fontName].add_command(label='%dpt bold' % s, font=spec, command=lambda s=spec: setFunc(s) )
-      
+          subMenus[fontName].add_command(label='%dpt bold' % s, font=(fontName, s, "bold"), command=lambda s=spec: setFunc(s) )
+
       if doItalic:
         for s in sizes:
           spec = '%s %d italic' % (fontName,s)
-          subMenus[fontName].add_command(label='%dpt italic' % s, font=spec, command=lambda s=spec: setFunc(s) )
-      
+          subMenus[fontName].add_command(label='%dpt italic' % s, font=(fontName, s, "italic"), command=lambda s=spec: setFunc(s) )
+
       if doBoldItalic:
         for s in sizes:
           spec = '%s %d bold italic' % (fontName,s)
-          subMenus[fontName].add_command(label='%dpt bold italic' % s, font=spec, command=lambda s=spec: setFunc(s) )
+          subMenus[fontName].add_command(label='%dpt bold italic' % s, font=(fontName, s, "bold", "italic"), command=lambda s=spec: setFunc(s) )
 
       self.add_cascade(label=fontName,   shortcut=fontName[0], menu=subMenus[fontName])

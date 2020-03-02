@@ -713,7 +713,7 @@ class AnalysisPopup(BasePopup, Analysis):
 
     # Preferences submenu
 
-    fontsMenu = FontMenu(self.menubar, self.selectFont, sizes=(8,10,12),
+    fontsMenu = FontMenu(self.menubar, self.selectFont, sizes=(8,10,12,14),
                          doItalic=False, doBoldItalic=False, tearoff=0)
     
     prefsMenu = Menu(self.menubar, tearoff=False)
