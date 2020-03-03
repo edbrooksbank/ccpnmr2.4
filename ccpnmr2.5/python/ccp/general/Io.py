@@ -493,7 +493,10 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
 
         xmlPath = found['path'].to_numpy()[0]
         xmlFile = found['file'].to_numpy()[0]
-        urlLocation = ccpForgeUrl+os.path.join(xmlPath, xmlFile)
+        # urlLocation = ccpForgeUrl+os.path.join(xmlPath, xmlFile)
+
+        # NOTE:ED must use '/' for url join
+        urlLocation = ccpForgeUrl+'/'.join([xmlPath, xmlFile])
       else:
         return None         # nothing found, need to skip here to match original version
     else:
@@ -529,25 +532,32 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
           data = r2.read()
           r2.close()
 
-          try:
-            saveChemCompPath = repository.getFileLocation('ccp.molecule.%s' % fileType)
-            if not os.path.exists(saveChemCompPath):
-              os.makedirs(saveChemCompPath)
-  
-            # chemCompFile = uniIo.joinPath(saveChemCompPath,chemCompXmlFile)
-            chemCompFile = uniIo.joinPath(saveChemCompPath, xmlFile)
-            fout = open(chemCompFile,'w')
-            fout.write(data)
-            fout.close()
-  
-            print ("Downloaded %s %s%s, %s from server %s, written to file %s!"
-                   % (fileType,sourceText,molType,ccpCode,ccpForgeDownloadUrl,chemCompFile))
-            result = chemCompFile
-  
-          except IOError, e:
-            showError("Cannot write file", 
-                      "Cannot write %s XML file %s%s, %s: %s" 
-                      % (fileType,sourceText,molType,ccpCode,str(e)))
+          if data and 'Not Found' in data[:min(20, len(data))]:
+
+            # NOTE:ED if the server returns file containing 'not found' then don't write
+            showError("File not found",
+                      "File not found on server: %s" % xmlFile)
+
+          else:
+            try:
+              saveChemCompPath = repository.getFileLocation('ccp.molecule.%s' % fileType)
+              if not os.path.exists(saveChemCompPath):
+                os.makedirs(saveChemCompPath)
+
+              # chemCompFile = uniIo.joinPath(saveChemCompPath,chemCompXmlFile)
+              chemCompFile = uniIo.joinPath(saveChemCompPath, xmlFile)
+              fout = open(chemCompFile,'w')
+              fout.write(data)
+              fout.close()
+
+              print ("Downloaded %s %s%s, %s from server %s, written to file %s!"
+                     % (fileType,sourceText,molType,ccpCode,ccpForgeDownloadUrl,chemCompFile))
+              result = chemCompFile
+
+            except IOError, e:
+              showError("Cannot write file",
+                        "Cannot write %s XML file %s%s, %s: %s"
+                        % (fileType,sourceText,molType,ccpCode,str(e)))
   
         except IOError, e:
           showError("Cannot read file", "Cannot read %s %s%s, %s: %s" 
