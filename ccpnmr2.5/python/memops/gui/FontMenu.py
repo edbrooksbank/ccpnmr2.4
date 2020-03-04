@@ -55,34 +55,51 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 from memops.gui.Menu import Menu
 
 fontNames = ('Courier','Helvetica','Lucida','System','Times')
+BOLD = 'bold'
+ITALIC = 'italic'
+
 
 class FontMenu(Menu):
 
-  def __init__(self, parent, setFunc, sizes=(8,10,12,14), doBold=1, doItalic=1, doBoldItalic=0, *args, **kw):
+    def __init__(self, parent, setFunc, sizes=(8, 10, 12, 14), doBold=1, doItalic=1, doBoldItalic=0, *args, **kw):
 
-    Menu.__init__(self, parent, *args, **kw)
+        Menu.__init__(self, parent, *args, **kw)
 
-    subMenus  = {}
-    for fontName in fontNames:
-      subMenus[fontName] = Menu(self, tearoff=0)
+        # NOTE:ED potentially read all the fonts available on the system
+        #       restricted to one-word names as must be stored as a string (tuple as nicer format)
+        # fontNames = tkFont.families()
+        # filter those that contain spaces
+        # fontNames = [fnt for fnt in fontNames if len(fnt.split()) == 1]
 
-      for s in sizes:
-        spec = '%s %d' % (fontName,s)
-        subMenus[fontName].add_command(label='%dpt' % s, font=(fontName, s), command=lambda s=spec: setFunc(s) )
+        subMenus = {}
+        for fontName in fontNames:
+            subMenus[fontName] = Menu(self, tearoff=0)
 
-      if doBold:
-        for s in sizes:
-          spec = '%s %d bold' % (fontName,s)
-          subMenus[fontName].add_command(label='%dpt bold' % s, font=(fontName, s, "bold"), command=lambda s=spec: setFunc(s) )
+            for s in sizes:
+                spec = '%s %d' % (fontName, s)
+                label = '%dpt' % s
+                fontSpec = (fontName, s)
+                subMenus[fontName].add_command(label=label, font=spec, command=lambda fnt=spec: setFunc(fnt))
 
-      if doItalic:
-        for s in sizes:
-          spec = '%s %d italic' % (fontName,s)
-          subMenus[fontName].add_command(label='%dpt italic' % s, font=(fontName, s, "italic"), command=lambda s=spec: setFunc(s) )
+            if doBold:
+                for s in sizes:
+                    spec = '%s %d %s' % (fontName, s, BOLD)
+                    label = '%dpt %s' % (s, BOLD)
+                    fontSpec = (fontName, s, BOLD)
+                    subMenus[fontName].add_command(label=label, font=spec, command=lambda fnt=spec: setFunc(fnt))
 
-      if doBoldItalic:
-        for s in sizes:
-          spec = '%s %d bold italic' % (fontName,s)
-          subMenus[fontName].add_command(label='%dpt bold italic' % s, font=(fontName, s, "bold", "italic"), command=lambda s=spec: setFunc(s) )
+            if doItalic:
+                for s in sizes:
+                    spec = '%s %d %s' % (fontName, s, ITALIC)
+                    label = '%dpt %s' % (s, ITALIC)
+                    fontSpec = (fontName, s, ITALIC)
+                    subMenus[fontName].add_command(label=label, font=spec, command=lambda fnt=spec: setFunc(fnt))
 
-      self.add_cascade(label=fontName,   shortcut=fontName[0], menu=subMenus[fontName])
+            if doBoldItalic:
+                for s in sizes:
+                    spec = '%s %d %s %s' % (fontName, s, BOLD, ITALIC)
+                    label = '%dpt %s %s' % (s, BOLD, ITALIC)
+                    fontSpec = (fontName, s, BOLD, ITALIC)
+                    subMenus[fontName].add_command(label=label, font=spec, command=lambda fnt=spec: setFunc(fnt))
+
+            self.add_cascade(label=fontName, shortcut=fontName[0], menu=subMenus[fontName])
