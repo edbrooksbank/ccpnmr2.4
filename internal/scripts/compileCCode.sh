@@ -89,5 +89,5 @@ echo "making path ${CCPNMR_TOP_DIR}/${VERSIONPATH}/c"
 if [[ ${MACHINE} != *"Windows"* ]]; then
     make -B $*
 else
-    echo "Please use 'nmake' from an x64 terminal in the above path to compile."
+    echo "Please set the conda environment use 'nmake' from an x64 terminal in the above path to compile."
 fi

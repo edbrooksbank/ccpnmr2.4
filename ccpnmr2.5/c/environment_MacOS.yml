@@ -1,3 +1,6 @@
+# Create a conda env with the following command from a bash shell
+# conda env create -f environment_MacOS.yml
+
 name: ccpn-v2.5.0
 channels:
   - defaults

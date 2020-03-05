@@ -154,8 +154,12 @@ class PartitionedSelector(Frame):
         # button  = Button(self,command=command,relief=self.buttonRelief,
         #                  font=self.fonts[i],borderwidth=self.buttonBorderWidth)
 
-        button  = Label(self,relief=self.buttonRelief,
-                         font=self.fonts[i],borderwidth=self.buttonBorderWidth)
+        # button  = Label(self,relief=self.buttonRelief,
+        #                  font=self.fonts[i],borderwidth=self.buttonBorderWidth)
+
+        # ignore font so that inherits from parent
+        button  = Label(self,relief=self.buttonRelief,borderwidth=self.buttonBorderWidth)
+
         self.buttons.append( button )
 
         command = lambda event, n=i, s=self: s.selectButton(n)
@@ -176,7 +180,11 @@ class PartitionedSelector(Frame):
 
       # NOTE:ED - swapping button for a label (tk MacOS fix) - need to test Windows/Linux
       # self.buttons[i].config(text=labels[i],font=self.fonts[i])
-      self.buttons[i].config(font=self.fonts[i])
+      # self.buttons[i].config(font=self.fonts[i])
+
+      # ignore font so that inherits from parent
+      self.buttons[i].config()
+
       self.buttons[i].set(labels[i])
 
       self.buttons[i].grid(row=row,column=col, sticky=Tkinter.NSEW)

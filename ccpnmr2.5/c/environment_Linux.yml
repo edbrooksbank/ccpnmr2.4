@@ -1,3 +1,6 @@
+# Create a conda env with the following command from a bash shell
+# conda env create -f environment_Linux.yml
+
 name: ccpn-v2.5.0
 channels:
   - conda-forge
@@ -62,7 +65,7 @@ dependencies:
 
 # tk came from smithsp -think this was a build against freetype/fontconfig
 
-#name: ccpnmrV2
+#name: ccpn-v2.5.0
 #channels:
 #  - conda-forge
 #  - smithsp
@@ -123,10 +126,10 @@ dependencies:
 #  - pip:
 #    - pyopengl==3.1.5
 #    - pyopengl-accelerate==3.1.5
-#prefix: /home/ccpn/miniconda3/envs/ccpnmrV2
+#prefix: /home/ccpn/miniconda3/envs/ccpn-v2.5.0
 #
-#(ccpnmrV2) [ccpn@osboxes bin]$ conda list
-## packages in environment at /home/ccpn/miniconda3/envs/ccpnmrV2:
+#(ccpn-v2.5.0) [ccpn@osboxes bin]$ conda list
+## packages in environment at /home/ccpn/miniconda3/envs/ccpn-v2.5.0:
 ##
 ## Name                    Version                   Build  Channel
 #_libgcc_mutex             0.1                        main

@@ -20,7 +20,7 @@ ccpnmr/                            top level directory
 
   doc/                             top level documentation
 
-  ccpnmr2.5/                       CcpNmr code
+  ccpnmr2.5/                       CcpNmr code (this folder name is subject to change)
 
     python/                        Python code
 

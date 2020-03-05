@@ -600,7 +600,8 @@ class WindowPopup(BasePopup):
     buttons[0].config(image=self.vertLines)
     buttons[1].config(image=self.horizLines)
    
-    self.stripsLabel = Label(frame, text='Active:', font=self.font, grid=(0,3))
+    # self.stripsLabel = Label(frame, text='Active:', font=self.font, grid=(0,3))
+    self.stripsLabel = Label(frame, text='Active:', grid=(0,3))
 
     tipText = 'Selects which strips are active; their locations are moved with the Z-axis scrollbar and the first active strip is the one shuffled or deleted'
     self.stripsToggleSelector = PartitionedSelector(frame, self.toggleStrips,
