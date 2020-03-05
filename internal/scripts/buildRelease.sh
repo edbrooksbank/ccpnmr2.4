@@ -271,6 +271,6 @@ fi
 if command_exists 7za && [[ "$BUILD_ZIP" == true ]]; then
     echo "using 7za"
     #zip -r -q ${HOME}/${RELEASE}/${CCPNMRFILE}.zip ${CCPNMRPATH}
-    7za a -tzip -bd "${HOME}/${RELEASE}/${CCPNMRFILE}.zip" "${CCPNMRPATH}"
+    7za a -tzip -bd -bso0 -bsp0 "${HOME}/${RELEASE}/${CCPNMRFILE}.zip" "${CCPNMRPATH}"
 fi
 echo "done"

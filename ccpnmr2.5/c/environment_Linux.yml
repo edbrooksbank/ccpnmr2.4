@@ -59,7 +59,6 @@ dependencies:
   - wheel
   - xz
   - zlib
-  - 7za
   - pip:
     - pyopengl==3.1.5
     - pyopengl-accelerate==3.1.5
