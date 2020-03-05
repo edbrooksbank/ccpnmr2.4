@@ -1,3 +1,6 @@
+# PYTHON_DIR WILL INSERT HERE
+# CONDA_ENV WILL INSERT HERE
+
 # should work if suitably edited for Linux, Irix, Solaris, OSX, Windows
 
 # general rules:

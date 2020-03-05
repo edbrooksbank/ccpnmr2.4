@@ -1,4 +1,4 @@
-name: ccpnmrV2
+name: conda-env-2.5.0
 channels:
   - defaults
 dependencies:

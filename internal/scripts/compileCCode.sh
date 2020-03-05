@@ -47,14 +47,22 @@ if [[ ! -d "${CONDA_CCPN_PATH}" ]]; then
     exit
 fi
 if [[ ! -d miniconda ]]; then
-    echo "Creating miniconda symbolic link"
-    ln -s "${CONDA_CCPN_PATH}" miniconda
+    if [[ ${MACHINE} == *"Windows"* ]]; then
+        # easier o make a link with a windows shell
+        echo "Please open Windows shell and copy below to make link (easiest way) and rerun script:"
+        echo "   cd ${CCPNMR_TOP_DIR}"
+        echo "   mklink /D miniconda ${CONDA_CCPN_PATH}"
+        exit
+    else
+        echo "Creating miniconda symbolic link"
+        ln -s "${CONDA_CCPN_PATH}" miniconda
+    fi
 fi
 
 # copy the correct environment file
 
 echo "compiling C Code"
-cd "${CCPNMR_TOP_DIR}/ccpnmr2.5/c" || exit
+cd "${CCPNMR_TOP_DIR}/${VERSIONPATH}/c" || exit
 
 echo "using environment_${MACHINE}.txt"
 if [[ ! -f environment_${MACHINE}.txt ]]; then
@@ -65,15 +73,21 @@ fi
 # run 'make'
 
 echo "setting up environment file"
-# CONDA_PATH="PYTHON_DIR = $(which python | rev | cut -d'/' -f3- | rev)"
-CONDA_PATH="PYTHON_DIR = ${ANACONDA3}"
+
+# copy the required environment for the makefile
+CONDA_HEADER="PYTHON_DIR = ${ANACONDA3}"
+CONDA_HEADER_ENV="CONDA_ENV = ${CONDA_SOURCE}"
+
 cp "environment_${MACHINE}.txt" environment.txt
 error_check
-sed -i.bak "1 s|^.*$|${CONDA_PATH}|" environment.txt && rm -rf environment.txt.bak
 
-echo "making"
+# insert the PYTHON_DIR and CONDA_ENV into the first line of the environment file (CONDA_ENV not strictly required)
+sed -i.bak "1 s|^.*$|${CONDA_HEADER}|" environment.txt && rm -rf environment.txt.bak
+sed -i.bak "2 s|^.*$|${CONDA_HEADER_ENV}|" environment.txt && rm -rf environment.txt.bak
+
+echo "making path ${CCPNMR_TOP_DIR}/${VERSIONPATH}/c"
 if [[ ${MACHINE} != *"Windows"* ]]; then
     make -B $*
 else
-    echo "Please use 'nmake' from an x64 terminal to compile."
+    echo "Please use 'nmake' from an x64 terminal in the above path to compile."
 fi

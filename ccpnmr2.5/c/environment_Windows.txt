@@ -1,5 +1,5 @@
-#PYTHON_DIR = C:\Users\localadmin1\Desktop\ccpn\ccpnv3\miniconda\
-PYTHON_DIR = C:\Users\localadmin1\Anaconda3\envs\ccpnmrV2
+# PYTHON_DIR WILL INSERT HERE
+# CONDA_ENV WILL INSERT HERE
 
 # should work if suitably edited for Linux, Irix, Solaris, OSX, Windows
 
