@@ -1,4 +1,4 @@
-name: conda-env-2.5.0
+name: ccpn-v2.5.0
 channels:
   - defaults
 dependencies:

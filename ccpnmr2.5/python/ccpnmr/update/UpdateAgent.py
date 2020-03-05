@@ -77,10 +77,12 @@ BAD_DOWNLOAD = 'Exception: '
 VERSION_ROUTE= 'ccpnmr.analysis.Version'
 VERSION_ATTRIBUTE = 'version'
 
-
 fieldSep = '\t'
 environmentFile = 'environment.txt'
 SERVER_USER_ROOT = '/home'
+CCPNMRCODEDIR = 'ccpnmr2.5'
+CCPNMRTOPDIR = 'ccpnmr'
+
 
 def getNumUninstalledUpdates(serverLocation=UPDATE_SERVER_LOCATION,
                              serverDirectory=UPDATE_DIRECTORY,
@@ -802,9 +804,9 @@ class FileUpdate:
 class ReleaseUpdate:
 
   def __init__(self, server, installRoot, currentVersion,
-               releaseDir = 'temporaryReleaseDir', ccpnmrTopDir = 'ccpnmr',
-               ccpnmrCodeDir = 'ccpnmr2.5', httpServer = 'www2.ccpn.ac.uk',
-               httpDir = 'ccpnmr', uid = 'ccpn'):
+               releaseDir = 'temporaryReleaseDir', ccpnmrTopDir = CCPNMRTOPDIR,
+               ccpnmrCodeDir = CCPNMRCODEDIR, httpServer = 'www2.ccpn.ac.uk',
+               httpDir = CCPNMRTOPDIR, uid = 'ccpn'):
 
     self.server         = server
     self.installRoot    = installRoot
