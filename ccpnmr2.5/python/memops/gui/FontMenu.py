@@ -78,28 +78,28 @@ class FontMenu(Menu):
             for s in sizes:
                 spec = '%s %d' % (fontName, s)
                 label = '%dpt' % s
-                fontSpec = (fontName, s)
+                # fontSpec = (fontName, s)
                 subMenus[fontName].add_command(label=label, font=spec, command=lambda fnt=spec: setFunc(fnt))
 
             if doBold:
                 for s in sizes:
                     spec = '%s %d %s' % (fontName, s, BOLD)
                     label = '%dpt %s' % (s, BOLD)
-                    fontSpec = (fontName, s, BOLD)
+                    # fontSpec = (fontName, s, BOLD)
                     subMenus[fontName].add_command(label=label, font=spec, command=lambda fnt=spec: setFunc(fnt))
 
             if doItalic:
                 for s in sizes:
                     spec = '%s %d %s' % (fontName, s, ITALIC)
                     label = '%dpt %s' % (s, ITALIC)
-                    fontSpec = (fontName, s, ITALIC)
+                    # fontSpec = (fontName, s, ITALIC)
                     subMenus[fontName].add_command(label=label, font=spec, command=lambda fnt=spec: setFunc(fnt))
 
             if doBoldItalic:
                 for s in sizes:
                     spec = '%s %d %s %s' % (fontName, s, BOLD, ITALIC)
                     label = '%dpt %s %s' % (s, BOLD, ITALIC)
-                    fontSpec = (fontName, s, BOLD, ITALIC)
+                    # fontSpec = (fontName, s, BOLD, ITALIC)
                     subMenus[fontName].add_command(label=label, font=spec, command=lambda fnt=spec: setFunc(fnt))
 
             self.add_cascade(label=fontName, shortcut=fontName[0], menu=subMenus[fontName])
