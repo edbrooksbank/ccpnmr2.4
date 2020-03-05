@@ -242,11 +242,11 @@ rm -rf "../${CONDA_SOURCE}.tgz"
 #  else
 #    tar czf "${HOME}/${RELEASE}/data${RELEASE_VER}.tgz" ${DATA_DIR}
 #  fi
-#  if command_exists 7z && [[ "$BUILD_ZIP" == true ]]; then
-#    echo "using 7z"
+#  if command_exists 7za && [[ "$BUILD_ZIP" == true ]]; then
+#    echo "using 7za"
 #    #zip -r -q ${HOME}/${RELEASE}/data${RELEASE_VER}.zip $DATA_DIR
-#    #example for parallel 7zip: 7z a -t7z -mx=9 -m0=LZMA2 -mmt14 "Target.7z" "Source\*.*
-#    7z a -tzip -bd "${HOME}/${RELEASE}/data${RELEASE_VER}.zip" ${DATA_DIR}
+#    #example for parallel 7zip: 7za a -tzip -mx=9 -m0=LZMA2 -mmt14 "Target.zip" "Source\*.*
+#    7za a -tzip -bd "${HOME}/${RELEASE}/data${RELEASE_VER}.zip" ${DATA_DIR}
 #  fi
 #  rm -rf "${DATA_DIR}"
 #fi
@@ -268,9 +268,9 @@ if command_exists pigz; then
 else
     tar czf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
 fi
-if command_exists 7z && [[ "$BUILD_ZIP" == true ]]; then
-    echo "using 7z"
+if command_exists 7za && [[ "$BUILD_ZIP" == true ]]; then
+    echo "using 7za"
     #zip -r -q ${HOME}/${RELEASE}/${CCPNMRFILE}.zip ${CCPNMRPATH}
-    7z a -tzip -bd "${HOME}/${RELEASE}/${CCPNMRFILE}.zip" "${CCPNMRPATH}"
+    7za a -tzip -bd "${HOME}/${RELEASE}/${CCPNMRFILE}.zip" "${CCPNMRPATH}"
 fi
 echo "done"
