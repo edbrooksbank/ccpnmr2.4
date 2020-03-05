@@ -102,7 +102,7 @@ GLUT_FLAG = $(GLUT_NEED_INIT) $(GLUT_NOT_IN_GL)
 MATH_LIB = -lm
 
 # Tk
-TK_DIR = /home/ccpn/miniconda3/envs/${CONDA_ENV)
+TK_DIR = /home/ccpn/miniconda3/envs/$(CONDA_ENV)
 TK_LIB = -ltk8.6 -ltcl8.6
 #TK_LIB = $(PYTHON_DIR)/lib/libtk8.6.dylib
 TK_INCLUDE_FLAGS = -I$(TK_DIR)/include
@@ -110,7 +110,7 @@ TK_LIB_FLAGS = -L$(TK_DIR)/lib
 
 # on OSX and some other Unixes below is possible if not using provided Mesa
 #GL_DIR = /usr
-#GL_DIR = /home/ccpn/miniconda3/envs/${CONDA_ENV)
+#GL_DIR = /home/ccpn/miniconda3/envs/$(CONDA_ENV)
 # use below if compiling GL, except on OSX if using framework glut
 GL_LIB = -lGL -lGLU -lglut
 # use below if compiling GL, except on OSX if using framework glut
@@ -162,7 +162,7 @@ SHARED_FLAGS = -shared
 # X11
 # use below for everything but Irix
 #X11_DIR = /usr/X11R6
-#X11_DIR = /home/ccpn/miniconda3/envs/${CONDA_ENV)
+#X11_DIR = /home/ccpn/miniconda3/envs/$(CONDA_ENV)
 # use below for Irix
 X11_DIR = /usr
 X11_LIB = -lX11 -lXext
