@@ -264,13 +264,13 @@ cd "${HOME}/${RELEASE}" || exit
 if command_exists pigz; then
     echo "using pigz"
     #  tar --use-compress-program=pigz -cf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
-    tar cf - "${CCPNMRPATH}" | pigz >"${HOME}/${RELEASE}/${CCPNMRFILE}.tgz"
+    tar cf - "${CCPNMRPATH}" | pigz -8 > "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz"
 else
     tar czf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
 fi
 if command_exists 7za && [[ "$BUILD_ZIP" == true ]]; then
     echo "using 7za"
     #zip -r -q ${HOME}/${RELEASE}/${CCPNMRFILE}.zip ${CCPNMRPATH}
-    7za a -tzip -bd -bso0 -bsp0 "${HOME}/${RELEASE}/${CCPNMRFILE}.zip" "${CCPNMRPATH}"
+    7za a -tzip -bd -bso0 -bsp0 -mx=7 "${HOME}/${RELEASE}/${CCPNMRFILE}.zip" "${CCPNMRPATH}"
 fi
 echo "done"

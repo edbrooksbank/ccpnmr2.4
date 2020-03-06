@@ -1495,7 +1495,7 @@ class CcpnNefReader():
                     commonUtil.resetSerial(resonanceGroup, useSerial)
                 except ValueError:
                     print("INFO: ResonanceGroup serial number %s could not be preserved. "
-                          "Data are still correct.")
+                          "Data are still correct." % useSerial)
                     # If the serial is taken we lose coherence, but that is better than an error
                     pass
 
