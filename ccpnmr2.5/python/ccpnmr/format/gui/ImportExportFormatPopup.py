@@ -447,7 +447,11 @@ class GenericFormatPopup(BasePopup):
     row = -1
     
     for component in self.components:
-      
+
+      # NOTE:ED component may be {} if buggy importer
+      if not self.IOkeywords[component]:
+        continue
+
       self.fileDefs = (component,self.format,self.selectFile,self.selectDir)
       normalWidgets = []
       toggleWidgets = []
@@ -539,8 +543,14 @@ class GenericFormatPopup(BasePopup):
 
           self.widgets[component][buttonKeyword] = widget
           self.widgetInfo[component][buttonKeyword] = (widgetInfo,selectionDict)
-          
-          infoButton = Tkinter.Button(master,text = 'i', font = ('Courier','10','bold'), width = 0, height = 0, command = lambda text = self.IOkeywords[component][buttonKeyword][2]: self.doInfoPopup(text))
+
+          try:
+            # infoButton = Tkinter.Button(master,text = 'i', font = ('Courier','10','bold'), width = 0, height = 0, command = lambda text = self.IOkeywords[component][buttonKeyword][2]: self.doInfoPopup(text))
+            labelText = self.IOkeywords[component][buttonKeyword][2]
+          except Exception as es:
+            labelText = 'Label Error'
+
+          infoButton = Tkinter.Button(master,text = 'i', font = ('Courier','10','bold'), width = 0, height = 0, command = lambda text = labelText: self.doInfoPopup(text))
 
           row = row + 1
           label.grid(row=row, column=0, sticky=Tkinter.E)
