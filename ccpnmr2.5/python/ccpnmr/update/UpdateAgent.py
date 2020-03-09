@@ -571,7 +571,9 @@ class UpdateServer:
       import urllib3.contrib.pyopenssl
       import certifi
 
-      fileName = os.path.join(serverDbRoot, fileName)
+      # fileName = os.path.join(serverDbRoot, fileName)
+      fileName = '/'.join([serverDbRoot, fileName])
+
       addr = '%s?fileName=%s' % (serverScript, fileName)
 
       urllib3.contrib.pyopenssl.inject_into_urllib3()
@@ -713,7 +715,7 @@ class FileUpdate:
     # self.storedAs   = '__temp_'.join(filePath.split('/')) + '_' + fileName
 
     # 20190322:ED different separator, __temp_ will split into directory tree on the server, __sep_ will put single file in update path
-    fullPath = os.path.join(filePath, fileName)
+    fullPath = '/'.join([filePath, fileName])
     self.storedAs   = '__sep_'.join(fullPath.split('/'))
 
     self.isCached   = 0
