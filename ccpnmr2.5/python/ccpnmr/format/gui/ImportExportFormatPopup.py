@@ -68,6 +68,7 @@ from memops.gui.Entry import Entry
 from memops.gui.PulldownList import PulldownList
 from memops.gui.ScrolledListbox import ScrolledListbox
 from memops.gui.DataEntry import askDir
+from memops.gui.ScrolledFrame import ScrolledFrame
 
 from ccpnmr.format.gui.AcqProcParsEditPopup import AcqProcParsEditPopup
 from ccpnmr.format.gui.InfoPopup import InfoPopup
@@ -263,7 +264,7 @@ class GenericFormatPopup(BasePopup):
     self.components = []
     self.widgetSetup = {}
     self.toggleInfoIndex = {}
-    
+
     #
     # Do the import of the relevant format class and the IOkeywords dictionary
     #
@@ -423,9 +424,18 @@ class GenericFormatPopup(BasePopup):
     BasePopup.__init__(self,parent = parent, title = self.titleText, modal = False, transient=False)
  
   def body(self, master):
-    
+
+    # Ensure that the first row and column in popup expand
+    master.grid_rowconfigure(0, weight=1)
+    master.grid_columnconfigure(0, weight=1, minsize=200)
+
+    # add a scrolled frame for the widgets
+    scrolledFrame = ScrolledFrame(master, xscroll=False)
+    scrolledFrame.grid(row=0, column=0, sticky='nsew')
+    _frame = scrolledFrame.frame
+
     if not self.components:
-      showError("Error","No valid %s implemented (yet)." % self.importExportFlag,master)
+      showError("Error","No valid %s implemented (yet)." % self.importExportFlag,_frame)
       self.close()
       
     # 
@@ -467,13 +477,13 @@ class GenericFormatPopup(BasePopup):
         
         row += 1
         
-        label = Label(master, text = self.IOkeywords[component]['showText'])
+        label = Label(_frame, text = self.IOkeywords[component]['showText'])
         label.grid(row=row, column=0, columnspan = 3, sticky=Tkinter.EW)
         
         self.widgets[component] = None
         
         row = row + 1
-        separator = Separator(master,height = 3)
+        separator = Separator(_frame,height = 3)
         separator.setColor('black', bgColor = 'black')
         separator.grid(row=row, column=0, columnspan = 3, sticky=Tkinter.EW)
 
@@ -486,10 +496,10 @@ class GenericFormatPopup(BasePopup):
       if self.importExportFlag == 'import' and not self.component:
         row += 1
         
-        label = Label(master, text = 'Import %s:' % component)
+        label = Label(_frame, text = 'Import %s:' % component)
         label.grid(row=row, column=0, sticky=Tkinter.E)
       
-        self.checkButton[component] = CheckButton(master) 
+        self.checkButton[component] = CheckButton(_frame) 
         self.checkButton[component].grid(row=row, column=1, sticky=Tkinter.W)
             
       toggleInfoLabelRow = None
@@ -507,7 +517,7 @@ class GenericFormatPopup(BasePopup):
         widgetInfo = self.widgetSetup[component][widgetIndex]
         buttonKeyword = widgetInfo[1]
 
-        (label,widget,selectionDict) = setIoInfo(master,widgetInfo,self.project,self.fileDefs)
+        (label,widget,selectionDict) = setIoInfo(_frame,widgetInfo,self.project,self.fileDefs)
 
         #
         # Make sure that widget info does not appear if no valid objects
@@ -545,12 +555,12 @@ class GenericFormatPopup(BasePopup):
           self.widgetInfo[component][buttonKeyword] = (widgetInfo,selectionDict)
 
           try:
-            # infoButton = Tkinter.Button(master,text = 'i', font = ('Courier','10','bold'), width = 0, height = 0, command = lambda text = self.IOkeywords[component][buttonKeyword][2]: self.doInfoPopup(text))
+            # infoButton = Tkinter.Button(_frame,text = 'i', font = ('Courier','10','bold'), width = 0, height = 0, command = lambda text = self.IOkeywords[component][buttonKeyword][2]: self.doInfoPopup(text))
             labelText = self.IOkeywords[component][buttonKeyword][2]
           except Exception as es:
             labelText = 'Label Error'
 
-          infoButton = Tkinter.Button(master,text = 'i', font = ('Courier','10','bold'), width = 0, height = 0, command = lambda text = labelText: self.doInfoPopup(text))
+          infoButton = Tkinter.Button(_frame,text = 'i', font = ('Courier','10','bold'), width = 0, height = 0, command = lambda text = labelText: self.doInfoPopup(text))
 
           row = row + 1
           label.grid(row=row, column=0, sticky=Tkinter.E)
@@ -572,14 +582,14 @@ class GenericFormatPopup(BasePopup):
           row += 1
           #print 'export button row %d' % row
 
-          self.exportButton[component] = Tkinter.Button(master, text = "Export %s file." % component, command = lambda comp = component: self.importExportFile(comp))
+          self.exportButton[component] = Tkinter.Button(_frame, text = "Export %s file." % component, command = lambda comp = component: self.importExportFile(comp))
           self.exportButton[component].grid(row=row, column=0, columnspan = 3, sticky=Tkinter.EW)
           
           allWidgets.append((None,self.exportButton[component],None))
 
         if toggleInfoLabelRow != None:
           #print toggleInfoLabelRow
-          toggleInfoLabel = ToggleLabel(master,  text='Additional options', callback= lambda hidden, curRow = toggleInfoLabelRow, toggleWidgets = toggleWidgets: self.toggleInfo(hidden,curRow,toggleWidgets))
+          toggleInfoLabel = ToggleLabel(_frame,  text='Additional options', callback= lambda hidden, curRow = toggleInfoLabelRow, toggleWidgets = toggleWidgets: self.toggleInfo(hidden,curRow,toggleWidgets))
           toggleInfoLabel.grid(row=toggleInfoLabelRow, column=0, sticky = Tkinter.E)
  
           if componentToggleRow != None:
@@ -590,12 +600,12 @@ class GenericFormatPopup(BasePopup):
             # If not part of encompassing toggle, just minimize now...
             toggleInfoLabel.callback(1)
         if componentToggleRow != None:
-          toggleInfoLabel = ToggleLabel(master,  text='Click here for the %s export menu.' % component, callback= lambda hidden, curRow = componentToggleRow, allWidgets = allWidgets: self.toggleInfo(hidden,curRow,allWidgets))
+          toggleInfoLabel = ToggleLabel(_frame,  text='Click here for the %s export menu.' % component, callback= lambda hidden, curRow = componentToggleRow, allWidgets = allWidgets: self.toggleInfo(hidden,curRow,allWidgets))
           toggleInfoLabel.grid(row=componentToggleRow, column=0, columnspan = 3, sticky = Tkinter.EW)
           toggleInfoLabel.callback(1)
 
         row = row + 1
-        separator = Separator(master,height = 3)
+        separator = Separator(_frame,height = 3)
         separator.setColor('black', bgColor = 'black')
         separator.grid(row=row, column=0, columnspan = 3, sticky=Tkinter.EW)
       
@@ -609,11 +619,11 @@ class GenericFormatPopup(BasePopup):
         texts = []
         commands = []
       
-      buttons = createDismissHelpButtonList(master, texts=texts, commands=commands, help_url=self.help_url)
+      buttons = createDismissHelpButtonList(_frame, texts=texts, commands=commands, help_url=self.help_url)
       buttons.grid(row=row, column=0, columnspan = 3)
 
     else:
-      showError("Error","No valid objects to %s" % self.importExportFlag,master)
+      showError("Error","No valid objects to %s" % self.importExportFlag,_frame)
       self.close()
   
   def doInfoPopup(self,text):
