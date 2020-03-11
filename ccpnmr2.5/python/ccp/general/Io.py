@@ -525,9 +525,12 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
       # (urlLocation, chemCompXmlFile) = findCcpForgeDownloadLink(dirData,fileType,ccpCode,ccpForgeDownloadUrl)
       
       if urlLocation:
- 
-        r2 = urllib.urlopen(urlLocation)
-    
+
+        import ssl
+        context = ssl._create_unverified_context()
+
+        r2 = urllib.urlopen(urlLocation, context=context)
+
         try:
           data = r2.read()
           r2.close()
