@@ -58,6 +58,7 @@ from memops.gui.Frame import Frame
 from memops.gui.Label import Label
 from memops.gui.Color import hsbToRgb
 from memops.gui.LabeledScale import LabeledScale
+from memops.universal.Util import buttonClick
 
 class ColorChooser(Frame):
 
@@ -80,8 +81,12 @@ class ColorChooser(Frame):
     self.pixelWidth = round(self.boxSize/self.numPixels)
     self.colorBox = Canvas(frame, relief='sunken', borderwidth=2, width=self.boxSize+2, height=self.boxSize+2)
     self.colorBox.bind('<Button-1>', self.pickInColorBox)
-    self.colorBox.bind('<Button-2>', self.pickInColorBox)
-    self.colorBox.bind('<Button-3>', self.pickInColorBox)
+
+    # self.colorBox.bind('<Button-2>', self.pickInColorBox)
+    # self.colorBox.bind('<Button-3>', self.pickInColorBox)
+    self.colorBox.bind(buttonClick(2), self.pickInColorBox)
+    self.colorBox.bind(buttonClick(3), self.pickInColorBox)
+
     self.colorBox.grid(row=0, column=2, rowspan=3, sticky=Tkinter.NSEW,padx=4,pady=4)
     self.pixel = []
     self.colors = []

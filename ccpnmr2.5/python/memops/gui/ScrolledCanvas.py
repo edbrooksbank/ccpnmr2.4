@@ -58,6 +58,8 @@ from memops.gui.FileSelect import FileType
 from memops.gui.FileSelectPopup import FileSelectPopup
 from memops.gui.Frame import Frame
 from memops.gui.Menu import Menu
+from memops.universal.Util import buttonClick, buttonRelease, buttonMotion
+
 
 class ScrolledCanvas(Frame):
 
@@ -87,12 +89,21 @@ class ScrolledCanvas(Frame):
 
     self.canvas.bind('<Configure>',        self.resizeAfter)
     self.canvas.bind('<Button-1>',         self.mouseButton1)
-    self.canvas.bind('<Button-2>',         self.mouseButton2)
-    self.canvas.bind('<Button-3>',         self.mouseButton3)
+
+    # self.canvas.bind('<Button-2>',         self.mouseButton2)
+    # self.canvas.bind('<Button-3>',         self.mouseButton3)
+    self.canvas.bind(buttonClick(2),         self.mouseButton2)
+    self.canvas.bind(buttonClick(3),         self.mouseButton3)
+
     self.canvas.bind('<ButtonRelease-1>',  self.mouseButtonRelease1)
-    self.canvas.bind('<ButtonRelease-2>',  self.mouseButtonRelease2)
-    self.canvas.bind('<B2-Motion>',        self.mouseScroll)
-    self.canvas.bind('<B3-Motion>',        self.doNothing)
+
+    # self.canvas.bind('<ButtonRelease-2>',  self.mouseButtonRelease2)
+    # self.canvas.bind('<B2-Motion>',        self.mouseScroll)
+    # self.canvas.bind('<B3-Motion>',        self.doNothing)
+    self.canvas.bind(buttonRelease(2),  self.mouseButtonRelease2)
+    self.canvas.bind(buttonMotion(2),        self.mouseScroll)
+    self.canvas.bind(buttonMotion(3),        self.doNothing)
+
     self.canvas.bind('<Motion>',           self.mouseEnter)
     self.canvas.bind('<Enter>',            self.mouseEnter)
 

@@ -670,3 +670,31 @@ def isWindowsOS():
 def isMacOS():
 
   return sys.platform.lower() == 'darwin'
+
+def useWheelMouse():
+  # NOTE:ED - small function so that all versions use the same mouse type
+  #         left-mouse    -> selection box
+  #         right-mouse   -> menu
+  #         middle-mouse  -> drag
+  #         scroll-wheel  -> zoom
+  return isWindowsOS() or isMacOS()
+
+def OSButton(button):
+  MACOSBUTTONBINDING = (None, 1, 3, 2)
+
+  if not (0 < button < 4):
+    raise ValueError('Button must be 1-3')
+
+  return int(MACOSBUTTONBINDING[button] if isMacOS() else button)
+
+def buttonClick(button):
+  return '<Button-%i>' % OSButton(button)
+
+def buttonPress(button):
+  return '<ButtonPress-%i>' % OSButton(button)
+
+def buttonRelease(button):
+  return '<ButtonRelease-%i>' % OSButton(button)
+
+def buttonMotion(button):
+  return '<B%i-Motion>' % OSButton(button)

@@ -10,13 +10,14 @@ from memops.gui.Frame import Frame
 from memops.gui.Menu import Menu
 
 from memops.universal.Io import getTopDirectory
+from memops.universal.Util import useWheelMouse, buttonPress
 
 # TBD
 # EditWidgets
 # Right mouse menu: collapse/expand all; print
 # Select between small/med/large icons
 
-isWindowsOS = platform[:3].lower() == 'win'
+# isWindowsOS = platform[:3].lower() == 'win'
 
 TOGGLE = 0
 ICON = 1
@@ -86,12 +87,13 @@ class Tree(Frame):
    
     self.canvas.bind('<Button-1>', self._mouseClick)
     self.canvas.bind('<Double-1>', self._mouseDoubleClick)
-    if isWindowsOS:
+
+    if useWheelMouse():
       self.canvas.bind('<MouseWheel>', self._windowsOsScroll)
     else:
       self.canvas.bind('<Button-4>', self._mouseUp)
       self.canvas.bind('<Button-5>', self._mouseDown)
-                                                    
+
     self.canvas.bind('<p>', self._printCanvas)
     self.canvas.bind('<KeyPress-Prior>', self._pageUp)
     self.canvas.bind('<KeyPress-Next>',  self._pageDown)
@@ -100,8 +102,10 @@ class Tree(Frame):
     self.canvas.bind('<KeyPress-Home>',  self._keyHome)
     self.canvas.bind('<KeyPress-End>',   self._keyEnd)
     self.canvas.bind('<Enter>',  self._enter)
-    self.canvas.bind('<ButtonPress-3>', self._popupMenu)
-     
+
+    # self.canvas.bind('<ButtonPress-3>', self._popupMenu)
+    self.canvas.bind(buttonPress(3), self._popupMenu)
+
     self.bind('<Configure>',self._changeSizeAfter)
     
   def _popupMenu(self, event):

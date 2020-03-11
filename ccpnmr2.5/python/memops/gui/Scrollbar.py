@@ -58,10 +58,11 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 
 import Tkinter
 
-
 from memops.gui.Canvas import Canvas
 from memops.gui.Color import scaleColor, invertColor
 from memops.gui.Frame import Frame
+from memops.universal.Util import buttonClick, buttonMotion
+
 
 shift_key_state = 1
 
@@ -212,9 +213,12 @@ class Scrollbar(Frame):
     c.bind('<Button-1>', self.buttonPressMove)
     c.bind('<B1-Motion>', self.buttonMotionMove)
     c.bind('<ButtonRelease-1>', self.buttonReleaseMove) 
+
     if (allow_resize):
-      c.bind('<Button-2>', self.buttonPressResize)
-      c.bind('<B2-Motion>', self.resize)
+      # c.bind('<Button-2>', self.buttonPressResize)
+      # c.bind('<B2-Motion>', self.resize)
+      c.bind(buttonClick(2), self.buttonPressResize)
+      c.bind(buttonMotion(2), self.resize)
 
   def updateScrollbar(self):
 

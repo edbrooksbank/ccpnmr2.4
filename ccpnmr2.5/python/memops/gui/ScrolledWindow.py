@@ -66,6 +66,7 @@ from memops.gui.Frame import Frame
 from memops.gui.Menu import Menu
 from memops.gui.Scrollbar import Scrollbar
 from memops.gui.Separator import Separator
+from memops.universal.Util import OSButton
 
 no_key_state = 0
 shift_key_state = 1
@@ -326,7 +327,7 @@ class CornerCanvas(Canvas):
   # TBD: does not work with splitting yet
 
   resize_button = 1
-  move_button = 2
+  move_button = OSButton(2)
 
   resize_delta = 2
 
@@ -855,7 +856,7 @@ class ScrolledWindow(Frame):
     self.menu = Menu(self, tearoff=0, include_event=True)
     self.sliceMenu = Menu(self, tearoff=0, include_event=True)
 
-  def setExpandYAxisTickDecimals(expand_y_axis_tick_decimals):
+  def setExpandYAxisTickDecimals(self, expand_y_axis_tick_decimals):
 
     self.expand_y_axis_tick_decimals = expand_y_axis_tick_decimals
     for tick in self.yticks:
@@ -1019,6 +1020,8 @@ class ScrolledWindow(Frame):
     self.pressFuncs[(button, state)] = pressFunc
     self.motionFuncs[(button, state)] = motionFunc
     self.releaseFuncs[(button, state)] = releaseFunc
+
+    # sButton = OSButton(button)
 
     s = '<%sButtonPress-%s>' % (t, button)
     cmd = lambda event, button=button, state=state: self.pressFunc(event, button, state)

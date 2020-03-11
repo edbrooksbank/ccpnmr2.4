@@ -529,6 +529,9 @@ void draw_xor_box_tk_handler(Tk_handler tk_handler,
 
     w = xx1 - xx0;
     h = yy1 - yy0;
+
+    if (!(w && h))
+        return;
 /*
     printf("draw_xor_box_tk_handler: %4.3f, %4.3f, %4.3f, %4.3f\n", x0, y0, x1, y1);
 */
@@ -536,13 +539,37 @@ void draw_xor_box_tk_handler(Tk_handler tk_handler,
 /*
     draw_box_tk_handler(tk_handler, x0, y0, x1, y1);
 */
-    gcv.fill_style = FillStippled;
-    XChangeGC(tk_handler_p->display, tk_handler_p->gc, GCFillStyle, &gcv);
-    XFillRectangle(tk_handler_p->display, tk_handler_p->drawable,
-                                tk_handler_p->gc, xx0, yy0, w, h);
-    gcv.fill_style = FillSolid;
-    XChangeGC(tk_handler_p->display, tk_handler_p->gc, GCFillStyle, &gcv);
-    
+
+    // NOTE:ED - change to draw a series of dotted lines to simulate stipple - doesn't work in MacOS
+    int dash_length = 1;
+    int gap_length = 3;
+    int dash_offset = (gap_length+dash_length)/2;
+    int ndashes = 2;
+    char dash_list[2];
+
+    dash_list[0] = (char) dash_length;
+    dash_list[1] = (char) gap_length;
+
+    gcv.line_style = LineOnOffDash;
+    XChangeGC(tk_handler_p->display, tk_handler_p->gc, GCLineStyle, &gcv);
+
+    // draw alternating lines to give offset to stippling
+    XSetDashes(tk_handler_p->display, tk_handler_p->gc, 0, dash_list, sizeof(dash_list));
+    for (int x=xx0+dash_offset; x<xx1; x+=2*(gap_length+1))
+        XDrawLine(tk_handler_p->display, tk_handler_p->drawable,
+                                tk_handler_p->gc, x, yy0, x, yy1);
+
+    // change the start offset for the stipple
+    XSetDashes(tk_handler_p->display, tk_handler_p->gc, dash_offset, dash_list, sizeof(dash_list));
+    for (int x=xx0+dash_offset+gap_length+1; x<xx1; x+=2*(gap_length+1))
+        XDrawLine(tk_handler_p->display, tk_handler_p->drawable,
+                                tk_handler_p->gc, x, yy0, x, yy1);
+
+    // draw a solid box around the selection
+    gcv.line_style = LineSolid;
+    XChangeGC(tk_handler_p->display, tk_handler_p->gc, GCLineStyle, &gcv);
+    XDrawRectangle(tk_handler_p->display, tk_handler_p->drawable, tk_handler_p->gc, xx0, yy0, w, h);
+
     finish_xor_tk_handler(tk_handler);
 }
 

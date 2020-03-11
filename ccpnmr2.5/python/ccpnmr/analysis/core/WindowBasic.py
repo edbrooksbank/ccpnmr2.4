@@ -308,8 +308,13 @@ def getWindowFrameCanvasLocation(argServer, event = None):
       event = None
 
   if event:
-    x = event.x
-    y = event.y
+    # x = event.x
+    # y = event.y
+
+    # NOTE:ED - replace the above event.<pos> because doesn't work on MacOS (OSbug)
+    px, py = event.widget.winfo_pointerxy()
+    rx, ry = (event.widget.winfo_rootx(), event.widget.winfo_rooty())
+    x, y = (px - rx, py - ry)
   else:
     x = y = None
 

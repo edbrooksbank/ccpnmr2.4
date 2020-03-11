@@ -56,7 +56,7 @@ from datetime import datetime
 
 import Tkinter
 
-from memops.universal.Util import isWindowsOS
+from memops.universal.Util import useWheelMouse, buttonPress, buttonMotion
 
 from memops.gui.Base import getPopup
 from memops.gui.BasePopup import BasePopup
@@ -223,12 +223,13 @@ class ScrolledMatrix(Frame):
     self.bind('<Configure>',self.refreshSizeAfter)
     
     self.canvas.bind('<Button-1>', self.mouseClick)
-    if not isWindowsOS():
+
+    if useWheelMouse():
+      self.canvas.bind('<MouseWheel>', self.windowsOsScroll)
+    else:
       self.canvas.bind('<Button-4>', self.scrollUp)
       self.canvas.bind('<Button-5>', self.scrollDown)
-    else:
-      self.canvas.bind('<MouseWheel>', self.windowsOsScroll)
-                                                    
+
     self.canvas.bind('<Double-1>', self.mouseDoubleClick)
     self.canvas.bind('<Motion>',   self.mouseEnter)
     self.canvas.bind('<Enter>',    self.mouseEnter)
@@ -287,9 +288,12 @@ class ScrolledMatrix(Frame):
     fontMenu = FontMenu(self.menu, self.setFont, sizes=(8,10,12), doBold=False, doBoldItalic=False, tearoff=False)
     self.menu.add_cascade(label = 'Font', shortcut='F', menu=fontMenu)
     self.setGraphMenu()
-    self.canvas.bind('<ButtonPress-3>', self.popupMenu)
-    self.canvas.bind('<B3-Motion>', self.doNothing)
-     
+
+    # self.canvas.bind('<ButtonPress-3>', self.popupMenu)
+    # self.canvas.bind('<B3-Motion>', self.doNothing)
+    self.canvas.bind(buttonPress(3), self.popupMenu)
+    self.canvas.bind(buttonMotion(3), self.doNothing)
+
     self.refreshScrollbars()
     self.drawCanvas()
   

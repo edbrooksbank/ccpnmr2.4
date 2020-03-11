@@ -61,6 +61,7 @@ from memops.gui.Canvas import Canvas
 from memops.gui.Frame import Frame
 from memops.gui.Label import Label
 from memops.gui.ToolTip import ToolTip
+from memops.universal.Util import buttonClick
 
 triangleOutline='#602000'
 triangleFill='#B05848'
@@ -109,8 +110,12 @@ class TabbedFrame(Frame):
     self.setTabs(options, selected, tipTexts, docKeys)
     
     self.canvas.bind('<Button-1>', self.mouseClick)
-    self.canvas.bind('<Button-2>', self.mouseClick)
-    self.canvas.bind('<Button-3>', self.mouseClick)
+
+    # self.canvas.bind('<Button-2>', self.mouseClick)
+    # self.canvas.bind('<Button-3>', self.mouseClick)
+    self.canvas.bind(buttonClick(2), self.mouseClick)
+    self.canvas.bind(buttonClick(3), self.mouseClick)
+
     self.bind('<Configure>', self.redraw)
   
   def setTabs(self, options, selected=None, tipTexts=None, docKeys=None):

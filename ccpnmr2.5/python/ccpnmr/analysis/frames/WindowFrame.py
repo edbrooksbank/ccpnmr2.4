@@ -47,7 +47,7 @@ import Tkinter
 from memops.general import Implementation
 
 from memops.universal.Region1D import Region1D
-from memops.universal.Util import formatDecimals, isWindowsOS
+from memops.universal.Util import formatDecimals, isWindowsOS, useWheelMouse, OSButton
 
 from memops.gui.ButtonScrollbar     import ButtonScrollbar
 from memops.gui.Color               import hexToRgb, inverseGrey, hexXor, hexInvert
@@ -292,27 +292,29 @@ class WindowFrame(Frame, WindowDraw):
     scrolledWindow.canvasBind('<Double-1>', self.clickActivateStrip)
     #self.bind('<FocusIn>', self.focusIn)
     
-    scrolledWindow.translateBind(button=2)
-    scrolledWindow.zoomBind(button=2, state=shift_key_state)
-    scrolledWindow.regionBind(button=2, state=ctrl_key_state)
-    #scrolledWindow.selectSingleBind(button=1)
-    scrolledWindow.selectSingleBind(button=1, state=ctrl_key_state)
-    scrolledWindow.selectMultiBind(button=1, state=no_key_state)
-    scrolledWindow.selectMultiBind(button=1, state=shift_key_state)
-    scrolledWindow.selectMultiBind(button=1, state=shift_key_state+ctrl_key_state)
-    scrolledWindow.selectMultiBind(button=1, state=ctrl_key_state)
-    scrolledWindow.menuBind(button=3, menu_items=self.menu_items,
+    scrolledWindow.translateBind(button=OSButton(2))
+    scrolledWindow.zoomBind(button=OSButton(2), state=shift_key_state)
+    scrolledWindow.regionBind(button=OSButton(2), state=ctrl_key_state)
+    #scrolledWindow.selectSingleBind(button=OSButton(1))
+    scrolledWindow.selectSingleBind(button=OSButton(1), state=ctrl_key_state)
+    scrolledWindow.selectMultiBind(button=OSButton(1), state=no_key_state)
+    scrolledWindow.selectMultiBind(button=OSButton(1), state=shift_key_state)
+    scrolledWindow.selectMultiBind(button=OSButton(1), state=shift_key_state+ctrl_key_state)
+    scrolledWindow.selectMultiBind(button=OSButton(1), state=ctrl_key_state)
+
+    # NOTE:ED - change the menu binding for MacOS
+    scrolledWindow.menuBind(button=OSButton(3), menu_items=self.menu_items,
                             update_func=self.updateMenuState)
 
-    if not isWindowsOS():
-      scrolledWindow.canvasBind('<Button-4>', self.zoomIn)
-      scrolledWindow.canvasBind('<Button-5>', self.zoomOut)
-    else:
+    if useWheelMouse():
       self.windowPopup.bind('<MouseWheel>', self.windowsZoom)
       #self.windowPopup.bind('<KeyPress>', self.keypress)
-                            
+    else:
+      scrolledWindow.canvasBind('<Button-4>', self.zoomIn)
+      scrolledWindow.canvasBind('<Button-5>', self.zoomOut)
+
     if not self.hasValueAxis:
-      scrolledWindow.sliceMenuBind(button=3, menu_items=self.slice_menu_items,
+      scrolledWindow.sliceMenuBind(button=OSButton(3), menu_items=self.slice_menu_items,
                                    update_func=self.updateSliceMenuState)
 
     self.topPopup.initSpectrumWindowPane(windowPane, self)

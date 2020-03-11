@@ -58,6 +58,7 @@ from memops.gui.Canvas import Canvas
 from memops.gui.Color  import scaleColor
 from memops.gui.Frame  import Frame
 from memops.gui.Label  import Label
+from memops.universal.Util import buttonClick, buttonRelease, buttonMotion
 
 TOOL_TIP = """Left-click (& drag): Slide selection.
 Middle-click (& drag): Toggle button on/off."""
@@ -118,9 +119,13 @@ class ButtonScrollbar(Frame):
     c.bind('<Button-1>',        self.slideState)
     c.bind('<B1-Motion>',        self.slideState)
     c.bind('<ButtonRelease-1>', self.slideStateDone)
-    c.bind('<Button-2>',        self.clickState)
-    c.bind('<B2-Motion>',        self.clickState)
-    c.bind('<ButtonRelease-2>', self.clickStateDone)
+
+    # c.bind('<Button-2>',        self.clickState)
+    # c.bind('<B2-Motion>',        self.clickState)
+    # c.bind('<ButtonRelease-2>', self.clickStateDone)
+    c.bind(buttonClick(2),        self.clickState)
+    c.bind(buttonMotion(2),        self.clickState)
+    c.bind(buttonRelease(2), self.clickStateDone)
 
   def resizeCanvas(self, event):
 

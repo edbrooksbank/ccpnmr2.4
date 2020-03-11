@@ -7,6 +7,8 @@ from memops.gui.Menu import Menu
 from memops.gui.Frame import Frame
 from memops.gui.MessageReporter import showOkCancel
 from memops.gui import Color
+from memops.universal.Util import buttonPress
+
 
 CARDINAL_ANCHORS = ('N','E','S','W')
 
@@ -62,7 +64,7 @@ INACTIVE = 'disabled'
 # Fame superclass for selection panel
 
 
-from memops.universal.Util import isWindowsOS
+from memops.universal.Util import isWindowsOS, useWheelMouse, isMacOS
 
 class LinkChart(Frame):
 
@@ -116,12 +118,13 @@ class LinkChart(Frame):
       self.canvas.configure(yscrollcommand=self.vertScrollbar.set)
  
     canvas.bind('<Button-1>', self._mouseSingleClick)
-    if not isWindowsOS():
+
+    if useWheelMouse():
+      canvas.bind('<MouseWheel>', self._windowsOsScroll)
+    else:
       canvas.bind('<Button-4>', self.scrollUp)
       canvas.bind('<Button-5>', self.scrollDown)
-    else:
-      canvas.bind('<MouseWheel>', self._windowsOsScroll)
-    
+
     canvas.bind('<Double-1>', self._mouseDoubleClick)
     canvas.bind('<B1-Motion>', self._mouseDrag)
     canvas.bind('<ButtonRelease-1>', self._mouseRelease)                                 
@@ -165,8 +168,9 @@ class LinkChart(Frame):
     self.menuItems = menuItems              
     self.menu.setMenuItems(menuItems)
     
-    canvas.bind('<ButtonPress-3>', self._popupMenu)
- 
+    # canvas.bind('<ButtonPress-3>', self._popupMenu)
+    canvas.bind(buttonPress(3), self._popupMenu)
+
     self._drawAfter()
 
   def _resizeAfter(self, event):

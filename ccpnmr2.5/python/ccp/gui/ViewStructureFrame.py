@@ -80,7 +80,8 @@ except Exception, e:
   print 'Will continue without Analysis structure viewing functionality'
   StructAtom = StructBond = StructStructure = TkHandler = None
 
-isWindowsOS = sys.platform[:3].lower() == 'win'
+from memops.universal.Util import isWindowsOS, buttonClick, buttonRelease, buttonMotion
+# isWindowsOS = sys.platform[:3].lower() == 'win'
 
 Pi    = math.pi
 Twopi = 2.0 * Pi
@@ -185,15 +186,21 @@ class ViewStructureFrame(ScrolledCanvas):
     self.bind('<Configure>', self.resize)
         
     self.canvas.bind('<Button-1>', self.mouseButton1)
-    self.canvas.bind('<Button-2>', self.mouseButton2)
-    self.canvas.bind('<Button-3>', self.mouseButton3)
+
+    # self.canvas.bind('<Button-2>', self.mouseButton2)
+    # self.canvas.bind('<Button-3>', self.mouseButton3)
+    self.canvas.bind(buttonClick(2), self.mouseButton2)
+    self.canvas.bind(buttonClick(3), self.mouseButton3)
+
     self.canvas.bind('<Prior>', self.zoomOut)
     self.canvas.bind('<Next>', self.zoomIn)
-    if not isWindowsOS:
+
+    if isWindowsOS():
+      self.canvas.bind('<MouseWheel>', self.windowsOsZoom)
+    else:
       self.canvas.bind('<Button-4>', self.zoomIn)
       self.canvas.bind('<Button-5>', self.zoomOut)
-    else:
-      self.canvas.bind('<MouseWheel>', self.windowsOsZoom)
+
     self.canvas.bind('<Up>', self.rotateUp)
     self.canvas.bind('<Down>', self.rotateDown)
     self.canvas.bind('<Left>', self.rotateLeft)
@@ -205,8 +212,12 @@ class ViewStructureFrame(ScrolledCanvas):
     self.canvas.bind('<Leave>', self.stop)
     self.canvas.bind('<Enter>', self.enter)
     self.canvas.bind('<ButtonRelease-1>',self.mouseButtonRelease1)
-    self.canvas.bind('<ButtonRelease-2>',self.mouseButtonRelease2)
-    self.canvas.bind('<B2-Motion>', self.mouseMotion)
+
+    # self.canvas.bind('<ButtonRelease-2>',self.mouseButtonRelease2)
+    # self.canvas.bind('<B2-Motion>', self.mouseMotion)
+    self.canvas.bind(buttonRelease(2),self.mouseButtonRelease2)
+    self.canvas.bind(buttonMotion(2), self.mouseMotion)
+
     self.bind('<Configure>', self.resize)
     self.bind('<Expose>', self.expose)
     self.configMenu()

@@ -67,6 +67,7 @@ from memops.gui.Label           import Label
 from memops.gui.Color           import scaleColor
 from memops.gui.MessageReporter import showWarning
 from memops.universal.Io        import getTopDirectory, joinPath
+from memops.universal.Util      import buttonMotion
 
 UNICODE_PHI = u'\u03A6'
 UNICODE_PSI = u'\u03A8'
@@ -140,7 +141,9 @@ class ViewRamachandranFrame(ScrolledCanvas):
     #if self.leaveCallback:
     #  self.canvas.tag_bind(self.cirTag, "<Leave>", self.circleLeave, "+")
 
-    self.canvas.bind('<B2-Motion>', self.mouseMotion)
+    # self.canvas.bind('<B2-Motion>', self.mouseMotion)
+    self.canvas.bind(buttonMotion(2), self.mouseMotion)
+
     self.canvas.bind('<Button-4>', self.zoomIn)
     self.canvas.bind('<Button-5>', self.zoomOut)
     self.canvas.bind('<Motion>',   self.mouseEnter)
@@ -148,7 +151,8 @@ class ViewRamachandranFrame(ScrolledCanvas):
     self.canvas.bind('<Leave>',    self.mouseLeave)
     
     # add handle function to double mouse click on Rama plot
-    #self.canvas.bind("<Button-3>", self.rightClick)
+    # # self.canvas.bind("<Button-3>", self.rightClick)
+    #self.canvas.bind(buttonClick(3), self.rightClick)
 
     self.drawCanvas()
     

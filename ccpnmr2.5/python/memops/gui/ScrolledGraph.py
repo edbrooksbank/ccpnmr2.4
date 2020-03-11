@@ -51,19 +51,17 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 
 ===========================REFERENCE END===============================
 """
-import Tkinter, math, sys
 
-from memops.gui.ButtonList import ButtonList
-from memops.gui.Canvas import Canvas
+import math
 from memops.gui.Frame import Frame
 from memops.gui.ScrolledCanvas import ScrolledCanvas
 from memops.gui.Color import hexRepr, hexToRgb
-from memops.gui.Util import getPopup
 from memops.gui.DataEntry import askString
+from memops.universal.Util import useWheelMouse
 
 sqrt3over2  = math.sqrt(3.0)/2.0
 log10       = math.log(10)
-isWindowsOS = sys.platform[:3].lower() == 'win'
+# isWindowsOS = sys.platform[:3].lower() == 'win'
 
 class ScrolledGraph(Frame):
 
@@ -165,11 +163,11 @@ class ScrolledGraph(Frame):
     if font:
       self.font = font
 
-    if not isWindowsOS:
+    if useWheelMouse():
+      self.canvas.bind('<MouseWheel>', self.windowsOsZoom)
+    else:
       self.canvas.bind('<Button-4>', lambda event: self.setZoom(self.zoom*1.2) )
       self.canvas.bind('<Button-5>', lambda event: self.setZoom(self.zoom/1.2) )
-    else:
-      self.canvas.bind('<MouseWheel>', self.windowsOsZoom)    
 
     self.configMenu()
     self.draw()
