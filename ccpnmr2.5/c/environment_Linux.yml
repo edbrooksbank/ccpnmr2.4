@@ -1,7 +1,7 @@
 # Create a conda env with the following command from a bash shell
 # conda env create -f environment_Linux.yml
 
-name: ccpn-v2.5.0
+name: <NAME INSERTED FROM internal/scripts/version.sh>
 channels:
   - conda-forge
   - smithsp
@@ -19,6 +19,7 @@ dependencies:
   - enum34
   - fontconfig
   - freetype
+  - freeglut
   - icu
   - idna
   - intel-openmp

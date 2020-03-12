@@ -1,7 +1,7 @@
 # Create a conda env with the following command from a git bash shell
 # conda env create -f environment_Windows.yml
 
-name: ccpn-v2.5.0
+name: <NAME INSERTED FROM internal/scripts/version.sh>
 channels:
   - defaults
 dependencies:

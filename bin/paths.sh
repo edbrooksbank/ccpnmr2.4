@@ -5,6 +5,8 @@ export CCPNMR_TOP_DIR
 export VERSIONPATH=ccpnmr2.5
 export ANACONDA3="${CCPNMR_TOP_DIR}"/miniconda
 export PYTHONPATH="${CCPNMR_TOP_DIR}/${VERSIONPATH}/python"
+export FONTCONFIG_FILE="${ANACONDA3}"/etc/fonts/fonts.conf
+export FONTCONFIG_PATH="${ANACONDA3}"/etc/fonts
 
 UNAME="$(uname -s)"
 if [[ ${UNAME} == 'Darwin' ]]; then
