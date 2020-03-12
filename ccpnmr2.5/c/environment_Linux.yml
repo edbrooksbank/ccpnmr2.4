@@ -19,7 +19,6 @@ dependencies:
   - enum34
   - fontconfig
   - freetype
-  - freeglut
   - icu
   - idna
   - intel-openmp
