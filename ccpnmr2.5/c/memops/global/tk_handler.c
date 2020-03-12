@@ -555,15 +555,15 @@ void draw_xor_box_tk_handler(Tk_handler tk_handler,
 
     // draw alternating lines to give offset to stippling
     XSetDashes(tk_handler_p->display, tk_handler_p->gc, 0, dash_list, sizeof(dash_list));
-    for (int x=xx0+dash_offset; x<xx1; x+=2*(gap_length+dash_length))
+    for (int x=xx0+1; x<xx1; x+=2*(gap_length+dash_length))
         XDrawLine(tk_handler_p->display, tk_handler_p->drawable,
-                                tk_handler_p->gc, x, yy0, x, yy1);
+                                tk_handler_p->gc, x, yy0+1, x, yy1-1);
 
     // change the start offset for the stipple
     XSetDashes(tk_handler_p->display, tk_handler_p->gc, dash_offset, dash_list, sizeof(dash_list));
-    for (int x=xx0+dash_offset+gap_length+1; x<xx1; x+=2*(gap_length+dash_length))
+    for (int x=xx0+dash_offset+1; x<xx1; x+=2*(gap_length+dash_length))
         XDrawLine(tk_handler_p->display, tk_handler_p->drawable,
-                                tk_handler_p->gc, x, yy0, x, yy1);
+                                tk_handler_p->gc, x, yy0+1, x, yy1-1);
 
     // draw a solid box around the selection
     gcv.line_style = LineSolid;
