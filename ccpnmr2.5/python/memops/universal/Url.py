@@ -1,4 +1,3 @@
-
 """
 ======================COPYRIGHT/LICENSE START==========================
 
@@ -54,37 +53,41 @@ software development. Bioinformatics 21, 1678-1684.
 
 """
 
+
 def fetchUrl(url, values=None, headers=None, timeout=None):
 
-  import socket
-  import urllib
-  import urllib2
+    return _fetchUrl(url, data=values, headers=headers, timeout=timeout)
 
-  if not headers:
-    headers = {}
+    # import socket
+    # import urllib
+    # import urllib2
+    #
+    # if not headers:
+    #     headers = {}
+    #
+    # try:
+    #     # from Python 2.6 there is a timeout option in urlopen()
+    #     # but for now assume Python 2.5 compatibility
+    #     oldTimeout = socket.getdefaulttimeout()
+    #     socket.setdefaulttimeout(timeout)
+    #     if values:
+    #         data = {}
+    #         for key in values:
+    #             value = values[key]
+    #             if isinstance(value, unicode):
+    #                 value = value.encode('utf-8')
+    #             data[key] = value
+    #         data = urllib.urlencode(data)
+    #     else:
+    #         data = None
+    #     request = urllib2.Request(url, data, headers)
+    #     response = urllib2.urlopen(request)
+    #     result = response.read()
+    # finally:
+    #     socket.setdefaulttimeout(oldTimeout)
+    #
+    # return result
 
-  try:
-    # from Python 2.6 there is a timeout option in urlopen()
-    # but for now assume Python 2.5 compatibility
-    oldTimeout = socket.getdefaulttimeout()
-    socket.setdefaulttimeout(timeout)
-    if values:
-      data = {}
-      for key in values:
-        value = values[key]
-        if isinstance(value, unicode):
-          value = value.encode('utf-8')
-        data[key] = value
-      data = urllib.urlencode(data)
-    else:
-      data = None
-    request = urllib2.Request(url, data, headers)
-    response = urllib2.urlopen(request)
-    result = response.read()
-  finally:
-    socket.setdefaulttimeout(oldTimeout)
-
-  return result
 
 # uploadFiles() is slightly modified version of code from Michael Foord
 # and that said:
@@ -97,77 +100,210 @@ def fetchUrl(url, values=None, headers=None, timeout=None):
 # It actually uses my upload script located at http://www.voidspace.xennos.com
 
 def uploadFiles(url, fileFields, fields=None, boundary=None):
-  """Uploads regular fields and files to specified url
-  url is the Url to send data to.
-  fileFields is a sequence of (name, fileName) elements, or the dictionary
-  equivalent, for file form fields.
-  fields is a sequence of (name, value) elements, or the dictionary equivalent,
-  for regular form fields.
-  Returns response."""
+    """Uploads regular fields and files to specified url
+    url is the Url to send data to.
+    fileFields is a sequence of (name, fileName) elements, or the dictionary
+    equivalent, for file form fields.
+    fields is a sequence of (name, value) elements, or the dictionary equivalent,
+    for regular form fields.
+    Returns response."""
 
-  import mimetypes
-  import mimetools
-  import os
-  import urllib2
+    import mimetypes
+    import mimetools
+    import os
+    import urllib2
 
-  if not fields:
-    fields = ()
+    if not fields:
+        fields = ()
 
-  if not boundary:
-    boundary = '-----' + mimetools.choose_boundary() + '-----'
+    if not boundary:
+        boundary = '-----' + mimetools.choose_boundary() + '-----'
 
-  CRLF = '\r\n'
-  xx = []
-  if isinstance(fields, dict):
-    fields = fields.items()
-  for (key, value) in fields:
-    xx.append('--' + boundary)
-    xx.append('Content-Disposition: form-data; name="%s"' % key)
+    CRLF = '\r\n'
+    xx = []
+    if isinstance(fields, dict):
+        fields = fields.items()
+    for (key, value) in fields:
+        xx.append('--' + boundary)
+        xx.append('Content-Disposition: form-data; name="%s"' % key)
+        xx.append('')
+        xx.append(str(value))
+
+    if isinstance(fileFields, dict):
+        fileFields = fileFields.items()
+    for (key, fileName) in fileFields:
+        fp = open(fileName, 'rb')
+        value = fp.read()
+        fp.close()
+
+        fileName = os.path.basename(fileName)
+        fileType = mimetypes.guess_type(fileName)[0] or 'application/octet-stream'
+        xx.append('--' + boundary)
+        xx.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, fileName))
+        xx.append('Content-Type: %s' % fileType)
+        xx.append('')
+        xx.append(value)
+
+    xx.append('--' + boundary + '--')
     xx.append('')
-    xx.append(str(value))
+    body = CRLF.join(xx)
 
-  if isinstance(fileFields, dict):
-    fileFields = fileFields.items()
-  for (key, fileName) in fileFields:
-    fp = open(fileName, 'rb')
-    value = fp.read()
-    fp.close()
+    contentType = 'multipart/form-data; boundary=%s' % boundary
+    headers = {
+        'Content-type'  : contentType,
+        'Content-length': str(len(body)),
+        }
 
-    fileName = os.path.basename(fileName)
-    fileType = mimetypes.guess_type(fileName)[0] or 'application/octet-stream'
-    xx.append('--' + boundary)
-    xx.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, fileName))
-    xx.append('Content-Type: %s' % fileType)
-    xx.append('')
-    xx.append(value)
+    request = urllib2.Request(url, body, headers)
+    handle = urllib2.urlopen(request)
+    try:
+        result = handle.read()
+    finally:
+        handle.close()
 
-  xx.append('--' + boundary + '--')
-  xx.append('')
-  body = CRLF.join(xx)
+    return result
 
-  contentType = 'multipart/form-data; boundary=%s' % boundary
-  headers = {
-    'Content-type': contentType,
-    'Content-length': str(len(body)),
-  }
-
-  request = urllib2.Request(url, body, headers)
-  handle = urllib2.urlopen(request)
-  try:
-    result = handle.read()
-  finally:
-    handle.close()
-
-  return result
 
 def uploadFile(url, fileKey, fileName, fields=None, boundary=None):
-  """Uploads regular fields and file to specified url
-  url is the Url to send data to.
-  fileKey is the form key for the file.
-  fileName is the full path for the file.
-  fields is a sequence of (name, value) elements, or the dictionary equivalent,
-  for regular form fields.
-  Returns response."""
+    """Uploads regular fields and file to specified url
+    url is the Url to send data to.
+    fileKey is the form key for the file.
+    fileName is the full path for the file.
+    fields is a sequence of (name, value) elements, or the dictionary equivalent,
+    for regular form fields.
+    Returns response."""
 
-  return uploadFiles(url, ((fileKey, fileName),), fields, boundary)
+    return uploadFiles(url, ((fileKey, fileName),), fields, boundary)
 
+
+def fetchHttpResponse(method, url, data=None, headers=None):
+    """Generate an http, and return the response
+    """
+    import os
+    import ssl
+    import certifi
+    import urllib
+    import urllib3.contrib.pyopenssl
+    from urllib import urlencode
+
+    context = ssl.create_default_context()
+    context.check_hostname = False
+    context.verify_mode = ssl.CERT_NONE
+
+    if not headers:
+        headers = {'Content-type': 'application/x-www-form-urlencoded;charset=UTF-8'}
+    body = urlencode(data).encode('utf-8') if data else None
+
+    urllib3.contrib.pyopenssl.inject_into_urllib3()
+
+    # create the options list for creating an http connection
+    options = {'cert_reqs': 'CERT_REQUIRED',
+               'ca_certs' : certifi.where(),
+               'timeout'  : urllib3.Timeout(connect=3.0, read=3.0),
+               'retries'  : urllib3.Retry(1, redirect=False)
+               }
+
+    # # check whether a proxy is required
+    # from ccpn.util.UserPreferences import UserPreferences, USEPROXY, USEPROXYPASSWORD, PROXYADDRESS, \
+    #     PROXYPORT, PROXYUSERNAME, PROXYPASSWORD, USESYSTEMPROXY
+
+    def _getProxyIn(proxyDict):
+        """Get the first occurrence of a proxy type in the supplied dict
+        """
+        # define a list of proxy identifiers
+        proxyCheckList = ['HTTPS_PROXY', 'https', 'HTTP_PROXY', 'http']
+        for pCheck in proxyCheckList:
+            proxyUrl = proxyDict.get(pCheck, None)
+            if proxyUrl:
+                return proxyUrl
+
+    # if proxySettings and proxySettings.get(USEPROXY):
+    #
+    #     # Use the user settings if set
+    #     useProxyPassword = proxySettings.get(USEPROXYPASSWORD)
+    #     proxyAddress = proxySettings.get(PROXYADDRESS)
+    #     proxyPort = proxySettings.get(PROXYPORT)
+    #     proxyUsername = proxySettings.get(PROXYUSERNAME)
+    #     proxyPassword = proxySettings.get(PROXYPASSWORD)
+    #
+    #     if useProxyPassword:
+    #         # grab the decode from the userPreferences
+    #         _userPreferences = UserPreferences(readPreferences=False)
+    #
+    #         options.update({'headers': urllib3.make_headers(proxy_basic_auth='%s:%s' %
+    #                                                                          (proxyUsername,
+    #                                                                           _userPreferences.decodeValue(proxyPassword)))})
+    #
+    #     proxyUrl = "http://%s:%s/" % (str(proxyAddress), str(proxyPort)) if proxyAddress else None
+    #
+    # else:
+    #     # read the environment/system proxies if exist
+    #     proxyUrl = _getProxyIn(os.environ) or _getProxyIn(urllib.request.getproxies())
+    #
+    #     # ED: issues - @"HTTPProxyAuthenticated" key on system?. If it exists, the value is a boolean (NSNumber) indicating whether or not the proxy is authentified,
+    #     # get the username if the proxy is authenticated: check @"HTTPProxyUsername"
+
+    proxyUrl = _getProxyIn(os.environ) or _getProxyIn(urllib.getproxies())
+
+    # proxy may still not be defined
+    if proxyUrl:
+        http = urllib3.ProxyManager(proxyUrl, **options)
+    else:
+        http = urllib3.PoolManager(**options)
+
+    # generate an http request
+    response = http.request(method, url,
+                            headers=headers,
+                            body=body,
+                            preload_content=False)
+
+    # return the http response
+    return response
+
+
+def _fetchUrl(url, data=None, headers=None, timeout=2.0, proxySettings=None, decodeResponse=True):
+    """Fetch url request from the server
+    """
+    import logging
+
+    urllib3_logger = logging.getLogger('urllib3')
+    urllib3_logger.setLevel(logging.CRITICAL)
+
+    # if not proxySettings:
+    #
+    #     # read the proxySettings from the preferences
+    #     from ccpn.util.UserPreferences import UserPreferences
+    #
+    #     _userPreferences = UserPreferences(readPreferences=True)
+    #     if _userPreferences.proxyDefined:
+    #         proxyNames = ['useProxy', 'proxyAddress', 'proxyPort', 'useProxyPassword',
+    #                       'proxyUsername', 'proxyPassword']
+    #         proxySettings = {}
+    #         for name in proxyNames:
+    #             proxySettings[name] = _userPreferences._getPreferencesParameter(name)
+
+    response = fetchHttpResponse('POST', url, data=data, headers=headers)
+
+    # if response:
+    #     ll = len(response.data)
+    #     print('>>>>>>responseUrl', proxySettings, response.data[0:min(ll, 20)])
+
+    return response.data.decode('utf-8') if decodeResponse else response
+
+
+def uploadFile(url, fileName, data=None):
+    import os
+
+    if not data:
+        data = {}
+
+    with open(fileName, 'rb') as fp:
+        fileData = fp.read()
+
+    data['fileName'] = os.path.basename(fileName)
+    data['fileData'] = fileData
+
+    try:
+        return fetchUrl(url, data)
+    except:
+        return None
