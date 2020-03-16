@@ -3,9 +3,9 @@
 
 name: <NAME INSERTED FROM internal/scripts/version.sh>
 channels:
+  - defaults
   - conda-forge
   - smithsp
-  - defaults
 dependencies:
   - _libgcc_mutex
   - asn1crypto
