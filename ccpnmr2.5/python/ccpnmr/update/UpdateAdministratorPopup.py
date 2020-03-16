@@ -63,7 +63,7 @@ from ccpnmr.analysis.Version import version
 
 SERVERUSER = 'ccpn'
 BASEBRANCH = 'master'
-UPDATEBRANCH = 'ccpnmr2.5'
+UPDATEBRANCH = '.'
 DEFAULTFILTER = ''
 
 
@@ -411,14 +411,14 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
     label.grid(row=row, column=0, stick='w')
     self._lineEditBase = Entry(frame, text=BASEBRANCH)
     self._lineEditBase.grid(row=row, column=1, stick='w')
-    # self._lineEditBase.returnPressed.connect(self.editCompareBranches)
+    self._lineEditBase.bind('<Return>', self.editFilter)
 
     row += 1
     label = Label(frame, text='Updates Branch:')
     label.grid(row=row, column=0, stick='w')
     self._lineEditUpdate = Entry(frame, text=UPDATEBRANCH)
     self._lineEditUpdate.grid(row=row, column=1, stick='w')
-    # self._lineEditUpdate.returnPressed.connect(self.editCompareBranches)
+    self._lineEditUpdate.bind('<Return>', self.editFilter)
 
     row += 1
     label = Label(frame, text='Filter by ExtensionType:')
