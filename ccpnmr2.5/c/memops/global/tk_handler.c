@@ -555,13 +555,14 @@ void draw_xor_box_tk_handler(Tk_handler tk_handler,
 
     // draw alternating lines to give offset to stippling
     XSetDashes(tk_handler_p->display, tk_handler_p->gc, 0, dash_list, sizeof(dash_list));
-    for (int x=xx0+1; x<xx1; x+=(gap_length+dash_length))
+    int x;
+    for (x=xx0+1; x<xx1; x+=(gap_length+dash_length))
         XDrawLine(tk_handler_p->display, tk_handler_p->drawable,
                                 tk_handler_p->gc, x, yy0+1, x, yy1-1);
 
     // change the start offset for the stipple
     XSetDashes(tk_handler_p->display, tk_handler_p->gc, dash_offset, dash_list, sizeof(dash_list));
-    for (int x=xx0+dash_offset+1; x<xx1; x+=(gap_length+dash_length))
+    for (x=xx0+dash_offset+1; x<xx1; x+=(gap_length+dash_length))
         XDrawLine(tk_handler_p->display, tk_handler_p->drawable,
                                 tk_handler_p->gc, x, yy0+1, x, yy1-1);
 

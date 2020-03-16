@@ -121,7 +121,8 @@ class RegisterPopup(BasePopup):
     self.buttons = buttons
 
   def openLicense(self):
-    licenseUrl = 'http://www.ccpn.ac.uk/license'
+    # licenseUrl = 'http://www.ccpn.ac.uk/license'
+    licenseUrl = 'https://www.ccpn.ac.uk/industry/licencefees'
     try:
       import webbrowser
     except ImportError:
