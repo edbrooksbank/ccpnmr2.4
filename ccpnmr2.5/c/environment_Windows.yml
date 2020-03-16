@@ -57,5 +57,5 @@ dependencies:
   - wincertstore=0.2
   - 7za
   - pip:
-    - pyopengl==3.1.5
-    - pyopengl-accelerate==3.1.5
+#    - pyopengl                     NOTE:ED - install from the .whl files from Windows
+#    - pyopengl-accelerate                    to fix the numpy bug
