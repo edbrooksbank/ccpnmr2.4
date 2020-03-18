@@ -271,9 +271,10 @@ if command_exists pigz; then
 else
     tar czf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
 fi
-if command_exists 7za && [[ "$BUILD_ZIP" == true ]]; then
+if command_exists 7za && [[ "$BUILD_ZIP" == true && "${MACHINE}" == *"Win"* ]]; then
     echo "using 7za"
+    EXTRASWITCHES="-bso0 -bsp0"
     #zip -r -q ${HOME}/${RELEASE}/${CCPNMRFILE}.zip ${CCPNMRPATH}
-    7za a -tzip -bd -bso0 -bsp0 -mx=7 "${HOME}/${RELEASE}/${CCPNMRFILE}.zip" "${CCPNMRPATH}"
+    7za a -tzip -bd -mx=7 "${HOME}/${RELEASE}/${CCPNMRFILE}.zip" "${CCPNMRPATH}"
 fi
 echo "done"
