@@ -65,7 +65,7 @@ RELEASE_NAME="${RELEASE_NAME:-$RELEASE_DEFAULT}"
 RELEASE_NAME="$(echo "${RELEASE_NAME}" | tr -d " \'\"\`")"
 
 # make the required pathnames
-RELEASE="release${RELEASE_NAME}"
+RELEASE="release${RELEASE_VER}${RELEASE_NAME}"
 CCPNMRPATH="ccpnmr${RELEASE_VER}"
 CCPNMRFILE="ccpnmr${RELEASE_VER}${RELEASE_NAME}${MACHINE}"
 
