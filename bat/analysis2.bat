@@ -1,1 +1,1 @@
-@call "analysis2.5"
+@call "%~dp0\analysis2.5"

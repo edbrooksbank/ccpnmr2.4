@@ -358,7 +358,7 @@ def getCcpForgeUrls(molType,ccpCode,sourceName=None):
 
   # github repository
 
-  ccpForgeUrl = "https://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/"
+  ccpForgeUrl = "http://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/"
   checkOutDir = ""
   archiveDir = "data/pdbe/chemComp/archive/"
 
@@ -526,10 +526,19 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
       
       if urlLocation:
 
-        import ssl
-        context = ssl._create_unverified_context()
+        # from memops.universal.Url import _fetchUrl, fetchHttpResponse
+        # import ssl
+        # import urllib2
+        # context = ssl._create_unverified_context()
+        #
+        # print(">>>urlopen database %s" % str(urlLocation))
+        # req = urllib2.Request(urlLocation)
+        # r2 = urllib2.urlopen(req, context=context)
 
-        r2 = urllib.urlopen(urlLocation, context=context)
+        # r2 = urllib.urlopen(urlLocation, context=context)
+
+        from memops.universal.Url import fetchHttpResponse
+        r2 = fetchHttpResponse(urlLocation)
 
         try:
           data = r2.read()

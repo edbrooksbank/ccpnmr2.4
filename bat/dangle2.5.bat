@@ -1,7 +1,7 @@
 @echo off
 setlocal
-call "paths.bat"
+call "%~dp0\paths.bat"
 
 set ENTRYMODULE="%CCPNMR_TOP_DIR%\%VERSIONPATH%"\python\cambridge\dangle\DangleGui.py
-"%ANACONDA3%"\python -i -O -W ignore::DeprecationWarning "%ENTRYMODULE%" %*
+"%ANACONDA3%"\python -i -O -W ignore "%ENTRYMODULE%" %*
 endlocal

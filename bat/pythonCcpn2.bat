@@ -1,1 +1,1 @@
-@call "pythonCcpn2.5"
+@call "%~dp0\pythonCcpn2.5"

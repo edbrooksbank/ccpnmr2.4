@@ -1,1 +1,1 @@
-@call "formatConverter2.5"
+@call "%~dp0\formatConverter2.5"

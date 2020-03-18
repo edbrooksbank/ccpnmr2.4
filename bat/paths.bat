@@ -1,7 +1,6 @@
 @echo off
-pushd..
-set CCPNMR_TOP_DIR=%CD%
-popd
+set CCPNMR_TOP_DIR=%~dp0\..
+
 set ANACONDA3=%CCPNMR_TOP_DIR%\miniconda
 set VERSIONPATH=ccpnmr2.5
 set PYTHONPATH=.;%CCPNMR_TOP_DIR%\%VERSIONPATH%\python

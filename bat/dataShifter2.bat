@@ -1,1 +1,1 @@
-@ call "dataShifter2.5"
+@call "%~dp0\dataShifter2.5"

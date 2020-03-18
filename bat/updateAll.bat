@@ -1,1 +1,1 @@
-@call "updateAll2"
+@call "%~dp0\updateAll2"

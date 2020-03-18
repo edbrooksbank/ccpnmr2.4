@@ -1,6 +1,6 @@
 @echo off
 setlocal
-call "paths"
+call "%~dp0\paths"
 
 "%ANACONDA3%"\python -O %*
 endlocal

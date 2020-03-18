@@ -1,1 +1,1 @@
-@call "pipe2azara2"
+@call "%~dp0\pipe2azara2"
