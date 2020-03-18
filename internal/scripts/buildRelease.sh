@@ -113,6 +113,9 @@ else
     DT=$(date '+%d-%m-%Y_%H:%M:%S')
     mv "${HOME}/${RELEASE}" "${HOME}/${RELEASE}_${DT}"
     error_check
+    # create the new release directory
+    mkdir -p "${HOME}/${RELEASE}"
+    error_check
 fi
 
 # Make current build in release directory
