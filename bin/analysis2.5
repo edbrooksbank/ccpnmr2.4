@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-source ./paths.sh
+SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" || exit && pwd)"
+source "${SCRIPTDIR}/paths.sh"
 
 ANALYSIS="${CCPNMR_TOP_DIR}/${VERSIONPATH}"/python/ccpnmr/analysis/AnalysisGui.py
 if [[ ${UNAME} == *"Win"* || ${UNAME} == *"MING"* ]]; then
