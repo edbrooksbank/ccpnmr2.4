@@ -413,12 +413,15 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
     self._lineEditBase.grid(row=row, column=1, stick='w')
     self._lineEditBase.bind('<Return>', self.editFilter)
 
+    UPDATEBRANCH = runGitCommand('rev-parse --abbrev-ref HEAD')
+
     row += 1
     label = Label(frame, text='Updates Branch:')
     label.grid(row=row, column=0, stick='w')
     self._lineEditUpdate = Entry(frame, text=UPDATEBRANCH)
     self._lineEditUpdate.grid(row=row, column=1, stick='w')
     self._lineEditUpdate.bind('<Return>', self.editFilter)
+    self._lineEditUpdate.configure(state='disabled')
 
     row += 1
     label = Label(frame, text='Filter by ExtensionType:')
@@ -509,7 +512,8 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
             os.chdir(dir)
 
             # get the different files between the branches for this repository
-            gitCmd = 'diff --name-only %s %s' % (self._lineEditBase.get(), self._lineEditUpdate.get())
+            gitCmd = 'diff --name-only %s %s --' % (self._lineEditBase.get(), self._lineEditUpdate.get())
+            print ">>> gitCommand:", gitCmd
             _files = runGitCommand(gitCmd)
             if _files:
 
@@ -517,10 +521,10 @@ class UpdateAdministratorPopup(BasePopup, UpdateAgent):
                 # [self._allFiles.add(os.path.join(localDir, path)) for path in _files.split()]
                 [self._allFiles.add(os.path.join(os.getcwd(), path)) for path in _files.split()]
 
-                filter = self._filterEntry.get()
-                if filter:
-                  # simple filter by file extension
-                  self._allFiles = [filePath for filePath in self._allFiles if os.path.splitext(filePath)[-1].lower() in filter.split()]
+    filter = self._filterEntry.get()
+    if filter:
+      # simple filter by file extension
+      self._allFiles = [filePath for filePath in self._allFiles if os.path.splitext(filePath)[-1].lower() in filter.split()]
 
     # # populate the list with the files - must be in the installRoot path
     n = len(self.installRoot)
