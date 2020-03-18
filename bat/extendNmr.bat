@@ -1,1 +1,1 @@
-@call "extendNmr2"
+@call "%~dp0\extendNmr2"

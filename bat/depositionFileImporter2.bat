@@ -1,1 +1,1 @@
-@call "depositionFileImporter2.5"
+@call "%~dp0\depositionFileImporter2.5"

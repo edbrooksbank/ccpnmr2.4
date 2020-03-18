@@ -1,1 +1,1 @@
-@call "eci2"
+@call "%~dp0\eci2"

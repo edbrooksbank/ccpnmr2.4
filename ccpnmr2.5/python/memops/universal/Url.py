@@ -179,33 +179,46 @@ def uploadFile(url, fileKey, fileName, fields=None, boundary=None):
 def fetchHttpResponse(url, method='GET', data=None, headers=None):
     """Generate an http, and return the response
     """
-    import os
     import ssl
+    import os
     import certifi
     import urllib
     import urllib3.contrib.pyopenssl
     from urllib import urlencode
 
-    context = ssl.create_default_context()
-    context.check_hostname = False
-    context.verify_mode = ssl.CERT_NONE
-
     if not headers:
-        headers = {'Content-type': 'application/x-www-form-urlencoded;charset=UTF-8'}
+        headers = {'Content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                    'User-Agent': 'ccpn-v2.5.0'
+        }
     body = urlencode(data).encode('utf-8') if data else None
 
-    urllib3.contrib.pyopenssl.inject_into_urllib3()
+    # urllib3.contrib.pyopenssl.inject_into_urllib3()
+
+    from urllib3.util import ssl_
+    if ssl_.IS_PYOPENSSL:
+        import urllib3.contrib.pyopenssl
+        urllib3.contrib.pyopenssl.extract_from_urllib3()
+
+    context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
+                                         cafile=None,
+                                         capath=None)
+
+    # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    # context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+    # context.verify_mode = ssl.CERT_NONE
+    # context.options |= ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_COMPRESSION
+    # context.load_default_certs()
+
+    # _http_pid = os.getpid()
+    # _http = urllib3.PoolManager(ssl_context=context)
 
     # create the options list for creating an http connection
-    options = {'cert_reqs': 'CERT_REQUIRED',
-               'ca_certs' : certifi.where(),
+    options = {#'cert_reqs': 'NONE',
+               #'ca_certs' : certifi.where(),
                'timeout'  : urllib3.Timeout(connect=3.0, read=3.0),
-               'retries'  : urllib3.Retry(1, redirect=False)
+               'retries'  : urllib3.Retry(1, redirect=False),
+               'ssl_context'  : context
                }
-
-    # # check whether a proxy is required
-    # from ccpn.util.UserPreferences import UserPreferences, USEPROXY, USEPROXYPASSWORD, PROXYADDRESS, \
-    #     PROXYPORT, PROXYUSERNAME, PROXYPASSWORD, USESYSTEMPROXY
 
     def _getProxyIn(proxyDict):
         """Get the first occurrence of a proxy type in the supplied dict
@@ -217,34 +230,7 @@ def fetchHttpResponse(url, method='GET', data=None, headers=None):
             if proxyUrl:
                 return proxyUrl
 
-    # if proxySettings and proxySettings.get(USEPROXY):
-    #
-    #     # Use the user settings if set
-    #     useProxyPassword = proxySettings.get(USEPROXYPASSWORD)
-    #     proxyAddress = proxySettings.get(PROXYADDRESS)
-    #     proxyPort = proxySettings.get(PROXYPORT)
-    #     proxyUsername = proxySettings.get(PROXYUSERNAME)
-    #     proxyPassword = proxySettings.get(PROXYPASSWORD)
-    #
-    #     if useProxyPassword:
-    #         # grab the decode from the userPreferences
-    #         _userPreferences = UserPreferences(readPreferences=False)
-    #
-    #         options.update({'headers': urllib3.make_headers(proxy_basic_auth='%s:%s' %
-    #                                                                          (proxyUsername,
-    #                                                                           _userPreferences.decodeValue(proxyPassword)))})
-    #
-    #     proxyUrl = "http://%s:%s/" % (str(proxyAddress), str(proxyPort)) if proxyAddress else None
-    #
-    # else:
-    #     # read the environment/system proxies if exist
-    #     proxyUrl = _getProxyIn(os.environ) or _getProxyIn(urllib.request.getproxies())
-    #
-    #     # ED: issues - @"HTTPProxyAuthenticated" key on system?. If it exists, the value is a boolean (NSNumber) indicating whether or not the proxy is authentified,
-    #     # get the username if the proxy is authenticated: check @"HTTPProxyUsername"
-
     proxyUrl = _getProxyIn(os.environ) or _getProxyIn(urllib.getproxies())
-
     # proxy may still not be defined
     if proxyUrl:
         http = urllib3.ProxyManager(proxyUrl, **options)
@@ -256,6 +242,7 @@ def fetchHttpResponse(url, method='GET', data=None, headers=None):
                             headers=headers,
                             body=body,
                             preload_content=False)
+    response.release_conn()
 
     # return the http response
     return response

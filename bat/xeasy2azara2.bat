@@ -1,1 +1,1 @@
-@call "xeasy2azara2.5"
+@call "%~dp0\xeasy2azara2.5"

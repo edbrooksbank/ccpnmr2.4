@@ -1,1 +1,1 @@
-@call "dangle2.5"
+@call "%~dp0\dangle2.5"

@@ -1,1 +1,1 @@
-@call "dataShifter2"
+@call "%~dp0\dataShifter2"

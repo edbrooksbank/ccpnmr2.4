@@ -1,1 +1,1 @@
-@call "updateCheck2.5"
+@call "%~dp0\updateCheck2.5"
