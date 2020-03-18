@@ -358,7 +358,8 @@ def getCcpForgeUrls(molType,ccpCode,sourceName=None):
 
   # github repository
 
-  ccpForgeUrl = "http://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/"
+  # ccpForgeUrl = "http://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/"
+  ccpForgeUrl = "https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/"
   checkOutDir = ""
   archiveDir = "data/pdbe/chemComp/archive/"
 

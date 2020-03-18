@@ -179,6 +179,7 @@ def uploadFile(url, fileKey, fileName, fields=None, boundary=None):
 def fetchHttpResponse(url, method='GET', data=None, headers=None):
     """Generate an http, and return the response
     """
+    import ssl
     import os
     import certifi
     import urllib
@@ -190,13 +191,30 @@ def fetchHttpResponse(url, method='GET', data=None, headers=None):
     body = urlencode(data).encode('utf-8') if data else None
 
     urllib3.contrib.pyopenssl.inject_into_urllib3()
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
+                                         cafile=None,
+                                         capath=None)
+
+
+
+    # context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+    # context.verify_mode = ssl.CERT_OPTIONAL
+    # context.options |= ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_COMPRESSION
+    # context.load_default_certs()
+    # _http_pid = os.getpid()
+    # _http = urllib3.PoolManager(ssl_context=context)
+
+
+
 
     # create the options list for creating an http connection
-    options = {'cert_reqs': 'NONE',
-               'ca_certs' : certifi.where(),
+    options = {#'cert_reqs': 'NONE',
+               #'ca_certs' : certifi.where(),
                'timeout'  : urllib3.Timeout(connect=3.0, read=3.0),
-               'retries'  : urllib3.Retry(1, redirect=False)
+               'retries'  : urllib3.Retry(1, redirect=False),
+               'ssl_context'  : context
                }
 
     def _getProxyIn(proxyDict):
