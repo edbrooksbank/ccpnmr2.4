@@ -187,27 +187,30 @@ def fetchHttpResponse(url, method='GET', data=None, headers=None):
     from urllib import urlencode
 
     if not headers:
-        headers = {'Content-type': 'application/x-www-form-urlencoded;charset=UTF-8'}
+        headers = {'Content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                    'User-Agent': 'ccpn-v2.5.0'
+        }
     body = urlencode(data).encode('utf-8') if data else None
 
-    urllib3.contrib.pyopenssl.inject_into_urllib3()
-    # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    # urllib3.contrib.pyopenssl.inject_into_urllib3()
+
+    from urllib3.util import ssl_
+    if ssl_.IS_PYOPENSSL:
+        import urllib3.contrib.pyopenssl
+        urllib3.contrib.pyopenssl.extract_from_urllib3()
 
     context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
                                          cafile=None,
                                          capath=None)
 
-
-
+    # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     # context = ssl.SSLContext(ssl.PROTOCOL_TLS)
-    # context.verify_mode = ssl.CERT_OPTIONAL
+    # context.verify_mode = ssl.CERT_NONE
     # context.options |= ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_COMPRESSION
     # context.load_default_certs()
+
     # _http_pid = os.getpid()
     # _http = urllib3.PoolManager(ssl_context=context)
-
-
-
 
     # create the options list for creating an http connection
     options = {#'cert_reqs': 'NONE',

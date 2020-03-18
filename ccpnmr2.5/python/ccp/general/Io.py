@@ -358,8 +358,14 @@ def getCcpForgeUrls(molType,ccpCode,sourceName=None):
 
   # github repository
 
+  # returns json
   # ccpForgeUrl = "http://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/"
-  ccpForgeUrl = "https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/"
+
+  # returns .xml
+  ccpForgeUrl = "http://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/"
+
+  # e.g. fetchHttpResponse("http://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/data/pdbe/chemComp/archive/ChemComp/other/A/other+A0a+pdbe_ccpnRef_2009-03-12-11-50-15-639_00001.xml")
+  # e.g data/pdbe/chemComp/archive/ChemComp/other/A/other+A0a+pdbe_ccpnRef_2009-03-12-11-50-15-639_00001.xml
   checkOutDir = ""
   archiveDir = "data/pdbe/chemComp/archive/"
 
@@ -857,3 +863,26 @@ def changeDataStoreUrl(dataStore, newPath):
           if dataUrl.url == oldUrl:
             dataUrl.url = newUrl
 
+if __name__ == '__main__':
+
+  # NOTE:ED - testing url loading from chemcomps
+
+  from memops.universal.Url import fetchHttpResponse
+
+  request = fetchHttpResponse("http://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/data/pdbe/chemComp/archive/ChemComp/other/A/other+A0a+pdbe_ccpnRef_2009-03-12-11-50-15-639_00001.xml")
+  data = request.read()
+  request.close()
+
+  print ">>> raw github"
+  if data:
+    print data[:min(100, len(data))]
+
+  request = fetchHttpResponse("http://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/data/pdbe/chemComp/archive/ChemComp/other/A/other+A0a+pdbe_ccpnRef_2009-03-12-11-50-15-639_00001.xml")
+  data = request.read()
+  request.close()
+
+  print ">>> raw github"
+  if data:
+    print data[:min(300, len(data))]
+
+  # check user-agent required
