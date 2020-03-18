@@ -873,15 +873,15 @@ if __name__ == '__main__':
   data = request.read()
   request.close()
 
-  print ">>> raw github"
+  print "~~~~~~~~~~~~~~~~~~~~\n>>> raw github"
   if data:
-    print data[:min(100, len(data))]
+    print data[:min(300, len(data))]
 
   request = fetchHttpResponse("http://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/data/pdbe/chemComp/archive/ChemComp/other/A/other+A0a+pdbe_ccpnRef_2009-03-12-11-50-15-639_00001.xml")
   data = request.read()
   request.close()
 
-  print ">>> raw github"
+  print "~~~~~~~~~~~~~~~~~~~~\n>>> api github"
   if data:
     print data[:min(300, len(data))]
 
