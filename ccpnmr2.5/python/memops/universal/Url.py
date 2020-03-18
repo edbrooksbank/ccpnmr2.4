@@ -176,7 +176,7 @@ def uploadFile(url, fileKey, fileName, fields=None, boundary=None):
     return uploadFiles(url, ((fileKey, fileName),), fields, boundary)
 
 
-def fetchHttpResponse(method, url, data=None, headers=None):
+def fetchHttpResponse(url, method='GET', data=None, headers=None):
     """Generate an http, and return the response
     """
     import os
@@ -282,7 +282,7 @@ def _fetchUrl(url, data=None, headers=None, timeout=2.0, proxySettings=None, dec
     #         for name in proxyNames:
     #             proxySettings[name] = _userPreferences._getPreferencesParameter(name)
 
-    response = fetchHttpResponse('POST', url, data=data, headers=headers)
+    response = fetchHttpResponse(url, method='POST', data=data, headers=headers)
 
     # if response:
     #     ll = len(response.data)
