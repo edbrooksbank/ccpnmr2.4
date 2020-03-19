@@ -178,13 +178,7 @@ if [[ -d "${HOME}/${RELEASE}/${CCPNMRPATH}/bin" ]]; then
     rm -rf "${SKIP_SCRIPTS}"
 fi
 
-# Change version for update script (mistake, this should have been done in the repository)
-
-# cd ${HOME}/${RELEASE}/${CCPNMRPATH}
-# cd src/python/ccpn/util
-# vi update.py [ etc.]
-
-# Remove metabolomics and structure code
+# Remove unneeded code
 
 echo "removing unneeded code"
 if [[ -d "${HOME}/${RELEASE}/${CCPNMRPATH}/src/python/ccpn" ]]; then
@@ -226,40 +220,6 @@ mv -v "${CONDA_SOURCE}" miniconda
 echo "removing ${CONDA_SOURCE}.tgz"
 rm -rf "../${CONDA_SOURCE}.tgz"
 
-# Fix miniconda library issues: - replaced
-# convertPaths.py must have the correct __version__ in the headers
-# cd ${HOME}/${RELEASE}/${CCPNMRPATH}
-# this may be required to use miniconda as your default python environment
-# python src/python/ccpn/util/convertPaths.py ${HOME}/${RELEASE}/${CCPNMRPATH}/miniconda ${HOME}/miniconda3/envs/$CONDA_SOURCE ${HOME}/${RELEASE}/${CCPNMRPATH}/miniconda
-
-## compress the data directories into their own folder
-#echo "extracting data directories"
-#cd "${HOME}/${RELEASE}/${CCPNMRPATH}" || exit
-#
-## compress the data directory and remove from main folder
-#
-#if [[ "$DATA_DIR" != "" ]]; then
-#  if command_exists pigz; then
-#    echo "using pigz"
-#    tar --use-compress-program=pigz -cf "${HOME}/${RELEASE}/data${RELEASE_VER}.tgz" ${DATA_DIR}
-#  else
-#    tar czf "${HOME}/${RELEASE}/data${RELEASE_VER}.tgz" ${DATA_DIR}
-#  fi
-#  if command_exists 7za && [[ "$BUILD_ZIP" == true ]]; then
-#    echo "using 7za"
-#    #zip -r -q ${HOME}/${RELEASE}/data${RELEASE_VER}.zip $DATA_DIR
-#    #example for parallel 7zip: 7za a -tzip -mx=9 -m0=LZMA2 -mmt14 "Target.zip" "Source\*.*
-#    7za a -tzip -bd "${HOME}/${RELEASE}/data${RELEASE_VER}.zip" ${DATA_DIR}
-#  fi
-#  rm -rf "${DATA_DIR}"
-#fi
-
-## extract the Licence file
-#
-#echo "extracting the licenceKey tgz/zip"
-#tar czf "${HOME}/${RELEASE}/Licence.tgz" "./config/licenceKey.txt"
-#zip -r -q "${HOME}/${RELEASE}/Licence.zip" "./config/licenceKey.txt"
-
 # compress the remaining folder
 
 echo "creating final tgz/zip"
@@ -273,8 +233,6 @@ else
 fi
 if command_exists 7za && [[ "$BUILD_ZIP" == true && "${MACHINE}" == *"Win"* ]]; then
     echo "using 7za"
-    EXTRASWITCHES="-bso0 -bsp0"
-    #zip -r -q ${HOME}/${RELEASE}/${CCPNMRFILE}.zip ${CCPNMRPATH}
     7za a -tzip -bd -mx=7 "${HOME}/${RELEASE}/${CCPNMRFILE}.zip" "${CCPNMRPATH}"
 fi
 echo "done"
