@@ -214,6 +214,11 @@ echo "moving to ${RELEASE} directory"
 cd "${HOME}/${RELEASE}/${CCPNMRPATH}" || exit
 tar xzf "../${CONDA_SOURCE}.tgz"
 error_check
+# take ownership in windows to stop permission denied
+if [[ "${MACHINE}" == *"Win"* ]]; then
+    chown -R "${USERNAME}" "${CONDA_SOURCE}"
+    chmod -R 755 "${CONDA_SOURCE}"
+fi
 rm -rf miniconda
 mv -v "${CONDA_SOURCE}" miniconda
 
