@@ -75,15 +75,17 @@ fi
 echo "setting up environment file"
 
 # copy the required environment for the makefile
+if [[ ${MACHINE} == *"Win"* ]]; then
+    # change Windows path
+    ANACONDA3="$(echo "${ANACONDA3}" | sed -e 's/^\///' -e 's/\//\\/g' -e 's/^./\0:/')"
+fi
+
 CONDA_HEADER="PYTHON_DIR = ${ANACONDA3}"
 CONDA_HEADER_ENV="CONDA_ENV = ${CONDA_SOURCE}"
 
-cp "environment_${MACHINE}.txt" environment.txt
-error_check
-
 # insert the PYTHON_DIR and CONDA_ENV into the first line of the environment file (CONDA_ENV not strictly required)
-sed -i.bak "1 s|^.*$|${CONDA_HEADER}|" environment.txt && rm -rf environment.txt.bak
-sed -i.bak "2 s|^.*$|${CONDA_HEADER_ENV}|" environment.txt && rm -rf environment.txt.bak
+(echo "${CONDA_HEADER}"; echo "${CONDA_HEADER_ENV}"; tail -n +3 environment_${MACHINE}.txt) > environment.txt
+error_check
 
 echo "making path ${CCPNMR_TOP_DIR}/${VERSIONPATH}/c"
 if [[ ${MACHINE} != *"Windows"* ]]; then
