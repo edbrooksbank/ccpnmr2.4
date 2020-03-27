@@ -316,14 +316,22 @@ def getChemCompCoord(project, sourceName, molType, ccpCode, download=True, showE
 
   return chemCompCoord
 
-def getCcpForgeSubPath(molType, ccpCode, sourceName=None):
+def _getCcpForgeIndexUrl():
   """
-  Creates the subPath info for ChemComp(Coord) downloads from CcpForge
+  Creates the CcpForge subPaths/index Path
   """
   ccpForgeUrl = "https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/"
   indexDir = "index"
   indexFile = "index.csv"
   ccpForgeIndexUrl = ccpForgeUrl + uniIo.joinPath(indexDir, indexFile)
+
+  return ccpForgeUrl, indexDir, indexFile, ccpForgeIndexUrl
+
+def getCcpForgeSubPath(molType, ccpCode, sourceName=None):
+  """
+  Creates the subPath info for ChemComp(Coord) downloads from CcpForge
+  """
+  ccpForgeUrl, indexDir, indexFile, ccpForgeIndexUrl = _getCcpForgeIndexUrl()
 
   if not sourceName:
     fileType = 'ChemComp'
@@ -551,7 +559,7 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
           data = r2.read()
           r2.close()
 
-          if data and 'Not Found' in data[:min(20, len(data))]:
+          if data and ('Not Found' in data[:min(20, len(data))] or 'Invalid request' in data[:min(20, len(data))]):
 
             # NOTE:ED if the server returns file containing 'not found' then don't write
             showError("File not found",
@@ -868,21 +876,70 @@ if __name__ == '__main__':
   # NOTE:ED - testing url loading from chemcomps
 
   from memops.universal.Url import fetchHttpResponse
+  import pandas as pd
 
-  request = fetchHttpResponse("http://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/data/pdbe/chemComp/archive/ChemComp/other/A/other+A0a+pdbe_ccpnRef_2009-03-12-11-50-15-639_00001.xml")
-  data = request.read()
-  request.close()
+  STRINGLEN = 300
 
-  print "~~~~~~~~~~~~~~~~~~~~\n>>> raw github"
-  if data:
-    print data[:min(300, len(data))]
-
-  request = fetchHttpResponse("http://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/data/pdbe/chemComp/archive/ChemComp/other/A/other+A0a+pdbe_ccpnRef_2009-03-12-11-50-15-639_00001.xml")
-  data = request.read()
-  request.close()
-
-  print "~~~~~~~~~~~~~~~~~~~~\n>>> api github"
-  if data:
-    print data[:min(300, len(data))]
+  # print "\n~~~~~~~~~~~~~~~~~~~~\n>>> github index"
+  # ccpForgeUrl, indexDir, indexFile, ccpForgeIndexUrl = _getCcpForgeIndexUrl()
+  # print ">>>", ccpForgeIndexUrl
+  # df = pd.read_csv(ccpForgeIndexUrl)
+  # if not df.empty:
+  #   print df.loc[0,:]
+  #
+  # print "\n~~~~~~~~~~~~~~~~~~~~\n>>> raw github - from Path A"
+  # request = fetchHttpResponse("http://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/data/pdbe/chemComp/archive/ChemComp/other/A/other+A0a+pdbe_ccpnRef_2009-03-12-11-50-15-639_00001.xml")
+  # data = request.read()
+  # request.close()
+  # if data:
+  #   print data[:min(STRINGLEN, len(data))]
+  #
+  # print "\n~~~~~~~~~~~~~~~~~~~~\n>>> api github"
+  # request = fetchHttpResponse("http://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/data/pdbe/chemComp/archive/ChemComp/other/A/other+A0a+pdbe_ccpnRef_2009-03-12-11-50-15-639_00001.xml")
+  # data = request.read()
+  # request.close()
+  # if data:
+  #   print data[:min(STRINGLEN, len(data))]
+  #
+  # print "\n~~~~~~~~~~~~~~~~~~~~\n>>> raw github - from Path T"
+  # request = fetchHttpResponse("https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/data/pdbe/chemComp/archive/ChemComp/other/T/other%2BTho%2Bmsd_ccpnRef_2007-12-11-10-19-31_00014.xml")
+  # data = request.read()
+  # request.close()
+  # if data:
+  #   print data[:min(STRINGLEN, len(data))]
 
   # check user-agent required
+
+  print "\n~~~~~~~~~~~~~~~~~~~~\n>>> raw github URLLIB2 request - from Path T"
+  import StringIO
+  from urllib2 import urlopen as _urlopen
+  import ssl
+
+  # from contextlib import contextmanager, closing
+  # # @wraps(_urlopen)
+  # @contextmanager
+  # def urlopen(*args, **kwargs):
+  #   with closing(_urlopen(*args, **kwargs)) as f:
+  #     yield f
+
+  # NOTE:ED - this may work with/without the context
+
+  # context = ssl._create_unverified_context()
+  context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
+                                       cafile=None,
+                                       capath=None)
+
+  try:
+    request = _urlopen("https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/data/pdbe/chemComp/archive/ChemComp/other/T/other%2BTho%2Bmsd_ccpnRef_2007-12-11-10-19-31_00014.xml",
+                       context=context,
+                       timeout=3.0)
+
+  except Exception as es:
+    print str(es)
+
+  else:
+    data = StringIO.StringIO(request.read())
+    request.close()
+    if data and data.buf:
+      data = data.buf
+      print data[:min(STRINGLEN, len(data))]
