@@ -552,12 +552,14 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
 
         # r2 = urllib.urlopen(urlLocation, context=context)
 
-        from memops.universal.Url import fetchHttpResponse
-        r2 = fetchHttpResponse(urlLocation)
+        # from memops.universal.Url import fetchHttpResponse
+        # r2 = fetchHttpResponse(urlLocation)
+        r2 = _fetchUrlData(urlLocation)
 
         try:
-          data = r2.read()
-          r2.close()
+          # data = r2.read()
+          # r2.close()
+          data = _readDataFromRequest(r2)
 
           if data and ('Not Found' in data[:min(20, len(data))] or 'Invalid request' in data[:min(20, len(data))]):
 
@@ -912,7 +914,8 @@ if __name__ == '__main__':
 
   print "\n~~~~~~~~~~~~~~~~~~~~\n>>> raw github URLLIB2 request - from Path T"
   import StringIO
-  from urllib2 import urlopen as _urlopen
+  import urllib2
+  # from urllib2 import urlopen as _urlopen, ProxyHandler, build_opener, install_opener
   import ssl
 
   # from contextlib import contextmanager, closing
@@ -929,8 +932,12 @@ if __name__ == '__main__':
                                        cafile=None,
                                        capath=None)
 
+  proxy_support = urllib2.ProxyHandler(urllib2.getproxies())
+  opener = urllib2.build_opener(proxy_support)
+  urllib2.install_opener(opener)
+
   try:
-    request = _urlopen("https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/data/pdbe/chemComp/archive/ChemComp/other/T/other%2BTho%2Bmsd_ccpnRef_2007-12-11-10-19-31_00014.xml",
+    request = urllib2.urlopen("https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/data/pdbe/chemComp/archive/ChemComp/other/T/other%2BTho%2Bmsd_ccpnRef_2007-12-11-10-19-31_00014.xml",
                        context=context,
                        timeout=3.0)
 
@@ -943,3 +950,42 @@ if __name__ == '__main__':
     if data and data.buf:
       data = data.buf
       print data[:min(STRINGLEN, len(data))]
+
+  # httpsproxy = urllib2.getproxies().get('https', None)
+  # if httpsproxy is not None:
+  #     try:
+  #         scheme, host, port, path = urllib2.parse_url(httpsproxy)
+  #         host, username, password = urllib2.parse_credentials(host)
+  #     except:
+  #         pass
+  #     finally:
+  #       d['ssl'] = 'True'
+  #       d['host'] = host
+  #       d['port'] = port
+  #       d['username'] = username
+  #       d['password'] = password
+
+def _fetchUrlData(urlLocation):
+  import urllib2
+  import ssl
+
+  # context = ssl._create_unverified_context()
+  context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
+                                       cafile=None,
+                                       capath=None)
+
+  proxy_support = urllib2.ProxyHandler(urllib2.getproxies())
+  opener = urllib2.build_opener(proxy_support)
+  urllib2.install_opener(opener)
+
+  request = urllib2.urlopen(urlLocation, context=context, timeout=3.0)
+
+  return request
+
+def _readDataFromRequest(request):
+  import StringIO
+
+  data = StringIO.StringIO(request.read())
+  request.close()
+  if data and data.buf:
+    return data.buf
