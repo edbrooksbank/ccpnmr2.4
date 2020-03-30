@@ -490,15 +490,8 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
     
   try:
 
-    # Get the file list, needs to be decomposed to get direct links
-    # r1 = urllib.urlopen(ccpForgeDirUrl)
-
-    # dirData = fetchUrl(ccpForgeDirUrl)
-    # fetchUrl(u'https://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/data/pdbe/chemComp/archive/')
-
-    # read the index file form the chemcomp website and then get the file location from the index
-
-    # NOTE:ED - THIS MIGHT BE CRASHING
+    # read the index file from the chemcomp website and then get the file location from the index
+    # currently using two methods
     from memops.universal.Url import fetchHttpResponse
     import StringIO
     request = fetchHttpResponse(ccpForgeIndexUrl)
@@ -517,7 +510,6 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
 
         xmlPath = found['path'].to_numpy()[0]
         xmlFile = found['file'].to_numpy()[0]
-        # urlLocation = ccpForgeUrl+os.path.join(xmlPath, xmlFile)
 
         # NOTE:ED must use '/' for url join
         urlLocation = ccpForgeUrl+'/'.join([xmlPath, xmlFile])
@@ -526,49 +518,16 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
     else:
       raise
 
-    # r1 = urllib.urlopen(urlLocation)
-
     try:
-
-      # https: // raw.githubusercontent.com / VuisterLab / CcpNmr - ChemComps / master / data / pdbe / chemComp / archive / ChemComp / protein /
-      # protein % 2 B004 % 2 Bpdbe_ccpnRef_2010 - 0 9 - 23 - 14 - 41 - 20 - 237_00001. xml
-
-      # dirData = r1.read()
-      # r1.close()
-      #
-      # # 20190321:ED skip if no directory has been found
-      # import json
-      #
-      # dirDataObj = json.loads(dirData)
-      # if isinstance(dirDataObj, dict) and "message" in dirDataObj:
-      #   # check response from gitHub
-      #   if dirDataObj['message'] == 'Not Found':
-      #     return None
-      #
-      # # continue with load
-      # (urlLocation, chemCompXmlFile) = findCcpForgeDownloadLink(dirData,fileType,ccpCode,ccpForgeDownloadUrl)
-      
       if urlLocation:
 
-        # from memops.universal.Url import _fetchUrl, fetchHttpResponse
-        # import ssl
-        # import urllib2
-        # context = ssl._create_unverified_context()
-        #
-        # print(">>>urlopen database %s" % str(urlLocation))
-        # req = urllib2.Request(urlLocation)
-        # r2 = urllib2.urlopen(req, context=context)
+        # NOTE ED - can now use  -  r2 = _fetchUrlData(urlLocation)
+        #                           data = _readDataFromRequest(r2)
 
-        # r2 = urllib.urlopen(urlLocation, context=context)
-
-        # from memops.universal.Url import fetchHttpResponse
-        # r2 = fetchHttpResponse(urlLocation)
-        r2 = _fetchUrlData(urlLocation)
-
+        r2 = fetchHttpResponse(urlLocation)
         try:
-          # data = r2.read()
-          # r2.close()
-          data = _readDataFromRequest(r2)
+          data = r2.read()
+          r2.close()
 
           if data and ('Not Found' in data[:min(20, len(data))] or 'Invalid request' in data[:min(20, len(data))]):
 
@@ -882,6 +841,35 @@ def changeDataStoreUrl(dataStore, newPath):
           if dataUrl.url == oldUrl:
             dataUrl.url = newUrl
 
+
+def _fetchUrlData(urlLocation):
+  """Fetch data by inserting unverified certificate into urllib2
+    getProxies not tested
+  """
+  import urllib2
+  import ssl
+
+  context = ssl._create_unverified_context()
+
+  proxy_support = urllib2.ProxyHandler(urllib2.getproxies())
+  opener = urllib2.build_opener(proxy_support)
+  urllib2.install_opener(opener)
+
+  request = urllib2.urlopen(urlLocation, context=context, timeout=3.0)
+
+  return request
+
+def _readDataFromRequest(request):
+  """Read string from download from request
+  """
+  import StringIO
+
+  data = StringIO.StringIO(request.read())
+  request.close()
+  if data and data.buf:
+    return data.buf
+
+
 if __name__ == '__main__':
 
   # NOTE:ED - testing url loading from chemcomps
@@ -891,55 +879,15 @@ if __name__ == '__main__':
 
   STRINGLEN = 300
 
-  # print "\n~~~~~~~~~~~~~~~~~~~~\n>>> github index"
-  # ccpForgeUrl, indexDir, indexFile, ccpForgeIndexUrl = _getCcpForgeIndexUrl()
-  # print ">>>", ccpForgeIndexUrl
-  # df = pd.read_csv(ccpForgeIndexUrl)
-  # if not df.empty:
-  #   print df.loc[0,:]
-  #
-  # print "\n~~~~~~~~~~~~~~~~~~~~\n>>> raw github - from Path A"
-  # request = fetchHttpResponse("http://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/data/pdbe/chemComp/archive/ChemComp/other/A/other+A0a+pdbe_ccpnRef_2009-03-12-11-50-15-639_00001.xml")
-  # data = request.read()
-  # request.close()
-  # if data:
-  #   print data[:min(STRINGLEN, len(data))]
-  #
-  # print "\n~~~~~~~~~~~~~~~~~~~~\n>>> api github"
-  # request = fetchHttpResponse("http://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/data/pdbe/chemComp/archive/ChemComp/other/A/other+A0a+pdbe_ccpnRef_2009-03-12-11-50-15-639_00001.xml")
-  # data = request.read()
-  # request.close()
-  # if data:
-  #   print data[:min(STRINGLEN, len(data))]
-  #
-  # print "\n~~~~~~~~~~~~~~~~~~~~\n>>> raw github - from Path T"
-  # request = fetchHttpResponse("https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/data/pdbe/chemComp/archive/ChemComp/other/T/other%2BTho%2Bmsd_ccpnRef_2007-12-11-10-19-31_00014.xml")
-  # data = request.read()
-  # request.close()
-  # if data:
-  #   print data[:min(STRINGLEN, len(data))]
-
-  # check user-agent required
-
   print "\n~~~~~~~~~~~~~~~~~~~~\n>>> raw github URLLIB2 request - from Path T"
   import StringIO
   import urllib2
-  # from urllib2 import urlopen as _urlopen, ProxyHandler, build_opener, install_opener
   import ssl
 
-  # from contextlib import contextmanager, closing
-  # # @wraps(_urlopen)
-  # @contextmanager
-  # def urlopen(*args, **kwargs):
-  #   with closing(_urlopen(*args, **kwargs)) as f:
-  #     yield f
-
-  # NOTE:ED - this may work with/without the context
-
-  # context = ssl._create_unverified_context()
-  context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
-                                       cafile=None,
-                                       capath=None)
+  context = ssl._create_unverified_context()
+  # context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
+  #                                      cafile=None,
+  #                                      capath=None)
 
   proxy_support = urllib2.ProxyHandler(urllib2.getproxies())
   opener = urllib2.build_opener(proxy_support)
@@ -960,10 +908,8 @@ if __name__ == '__main__':
       data = data.buf
       print data[:min(STRINGLEN, len(data))]
 
-
+  ccpForgeIndexUrl = 'https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/index/index.csv'
   try:
-    ccpForgeIndexUrl = 'https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/index/index.csv'
-
     from memops.universal.Url import fetchHttpResponse
     import StringIO
     request = fetchHttpResponse(ccpForgeIndexUrl)
@@ -971,47 +917,18 @@ if __name__ == '__main__':
     request.close()
     csvString = StringIO.StringIO(ccIndex)
     df = pd.read_csv(csvString)
-    print df[:1]
+    print "fetchHttpResponse - ", df[:1]
 
   except Exception as es:
     print(str(es))
 
-  # httpsproxy = urllib2.getproxies().get('https', None)
-  # if httpsproxy is not None:
-  #     try:
-  #         scheme, host, port, path = urllib2.parse_url(httpsproxy)
-  #         host, username, password = urllib2.parse_credentials(host)
-  #     except:
-  #         pass
-  #     finally:
-  #       d['ssl'] = 'True'
-  #       d['host'] = host
-  #       d['port'] = port
-  #       d['username'] = username
-  #       d['password'] = password
+  try:
+    import StringIO
+    request = _fetchUrlData(ccpForgeIndexUrl)
+    ccIndex = _readDataFromRequest(request)
+    csvString = StringIO.StringIO(ccIndex)
+    df = pd.read_csv(csvString)
+    print "_fetchUrlData - ", df[:1]
 
-def _fetchUrlData(urlLocation):
-  import urllib2
-  import ssl
-
-  print ">>> fetching urlLocation"
-  context = ssl._create_unverified_context()
-  # context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
-  #                                      cafile=None,
-  #                                      capath=None)
-
-  proxy_support = urllib2.ProxyHandler(urllib2.getproxies())
-  opener = urllib2.build_opener(proxy_support)
-  urllib2.install_opener(opener)
-
-  request = urllib2.urlopen(urlLocation, context=context, timeout=3.0)
-
-  return request
-
-def _readDataFromRequest(request):
-  import StringIO
-
-  data = StringIO.StringIO(request.read())
-  request.close()
-  if data and data.buf:
-    return data.buf
+  except Exception as es:
+    print(str(es))
