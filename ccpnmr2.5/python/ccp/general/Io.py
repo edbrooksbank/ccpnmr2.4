@@ -497,7 +497,16 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
     # fetchUrl(u'https://api.github.com/repos/VuisterLab/CcpNmr-ChemComps/contents/data/pdbe/chemComp/archive/')
 
     # read the index file form the chemcomp website and then get the file location from the index
-    df = pd.read_csv(ccpForgeIndexUrl)
+
+    # NOTE:ED - THIS MIGHT BE CRASHING
+    from memops.universal.Url import fetchHttpResponse
+    import StringIO
+    request = fetchHttpResponse(ccpForgeIndexUrl)
+    ccIndex = request.read()
+    request.close()
+    csvString = StringIO.StringIO(ccIndex)
+    df = pd.read_csv(csvString)
+
     urlLocation = None
     if df is not None:
       found = df[df['file'].str.match(searchString)]
@@ -950,6 +959,22 @@ if __name__ == '__main__':
     if data and data.buf:
       data = data.buf
       print data[:min(STRINGLEN, len(data))]
+
+
+  try:
+    ccpForgeIndexUrl = 'https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/index/index.csv'
+
+    from memops.universal.Url import fetchHttpResponse
+    import StringIO
+    request = fetchHttpResponse(ccpForgeIndexUrl)
+    ccIndex = request.read()
+    request.close()
+    csvString = StringIO.StringIO(ccIndex)
+    df = pd.read_csv(csvString)
+    print df[:1]
+
+  except Exception as es:
+    print(str(es))
 
   # httpsproxy = urllib2.getproxies().get('https', None)
   # if httpsproxy is not None:
