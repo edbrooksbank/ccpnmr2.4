@@ -969,10 +969,11 @@ def _fetchUrlData(urlLocation):
   import urllib2
   import ssl
 
-  # context = ssl._create_unverified_context()
-  context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
-                                       cafile=None,
-                                       capath=None)
+  print ">>> fetching urlLocation"
+  context = ssl._create_unverified_context()
+  # context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
+  #                                      cafile=None,
+  #                                      capath=None)
 
   proxy_support = urllib2.ProxyHandler(urllib2.getproxies())
   opener = urllib2.build_opener(proxy_support)
