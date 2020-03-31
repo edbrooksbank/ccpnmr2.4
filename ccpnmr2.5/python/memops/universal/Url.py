@@ -199,11 +199,12 @@ def fetchHttpResponse(url, method='GET', data=None, headers=None):
         import urllib3.contrib.pyopenssl
         urllib3.contrib.pyopenssl.extract_from_urllib3()
 
-    context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
-                                         cafile=None,
-                                         capath=None)
+    context = ssl._create_unverified_context()
+    # context = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH,
+    #                                      cafile=None,
+    #                                      capath=None)
 
-    # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     # context = ssl.SSLContext(ssl.PROTOCOL_TLS)
     # context.verify_mode = ssl.CERT_NONE
     # context.options |= ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_COMPRESSION

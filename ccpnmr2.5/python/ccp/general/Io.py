@@ -63,11 +63,12 @@ import os, urllib, re
 import pandas as pd
 from memops.universal import Io as uniIo
 from memops.universal import Util as uniUtil
-from memops.universal.Url import fetchUrl
+from memops.universal.Url import fetchUrl, fetchHttpResponse
 from memops.general.Implementation import ApiError
 from memops.general.Io import findCcpXmlFile, getCcpFileString
 from memops.api import Implementation
 from memops.format.xml import XmlIO
+import StringIO
 
 from ccp.general.Constants import chemCompServer, chemCompWebPath
 from ccp.general.Constants import standardResidueCcpCodes
@@ -492,8 +493,6 @@ def downloadChemCompInfoFromCcpForge(repository, molType, ccpCode, sourceName=No
 
     # read the index file from the chemcomp website and then get the file location from the index
     # currently using two methods
-    from memops.universal.Url import fetchHttpResponse
-    import StringIO
     request = fetchHttpResponse(ccpForgeIndexUrl)
     ccIndex = request.read()
     request.close()
@@ -862,8 +861,6 @@ def _fetchUrlData(urlLocation):
 def _readDataFromRequest(request):
   """Read string from download from request
   """
-  import StringIO
-
   data = StringIO.StringIO(request.read())
   request.close()
   if data and data.buf:
@@ -874,13 +871,11 @@ if __name__ == '__main__':
 
   # NOTE:ED - testing url loading from chemcomps
 
-  from memops.universal.Url import fetchHttpResponse
   import pandas as pd
 
   STRINGLEN = 300
 
   print "\n~~~~~~~~~~~~~~~~~~~~\n>>> raw github URLLIB2 request - from Path T"
-  import StringIO
   import urllib2
   import ssl
 
@@ -910,8 +905,6 @@ if __name__ == '__main__':
 
   ccpForgeIndexUrl = 'https://raw.githubusercontent.com/VuisterLab/CcpNmr-ChemComps/master/index/index.csv'
   try:
-    from memops.universal.Url import fetchHttpResponse
-    import StringIO
     request = fetchHttpResponse(ccpForgeIndexUrl)
     ccIndex = request.read()
     request.close()
@@ -923,7 +916,6 @@ if __name__ == '__main__':
     print(str(es))
 
   try:
-    import StringIO
     request = _fetchUrlData(ccpForgeIndexUrl)
     ccIndex = _readDataFromRequest(request)
     csvString = StringIO.StringIO(ccIndex)
