@@ -2,6 +2,6 @@
 setlocal
 call "%~dp0\paths"
 
-set ENTRYMODULE="%CCPNMR_TOP_DIR%\%VERSIONPATH%"\python\ccp\format\spectra\params\NmrPipeData.py
+set ENTRYMODULE=%CCPNMR_TOP_DIR%\%VERSIONPATH%\python\ccp\format\spectra\params\NmrPipeData.py
 "%ANACONDA3%"\python -i -O -W ignore "%ENTRYMODULE%" %*
 endlocal
