@@ -229,12 +229,15 @@ rm -rf "../${CONDA_SOURCE}.tgz"
 
 echo "creating final tgz/zip"
 cd "${HOME}/${RELEASE}" || exit
-if command_exists pigz; then
-    echo "using pigz"
-    #  tar --use-compress-program=pigz -cf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
-    tar cf - "${CCPNMRPATH}" | pigz -8 > "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz"
-else
-    tar czf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
+if [[ "${MACHINE}" != *"Win"* ]]; then
+    # build .tgz files on non-Windows
+    if command_exists pigz; then
+        echo "using pigz"
+        #  tar --use-compress-program=pigz -cf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
+        tar cf - "${CCPNMRPATH}" | pigz -8 > "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz"
+    else
+        tar czf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
+    fi
 fi
 if command_exists 7za && [[ "$BUILD_ZIP" == true && "${MACHINE}" == *"Win"* ]]; then
     echo "using 7za"
