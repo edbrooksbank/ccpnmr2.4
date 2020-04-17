@@ -58,16 +58,34 @@ fi
 # set the new pathname
 
 RELEASE_DEFAULT=""
-read -rp "Enter name for release [${RELEASE_DEFAULT}]: " RELEASE_NAME
+read -rp "Enter name for release [${RELEASE_DEFAULT}] (suggest adding linux flavour): " RELEASE_NAME
 RELEASE_NAME="${RELEASE_NAME:-$RELEASE_DEFAULT}"
 
 # remove all quotes and spaces - not needed here as an appended name
 RELEASE_NAME="$(echo "${RELEASE_NAME}" | tr -d " \'\"\`")"
 
+INCLUDE_MACHINE_NAME=$(execute_codeblock "do you want to append the machine name? (suggest n if adding release name for linux)")
+
 # make the required pathnames
 RELEASE="release${RELEASE_VER}${RELEASE_NAME}"
 CCPNMRPATH="ccpnmr${RELEASE_VER}"
-CCPNMRFILE="ccpnmr${RELEASE_VER}${RELEASE_NAME}${MACHINE}"
+if [[ "${INCLUDE_MACHINE_NAME}" == "True" ]]; then
+    CCPNMRFILE="ccpnmr${RELEASE_VER}${RELEASE_NAME}${MACHINE}"
+else
+    if [[ ${RELEASE_NAME} ]]; then
+        CCPNMRFILE="ccpnmr${RELEASE_VER}${RELEASE_NAME}"
+    else
+        echo "Error - release name must be defined"
+        exit
+    fi
+fi
+
+# echo current settings
+
+echo "Home:         ${HOME}"
+echo "Release path: ${RELEASE}"
+echo "CcpnNmrPath:  ${CCPNMRPATH}"
+echo "File:         ${CCPNMRFILE}"
 
 ## get the required LicenceKey file
 #
@@ -119,11 +137,6 @@ else
 fi
 
 # Make current build in release directory
-
-echo "Home:         ${HOME}"
-echo "Release path: ${RELEASE}"
-echo "CcpnNmrPath:  ${CCPNMRPATH}"
-echo "File:         ${CCPNMRFILE}"
 
 echo "creating new directory ${HOME}/${RELEASE}/${CCPNMRPATH}"
 if [[ ! -d "${HOME}/${RELEASE}/${CCPNMRPATH}" ]]; then
@@ -233,13 +246,14 @@ if [[ "${MACHINE}" != *"Win"* ]]; then
     # build .tgz files on non-Windows
     if command_exists pigz; then
         echo "using pigz"
-        #  tar --use-compress-program=pigz -cf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
         tar cf - "${CCPNMRPATH}" | pigz -8 > "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz"
     else
         tar czf "${HOME}/${RELEASE}/${CCPNMRFILE}.tgz" "${CCPNMRPATH}"
     fi
 fi
-if command_exists 7za && [[ "$BUILD_ZIP" == true && "${MACHINE}" == *"Win"* ]]; then
+
+if command_exists 7za && [[ "$BUILD_ZIP" == "True" && "${MACHINE}" == *"Win"* ]]; then
+    # Only build zips on Windows
     echo "using 7za"
     7za a -tzip -bd -mx=7 "${HOME}/${RELEASE}/${CCPNMRFILE}.zip" "${CCPNMRPATH}"
 fi
