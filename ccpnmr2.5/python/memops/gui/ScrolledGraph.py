@@ -53,6 +53,7 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 """
 
 import math
+import Tkinter
 from memops.gui.Frame import Frame
 from memops.gui.ScrolledCanvas import ScrolledCanvas
 from memops.gui.Color import hexRepr, hexToRgb
