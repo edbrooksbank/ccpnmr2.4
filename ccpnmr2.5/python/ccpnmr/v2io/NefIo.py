@@ -1401,6 +1401,10 @@ class CcpnNefReader():
                         # Name does not match serial number, so we must change it
                         # - names like H@123 are reserved
                         fixedName = nameForSetting = name.replace('@', '__')
+
+                else:
+                    # TODO:ED - fixedName missed here, was missed check what happens here
+                    nameForSetting = fixedName = name
             else:
                 nameForSetting = fixedName = name
             atomMap = atomMappings[name] = {'name'    : fixedName, 'mappingType': 'simple',

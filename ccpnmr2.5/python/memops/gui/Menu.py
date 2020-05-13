@@ -343,28 +343,59 @@ if __name__ == '__main__':
 
   root = Tkinter.Tk()
  
+  fontNames = ('Courier', 'Helvetica', 'Lucida', 'System', 'Times')
+  BOLD = 'bold'
+  ITALIC = 'italic'
+  UNDERLINE = 'underline'
+  fontSpec = '%s %d %s' % (fontNames[2], 24, ITALIC)
+  mediumFontSpec = '%s %d %s' % (fontNames[2], 16, ITALIC)
+  tinyFontSpec = '%s %d %s' % (fontNames[2], 1, ITALIC)
+
   menubar = Menu(root)
- 
-  menu = Menu(menubar, tearoff=0)
+  menu = Menu(menubar, tearoff=0, font=mediumFontSpec)
 
-  # cannot set any coloours here otherwise overrides the MacOS defaults
+  # cannot set any colours here otherwise overrides the MacOS defaults
 
-  menu.add_command(label='New', shortcut='N', command=new, )
-  menu.add_command(label='Pick', shortcut='P', command=pick)
-  menu.add_command(label='Pick1', shortcut='1', command=pick, tipText='Tip A')
+  WIDTH, HEIGHT = 64, 1
+
+  # window = Tk()
+  # canvas = Canvas(window, width=WIDTH, height=HEIGHT, bg="#000000")
+  # canvas.pack()
+
+  img = Tkinter.PhotoImage(width=WIDTH, height=HEIGHT)
+  # canvas.create_image((WIDTH / 2, HEIGHT / 2), image=img, state="normal")
+
+  for x in range(24,48):
+    img.put("#000000", (x , 0))
+
+  menu.add_command(label='New', shortcut='N', command=new, compound="left")
+  menuItem = menu.add_command(label='Pick', shortcut='P', command=pick, font=fontSpec)
+  menu.entryconfig(1, underline=0, accelerator='P')
+  menuItem = menu.add_command(label='Pick1', shortcut='1', command=pick, tipText='Tip A', underline=1, image=img, compound='top')
+  menuItem = menu.add_command(label=' ', image=img, compound=Tkinter.TOP, font=tinyFontSpec)
+
+  # menu.entryconfig(2, underline=2, accelerator='c', image=img, compound='bottom')
   menu.add_command(label='Pick2', shortcut='2', command=pick, tipText='Tip B')
   menu.add_command(label='Pick3', shortcut='3', command=pick, tipText='Tip C')
-  menubar.add_cascade(label='Project', shortcut='P', menu=menu)
+  menubar.add_cascade(label='Project', shortcut='P', menu=menu, font=fontSpec)
 
   # menu.entryconfig(0, activeforeground='#3E4149', foreground='#10FF30', label='NEEEEEEW', state = Tkinter.NORMAL)
   # menu.entryconfig(1, foreground='#10FF30', state = Tkinter.DISABLED)
   menu.entryconfig(3, state = Tkinter.DISABLED)
   menu.entryconfig(4, state = Tkinter.DISABLED)
 
-  menu = Menu(menubar, tearoff=0)
-  menu.add_command(label='Enter Full Screen', shortcut='E', command=new)
-  menubar.add_cascade(label='View', shortcut='V', menu=menu)
+  # image = self.image, compound = "left"),
+
+  menu = Menu(menubar, tearoff=0, font=fontSpec)
+  menu.add_command(label='My Menu Option', command=new, image=img, compound='top')
+  menubar.add_cascade(label='View', menu=menu)
  
   root.config(menu=menubar)
- 
+
+  button = Tkinter.Label(root, text="UNDERLINE\nTEXT", underline=4, font=fontSpec)
+  button.pack()
+  button = Tkinter.Button(root, text="UNDERLINE\nTEXT", underline=2, font=fontSpec)
+  button.pack()
+
   root.mainloop()
+
