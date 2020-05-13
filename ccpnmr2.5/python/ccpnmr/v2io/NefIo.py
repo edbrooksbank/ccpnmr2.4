@@ -470,29 +470,32 @@ class CcpnNefReader():
 
         # Read shifts loop
         loop = saveFrame.get('nef_chemical_shift') or []
-        for row in loop.data:
-            name = row['atom_name']
-            element = row.get('element')
-            isotopeNumber = row.get('isotope_number')
+        if loop and hasattr(loop, 'data'):
+            # only read the data if it exists, this loop is mandatory and should be here
+            # but validation will follow
+            for row in loop.data:
+                name = row['atom_name']
+                element = row.get('element')
+                isotopeNumber = row.get('isotope_number')
 
-            if not element:
-                element = commonUtil.name2ElementSymbol(name)
-            if element:
-                if isotopeNumber:
-                    isotopeCode = '%s%s%s' % (isotopeNumber, element[0].upper(), element[1:].lower())
+                if not element:
+                    element = commonUtil.name2ElementSymbol(name)
+                if element:
+                    if isotopeNumber:
+                        isotopeCode = '%s%s%s' % (isotopeNumber, element[0].upper(), element[1:].lower())
+                    else:
+                        isotopeCode = genConstants.DEFAULT_ISOTOPE_DICT.get(element.upper())
                 else:
-                    isotopeCode = genConstants.DEFAULT_ISOTOPE_DICT.get(element.upper())
-            else:
-                isotopeCode = None
+                    isotopeCode = None
 
-            atomMap = self.fetchAtomMap(row['chain_code'], row['sequence_code'], name,
-                                        isotopeCode=isotopeCode)
-            for resonance in atomMap['resonances']:
-                # There will be more than one resonance for e.g. Ser HB% or Leu HD%
-                shiftList.newShift(resonance=resonance, value=row['value'],
-                                   error=row.get('value_uncertainty', 0),
-                                   figOfMerit=row.get('ccpn_figure_of_merit', 1),
-                                   details=row.get('ccpn_comment'))
+                atomMap = self.fetchAtomMap(row['chain_code'], row['sequence_code'], name,
+                                            isotopeCode=isotopeCode)
+                for resonance in atomMap['resonances']:
+                    # There will be more than one resonance for e.g. Ser HB% or Leu HD%
+                    shiftList.newShift(resonance=resonance, value=row['value'],
+                                       error=row.get('value_uncertainty', 0),
+                                       figOfMerit=row.get('ccpn_figure_of_merit', 1),
+                                       details=row.get('ccpn_comment'))
         #
         return shiftList
 
