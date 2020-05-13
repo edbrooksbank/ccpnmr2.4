@@ -841,6 +841,9 @@ class CcpnNefReader():
                 else:
                     experimentParams['refExperiment'] = refExperiment
 
+            if u'name' in experimentParams:
+                # NOTE:ED - small fix for name sometimes being decoded as an int
+                experimentParams[u'name'] = str(experimentParams[u'name'])
             nmrExperiment = nmrProject.newExperiment(**experimentParams)
             dataSource = nmrExperiment.newDataSource(**dataSourceParams)
 
