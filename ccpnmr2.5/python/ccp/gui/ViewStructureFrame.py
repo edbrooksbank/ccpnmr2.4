@@ -182,7 +182,7 @@ class ViewStructureFrame(ScrolledCanvas):
     self.cStructureZoom = None
     self.canvas.config(background='black')
 
-    self.handler = TkHandler.TkHandler(self.canvas)
+    self.handler = None                       # TkHandler.TkHandler(self.canvas)
     self.bind('<Configure>', self.resize)
         
     self.canvas.bind('<Button-1>', self.mouseButton1)
@@ -359,9 +359,15 @@ class ViewStructureFrame(ScrolledCanvas):
     self.initialY  = None
 
   def resize(self, event):
-  
-    self.handler.resize(event.width, event.height)
-    self.drawStructure()
+
+    # if the handler has not been initialised the do it here
+    if not self.handler and TkHandler:
+      self.handler = TkHandler.TkHandler(self.canvas)
+
+    if self.handler:
+      # only resize of handler exists
+      self.handler.resize(event.width, event.height)
+      self.drawStructure()
   
   def windowsOsZoom(self, event):
   
@@ -1151,10 +1157,13 @@ class ViewStructureFrame(ScrolledCanvas):
       showError('IO Error', str(e), parent=self)
 
   def drawStructure(self, handler=None):
-  
+
     if not handler:
       handler = self.handler
- 
+
+    if not handler:
+      return
+
     w  = self.winfo_width()
     h  = self.winfo_height()
   
