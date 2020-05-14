@@ -577,10 +577,19 @@ class UpdateServer:
       addr = '%s?fileName=%s' % (serverScript, fileName)
 
       urllib3.contrib.pyopenssl.inject_into_urllib3()
-      http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
-                                 ca_certs=certifi.where(),
-                                 timeout=urllib3.Timeout(connect=5.0, read=5.0),
-                                 retries=urllib3.Retry(1, redirect=False))
+      proxy_url = os.environ.get('HTTPS_PROXY', os.environ.get('HTTP_PROXY'))
+      if proxy_url:
+        http = urllib3.ProxyManager(proxy_url,
+                                    cert_reqs='CERT_REQUIRED',
+                                    ca_certs=certifi.where(),
+                                    timeout=urllib3.Timeout(connect=3.0, read=3.0),
+                                    retries=urllib3.Retry(1, redirect=False))
+      else:
+        http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
+                                   ca_certs=certifi.where(),
+                                   timeout=urllib3.Timeout(connect=3.0, read=3.0),
+                                   retries=urllib3.Retry(1, redirect=False))
+
       response = http.request('GET', addr,
                               preload_content=False)
       return response
