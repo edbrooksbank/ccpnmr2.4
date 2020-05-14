@@ -1070,11 +1070,13 @@ class AnalysisPopup(BasePopup, Analysis):
                                      'Reference Isotope Schemes', 
                                      'Atom Browser', 'Add Sequence', 
                                      'Residue Information']
-    if isWindowsOS():
-      # Always inactivate 'Residue Information' under Windows (does not work)
-      ind = self.menu_items[MoleculeMenu].index('Residue Information')
-      # ind+2 because of two separators
-      self.fixedActiveMenus[(MoleculeMenu, ind+2)] = False
+
+    # NOTE:ED - works now :)
+    # if isWindowsOS():
+    #   # Always inactivate 'Residue Information' under Windows (does not work)
+    #   ind = self.menu_items[MoleculeMenu].index('Residue Information')
+    #   # ind+2 because of two separators
+    #   self.fixedActiveMenus[(MoleculeMenu, ind+2)] = False
 
   def setAssignMenu(self):
  
