@@ -206,7 +206,8 @@ def makeTransposePeakList(peakList):
         position.append(peakDim.position)
 
     newPeak = pickPeak(newPeakList, position, unit=unit)
-    
+    newPeak.details = peak.details
+
     propagatePeakAssignments([newPeak,], refPeak=peak, tolerances=tolerances)
 
   return newPeakList
@@ -1370,7 +1371,10 @@ def copyPeakList(peakList, destPeakList, progressBar=None, rePick=False, peaks=N
             for contrib in peakDim.peakDimContribs:
               resonance = contrib.resonance
               assignResToDim(newPeakDims[i-1], resonance, tolerance=1.0) 
-  
+
+          # add the details here
+          newPeak.details = peak.details
+
       if progressBar:
         progressBar.increment()
         
@@ -1432,6 +1436,8 @@ def _copyPeakInfo(peakList, peak):
     peakIntensity2 = peak2.newPeakIntensity(method=peakIntensity.method)
     for attr in ('error', 'intensityType', 'value'):
       setattr(peakIntensity2, attr, getattr(peakIntensity, attr))
+
+  peak2.details = peak.details
 
   return peak2
 
