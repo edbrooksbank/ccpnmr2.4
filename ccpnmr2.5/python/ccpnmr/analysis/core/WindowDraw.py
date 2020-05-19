@@ -1006,7 +1006,7 @@ class WindowDraw:
             self.setHandlerFont(handler, name, size)
           analysisPeakList = winPeakList.analysisPeakList
           if analysisPeakList not in analysisPeakLists:
-            color = analysisPeakList.printColor
+            color = analysisPeakList.symbolColor              # printColor
             if color and color[0] != '#': # assume it is a name
               scheme = profile.findFirstColorScheme(name=color)
               if scheme:
