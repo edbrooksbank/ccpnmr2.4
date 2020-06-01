@@ -1498,6 +1498,9 @@ class WindowDraw:
       drawMark(handler, mark, x0, x1, y0, y1)
 
     # handler.resetLineWidth() # reset to default
+    # NOTE:ED - quickest way to fix the bug without re-compiling
+    #           error caused because tkhandler DEFAULT_LINEWIDTH is 0.0, should be 1.0 under conda
+    handler.setLineWidth(1.0)
 
   def drawRuler(self, handler, ruler, x0, x1, y0, y1):
 
@@ -1527,6 +1530,7 @@ class WindowDraw:
       drawRuler(handler, ruler, x0, x1, y0, y1)
 
     # handler.resetLineWidth() # reset to default
+    handler.setLineWidth(1.0)
 
   def drawDeltaMarker(self, handler, x0, x1, y0, y1, color):
 
