@@ -4978,23 +4978,19 @@ class WindowFrame(Frame, WindowDraw):
     analysisSpectrum = view.analysisSpectrum
     color = analysisSpectrum.sliceColor
  
-#     if isinstance(slice, FakeSlice):
-#       bg = self.windowPopup.analysisProfile.bgColor
-#       handler.setColor(hexToRgb(hexXor(color, bg)))
-#
-#       """ 17 Nov 09: OpenGL also needs this now that using GL_XOR in xor drawing
-#       if self.handlerClass == TkHandler.TkHandler:
-#         # 29 Sep 09: Tk case seems to require xor here
-#         bg = self.windowPopup.analysisProfile.bgColor
-#         handler.setColor(hexToRgb(hexXor(color, bg)))
-#       else:
-#         handler.setColor(hexToRgb(color))
-# """
-#     else:
-#       handler.setColor(hexToRgb(color))
+    if isinstance(slice, FakeSlice):
+      # bg = self.windowPopup.analysisProfile.bgColor
+      # handler.setColor(hexToRgb(hexXor(color, bg)))
 
-    # NOTE:ED - xor not needed now
-    handler.setColor(hexToRgb(color))
+      # 17 Nov 09: OpenGL also needs this now that using GL_XOR in xor drawing
+      if self.handlerClass != TkHandler.TkHandler:
+        # 29 Sep 09: Tk case seems to require xor here
+        bg = self.windowPopup.analysisProfile.bgColor
+        handler.setColor(hexToRgb(hexXor(color, bg)))
+      else:
+        handler.setColor(hexToRgb(color))
+    else:
+      handler.setColor(hexToRgb(color))
 
     #print 'drawViewSliceC', view.analysisSpectrum.dataSource.name
     position = analysisSpectrum.dataSource.numDim * [0]
