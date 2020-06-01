@@ -47,7 +47,7 @@ import Tkinter
 from memops.general import Implementation
 
 from memops.universal.Region1D import Region1D
-from memops.universal.Util import formatDecimals, isWindowsOS, useWheelMouse, OSButton
+from memops.universal.Util import formatDecimals, isWindowsOS, useWheelMouse, OSButton, isMacOS
 
 from memops.gui.ButtonScrollbar     import ButtonScrollbar
 from memops.gui.Color               import hexToRgb, inverseGrey, hexXor, hexInvert
@@ -4979,16 +4979,19 @@ class WindowFrame(Frame, WindowDraw):
     color = analysisSpectrum.sliceColor
  
     if isinstance(slice, FakeSlice):
-      # bg = self.windowPopup.analysisProfile.bgColor
-      # handler.setColor(hexToRgb(hexXor(color, bg)))
-
-      # 17 Nov 09: OpenGL also needs this now that using GL_XOR in xor drawing
-      if self.handlerClass != TkHandler.TkHandler:
-        # 29 Sep 09: Tk case seems to require xor here
-        bg = self.windowPopup.analysisProfile.bgColor
-        handler.setColor(hexToRgb(hexXor(color, bg)))
-      else:
+      bg = self.windowPopup.analysisProfile.bgColor
+      if isMacOS():
         handler.setColor(hexToRgb(color))
+
+      elif isWindowsOS():
+        if self.handlerClass == TkHandler.TkHandler:
+          handler.setColor(hexToRgb(hexXor(color, bg)))
+        else:
+          handler.setColor(hexToRgb(color))
+
+      else:
+        handler.setColor(hexToRgb(hexXor(color, bg)))
+
     else:
       handler.setColor(hexToRgb(color))
 
