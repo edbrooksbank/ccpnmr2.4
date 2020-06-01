@@ -4981,13 +4981,8 @@ class WindowFrame(Frame, WindowDraw):
     if isinstance(slice, FakeSlice):
       bg = self.windowPopup.analysisProfile.bgColor
       if isMacOS():
+        # only Tk
         handler.setColor(hexToRgb(color))
-
-      elif isWindowsOS():
-        if self.handlerClass == TkHandler.TkHandler:
-          handler.setColor(hexToRgb(hexXor(color, bg)))
-        else:
-          handler.setColor(hexToRgb(color))
 
       else:
         handler.setColor(hexToRgb(hexXor(color, bg)))
