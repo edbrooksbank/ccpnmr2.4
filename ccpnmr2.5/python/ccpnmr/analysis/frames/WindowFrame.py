@@ -3755,7 +3755,14 @@ class WindowFrame(Frame, WindowDraw):
     # color = inverseGrey(profile.bgColor)
     # handler.setColor(hexToRgb(color))
     fg = self.windowPopup.analysisProfile.fgColor
-    handler.setColor(hexToRgb(fg))
+    # handler.setColor(hexToRgb(fg))
+    bg = self.windowPopup.analysisProfile.bgColor
+    if isMacOS():
+      # only Tk
+      handler.setColor(hexToRgb(fg))
+
+    else:
+      handler.setColor(hexToRgb(hexXor(fg, bg)))
 
     for x in xs:
       x = float(x - x0) / (x1 - x0)
