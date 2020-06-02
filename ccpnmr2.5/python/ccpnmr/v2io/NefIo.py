@@ -1106,8 +1106,8 @@ class CcpnNefReader():
 
             serial = row['peak_id']
             parameters = {}
-            parameters['volume'] = row.get('volume')
-            parameters['height'] = row.get('height')
+            parameters['volume'] = float(row.get('volume')) if row.get('volume') is not None else None
+            parameters['height'] = float(row.get('height')) if row.get('height') is not None else None
             parameters['annotation'] = row.get('ccpn_annotation')
             parameters['details'] = row.get('ccpn_comment')  #
             val = row.get('ccpn_figure_of_merit')
@@ -1137,8 +1137,8 @@ class CcpnNefReader():
                 values = tuple(row.get(x) for x in multipleAttributes['position'])
                 errors = tuple(row.get(x) for x in multipleAttributes['positionError'])
                 for ii, peakDim in enumerate(peak.sortedPeakDims()):
-                    peakDim.value = values[ii]
-                    peakDim.valueError = errors[ii]
+                    peakDim.value = float(values[ii]) if values[ii] is not None else None
+                    peakDim.valueError = float(errors[ii]) if errors[ii] is not None else None
                     # add dataDimRef
                     peakDim.dataDimRef = dataDimRefMap.get(peakDim.dim)
 
