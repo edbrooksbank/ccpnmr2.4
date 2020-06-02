@@ -2057,7 +2057,11 @@ def findMatchingPeakDimShifts(peakDim, shiftRanges=None, tolerance=None,
   
   if ppm is None:
     ppm = peakDim.realValue
-  
+
+    # NOTE:ED - in some cases ppm can still be None
+    if ppm is None:
+      return shifts
+
   unit = dataDimRef.expDimRef.unit
   dataDim = dataDimRef.dataDim
   peakDimPos = unit_converter[(unit,'point')](ppm, dataDimRef)

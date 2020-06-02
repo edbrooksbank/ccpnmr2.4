@@ -1902,9 +1902,13 @@ class EditAssignmentPopup(BasePopup):
 
         if (peakDim.realValue is not None) and (peakDim.realValue != peakDim.value):
           posn = '%8.4f (%.4f)' % (peakDim.realValue, peakDim.value)
-        else:
+
+        elif (peakDim.realValue is not None):
+          # NOTE:ED - ppm.realValue can still be None
           posn  = '%8.4f' % peakDim.value
-          
+        else:
+          continue
+
         peakDimComponents = [None,] + peakDim.sortedPeakDimComponents()
         allContribs = peakDim.sortedPeakDimContribs()
         
