@@ -1118,7 +1118,14 @@ class CalcHnHaCouplingPopup(BasePopup):
     peakList   = self.peakList
     iType      = self.intensityPulldown.getText()
     spectrum   = self.peakList.dataSource
-    dims       = [dataDim.dim for dataDim in getOnebondDataDims(spectrum)[0]]
+
+    # NOTE:ED - not sure whether to just exit or carry on with an empty list
+    getBonds = getOnebondDataDims(spectrum)
+    if getBonds and len(getBonds) > 0:
+      dims = [dataDim.dim for dataDim in getBonds[0]]
+    else:
+      dims     = []
+
     project    = self.project
     atomNames  = ATOM_NAME_DICT[spectrum.experiment.refExperiment.name]
     atomNames  = (atomNames[0], atomNames[3])

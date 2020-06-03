@@ -1081,6 +1081,8 @@ class CcpnNefReader():
     def load_nef_peak(self, peakList, loop):
         """Serves to load nef_peak loop"""
 
+        import ccpnmr.analysis.core.PeakBasic as PeakBasic
+
         dimensionCount = peakList.dataSource.numDim
         # Get name map for per-dimension attributes
         max = dimensionCount + 1
@@ -1109,7 +1111,7 @@ class CcpnNefReader():
             parameters['volume'] = float(row.get('volume')) if row.get('volume') is not None else None
             parameters['height'] = float(row.get('height')) if row.get('height') is not None else None
             parameters['annotation'] = row.get('ccpn_annotation')
-            parameters['details'] = row.get('ccpn_comment')  #
+            parameters['details'] = row.get('ccpn_comment')
             val = row.get('ccpn_figure_of_merit')
             if val is not None:
                 parameters['figOfMerit'] = val
@@ -1129,6 +1131,12 @@ class CcpnNefReader():
 
                 # Make new peak
                 peak = peakList.newPeak(**parameters)
+
+                # NOTE:ED - need to use the helper functions to set attributes
+                #           these MUST be here or crashes in c-code
+                PeakBasic.setManualPeakIntensity(peak, parameters['height'] or 0.0, intensityType='height')
+                PeakBasic.setManualPeakIntensity(peak, parameters['volume'] or 0.0, intensityType='volume')
+
                 commonUtil.resetSerial(peak, serial)
                 peaks[serial] = peak
                 result.append(peak)
