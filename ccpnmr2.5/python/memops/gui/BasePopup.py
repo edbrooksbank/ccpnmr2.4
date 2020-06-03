@@ -61,7 +61,7 @@ from memops.gui.Label import Label
 from memops.gui.Menu import Menu
 from memops.gui.Frame import Frame
 
-from memops.universal.Util import isWindowsOS
+from memops.universal.Util import isWindowsOS, isMacOS
 
 # base_popups = list of popups created using BasePopup()
 # BasePopup can be subclassed or using createPopup() instead
@@ -74,6 +74,12 @@ class BasePopup(Tkinter.Toplevel, Base):
   def __init__(self, parent, title='', location='', hide=False, font=None,
                modal=False, transient=False, quitFunc=None,
                docKey=None, tipText=None, createToolTip=False, *args, **kw):
+
+    # NOTE:ED - can only be non-transient if modal as well
+    #           transient means the windows are tied to the app
+    #           on MacOS his means that they cannot be raised/lowered
+    if isMacOS():
+      transient = modal
 
     self.parent = parent
     self.location = location
