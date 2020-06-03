@@ -2969,13 +2969,16 @@ class AnalysisPopup(BasePopup, Analysis):
       if (not self.checkSaving()):
         return
 
+    # NOTE:ED - add a flag to show that the program has already exited
+    self._hasQuitNormally = True
+
     self.destroy()
 
-    if not isinstance(self.parent, Tkinter.Tk): # Launched from somewhere else
+    if not isinstance(self.parent, Tkinter.Tk):  # Launched from somewhere else
       return
-      
+
     # Need the below code to fix the problem with Bash
-    # where the commend line was getting screwed up on exit.
+    # where the command line was getting screwed up on exit.
     if os.name == 'posix':
       os.system('stty sane')
 

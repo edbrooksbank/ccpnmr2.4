@@ -71,7 +71,7 @@ from memops.general.Implementation import ApiError
 
 from memops.gui.MessageReporter import showError
 
-from memops.universal.Util import isWindowsOS
+from memops.universal.Util import isWindowsOS, isMacOS
 
 from ccp.gui.Io import loadProject
 
@@ -82,6 +82,9 @@ if isWindowsOS():
   os.environ["PYTHONINSPECT"]="x"
 
 top = None
+
+import atexit
+
 
 def main(projectDir=None, cache_size=64, glDirect=None):
 
@@ -94,11 +97,24 @@ def main(projectDir=None, cache_size=64, glDirect=None):
   # root.option_add("*Background", "grey90")
   root.option_add("*Font", "Helvetica -12")
   root.option_add("*Dialog.msg.wrapLength", '6i')
-  
+
   top = AnalysisPopup(root, cache_size=cache_size, glDirect=glDirect)
   #top.option_add("*Cursor", "crosshair")
   #top.option_add("*Cursor", "watch")
   #top.configure(cursor="crosshair")
+
+  def _checkPythonQuit():
+    if top is not None and not hasattr(top, '_hasQuitNormally'):
+      # # NOTE:ED - can remove the threading Thread.__delete keyError
+      # #           but not sure want to remove threading module
+      # #           can monkey patch Thread before module loaded?
+      # #           error caused because trying to exit twice and top already deleted...
+      # if 'threading' in sys.modules:
+      #   del sys.modules['threading']
+      top.quit()
+
+  # add handler to trap quiting from the Python menu in MacOS - shouldn't occur in Windows and Linux
+  atexit.register(_checkPythonQuit)
 
   project = None
   if projectDir:
@@ -118,7 +134,6 @@ def main(projectDir=None, cache_size=64, glDirect=None):
 
   if isWindowsOS():
     root.mainloop()
-    print('Finished...')
 
   return top
 
