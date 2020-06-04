@@ -1124,7 +1124,9 @@ class CalcHnHaCouplingPopup(BasePopup):
     if getBonds and len(getBonds) > 0:
       dims = [dataDim.dim for dataDim in getBonds[0]]
     else:
-      dims     = []
+      dims = []
+      msg = 'Contains no one-bond dataDims - possibly wrong experimentType.'
+      showWarning('HnHa Coupling error', msg, parent=self)
 
     project    = self.project
     atomNames  = ATOM_NAME_DICT[spectrum.experiment.refExperiment.name]
