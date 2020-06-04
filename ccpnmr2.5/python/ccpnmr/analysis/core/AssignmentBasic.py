@@ -2060,6 +2060,8 @@ def findMatchingPeakDimShifts(peakDim, shiftRanges=None, tolerance=None,
 
     # NOTE:ED - in some cases ppm can still be None
     if ppm is None:
+      showWarning('peakDim Failure',
+                  'peakDim contains no realValue - possibly wrong experimentType')
       return shifts
 
   unit = dataDimRef.expDimRef.unit
