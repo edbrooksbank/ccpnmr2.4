@@ -294,9 +294,14 @@ class PrintWindowPopup(BasePopup):
 
     self.updateWindows()
     self.updateAfter()
-    
+
     self.administerNotifiers(self.registerNotify)
-    
+
+  def open(self):
+    # NOTE:ED - subclass the open so that the window pulldown gets updated on subsequent open events
+    super(PrintWindowPopup, self).open()
+    self.updateWindows()
+
   def administerNotifiers(self, notifyFunc):
   
     for func in ('__init__', 'delete', 'setOverrideRegion'):
