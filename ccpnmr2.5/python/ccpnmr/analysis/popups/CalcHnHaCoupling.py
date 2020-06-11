@@ -1347,8 +1347,8 @@ class CalcHnHaCouplingPopup(BasePopup):
       if self.inBody:
         msg1 = 'Warning: %d peaks have an unusable %s value' % (invalid,iType)
         invalidReasons.insert(0, msg1)
-        for message in invalidReasons:
-          print(message)
+        error = '\n'.join(invalidReasons)
+        print(error)
 
       else:
         msg1 = '%d peaks have an unusable %s value' % (invalid,iType)
