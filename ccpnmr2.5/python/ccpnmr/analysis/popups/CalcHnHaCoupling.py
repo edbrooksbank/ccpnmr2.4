@@ -1136,7 +1136,8 @@ class CalcHnHaCouplingPopup(BasePopup):
     useGly     = self.glycineSelect.get()
     aFilter    = self.angleFilterSelect.get()
     relaxCorr  = self.relaxCorrEntry.get() or 1.11
-    
+    invalidReasons = []
+
     f = 4*twoPi*twoPi*tTime*tTime
     
     degrees = 360/twoPi
@@ -1160,6 +1161,12 @@ class CalcHnHaCouplingPopup(BasePopup):
         height = intensity.value
             
       if (not intensity) or (not intensity.value) or not height:
+        if not intensity:
+          invalidReasons.append('HNHA Error: no intensity [peak: %s]' % str(peak))
+        elif not intensity.value:
+          invalidReasons.append('HNHA Error: no intensity.value [peak: %s]' % str(peak))
+        elif not height:
+          invalidReasons.append('HNHA Error: no height [peak: %s]' % str(peak))
         invalid += 1
         continue
         
@@ -1275,6 +1282,7 @@ class CalcHnHaCouplingPopup(BasePopup):
       ratio = intensityB/intensityA
       
       if ratio > 0:
+        invalidReasons.append('HNHA Error: bad ratio [value: %f spin-system: %s]' %(ratio, str(spinSystem)))
         invalid += 1
         continue
       
@@ -1288,6 +1296,7 @@ class CalcHnHaCouplingPopup(BasePopup):
       b = 4*kA*(kC-coupling)
       
       if b > a:
+        invalidReasons.append('HNHA Error: b > a [a: %f b: %f spin-system: %s]' % (a,b, str(spinSystem)))
         invalid += 1
         continue
       
@@ -1328,11 +1337,25 @@ class CalcHnHaCouplingPopup(BasePopup):
       data.append(datum)   
      
     if invalid:
+
+      if invalidReasons:
+        msg = 'reasons for HNHA errors'
+        msg2 = '-'*len(msg)
+        invalidReasons.insert(0, msg2)
+        invalidReasons.insert(0, msg)
+
       if self.inBody:
-        print('Warning: %d peaks have an unusable %s value' % (invalid,iType))
+        msg1 = 'Warning: %d peaks have an unusable %s value' % (invalid,iType)
+        invalidReasons.insert(0, msg1)
+        for message in invalidReasons:
+          print(message)
+
       else:
+        msg1 = '%d peaks have an unusable %s value' % (invalid,iType)
+        invalidReasons.insert(0, msg1)
+        error = '\n'.join(invalidReasons)
         showWarning('Warning',
-                    '%d peaks have an unusable %s value' % (invalid,iType),
+                    error,
                     parent=self)
        
     return data
