@@ -183,6 +183,9 @@ extern void ccpn_free(void *ptr);
 #define  OPEN_FOR_WRITING(fp, name) \
 	 (((fp) = fopen((name), WRITE)) == NULL)
 
+#define  OPEN_FOR_APPENDING(fp, name) \
+	 (((fp) = fopen((name), APPEND)) == NULL)
+
 #define  OPEN_FOR_BINARY_READING(fp, name) \
 	 (((fp) = fopen((name), BINARY_READ)) == NULL)
 

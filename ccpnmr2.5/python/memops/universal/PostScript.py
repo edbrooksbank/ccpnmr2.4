@@ -176,73 +176,81 @@ class PostScript(Output.Output):
                            fonts=fonts, do_outline_box=do_outline_box,
                            file_mode='w')
 
+  def outputData(self, data):
+    """Write output to the stream
+    Only keep open whilst writing to ensure no clash with other threads
+    """
+    self._midStreamOpen()
+    self.stream.write(data)
+    self._midStreamClose()
+
   def outputHeader(self):
 
-    stream = self.stream
+    outputData = self.outputData
 
     if (self.output_format == 'PostScript'):
       header = ps_header
     else:
       header = eps_header
-    stream.write(header)
+    outputData(header)
 
     (w, h) = self.paper_size
     font = ' '.join(self.fonts)
-    stream.write(ps_comments % (w, h, font))
+    outputData(ps_comments % (w, h, font))
 
-    stream.write(ps_prolog)
-    stream.write(ps_setup)
-    stream.write(ps_begin)
+    outputData(ps_prolog)
+    outputData(ps_setup)
+    outputData(ps_begin)
 
   def outputTrailer(self):
 
-    self.stream.write(ps_end)
-    self.stream.write(ps_eof)
+    self.outputData(ps_end)
+    self.outputData(ps_eof)
 
   def setBlackWhite(self):
 
-    self.stream.write('PS_black_white\n')
+    self.outputData('PS_black_white\n')
 
   def setColorGray(self):
 
-    self.stream.write('PS_color_gray\n')
+    self.outputData('PS_color_gray\n')
 
   def rectangleClip(self, x0, y0, x1, y1):
 
     (x0, y0, x1, y1) = [ float(t) for t in (x0, y0, x1, y1) ]
 
-    self.stream.write('%3.2f %3.2f %3.2f %3.2f PS_rectangle_clip\n' % (x0, y0, x1, y1))
+    self.outputData('%3.2f %3.2f %3.2f %3.2f PS_rectangle_clip\n' % (x0, y0, x1, y1))
 
   def rotate(self, angle):
 
-    self.stream.write('%3.2f PS_rotate\n' % float(angle))
+    self.outputData('%3.2f PS_rotate\n' % float(angle))
 
   def translate(self, x, y):
 
-    self.stream.write('%3.2f %3.2f PS_translate\n' % (float(x), float(y)))
+    self.outputData('%3.2f %3.2f PS_translate\n' % (float(x), float(y)))
 
   def drawLine(self, x0, y0, x1, y1):
 
-    self.stream.write('%3.2f %3.2f %3.2f %3.2f PS_draw_line\n' % \
+    self.outputData('%3.2f %3.2f %3.2f %3.2f PS_draw_line\n' % \
                       (self.ax*x0, self.ay*y0, self.ax*x1, self.ay*y1))
 
   def fillCircle(self, x, y, r):
 
     s = math.sqrt(self.ax * self.ay)
 
-    self.stream.write('%3.2f %3.2f %3.2f PS_fill_circle\n' % \
+    self.outputData('%3.2f %3.2f %3.2f PS_fill_circle\n' % \
                       (self.ax*x, self.ay*y, s*r))
 
   def drawCircle(self, x, y, r):
 
     s = math.sqrt(self.ax * self.ay)
 
-    self.stream.write('%3.2f %3.2f %3.2f PS_draw_circle\n' % \
+    self.outputData('%3.2f %3.2f %3.2f PS_draw_circle\n' % \
                       (self.ax*x, self.ay*y, s*r))
 
   def drawDashLine(self, x0, y0, x1, y1, dashLength, gapLength):
 
-    self.stream.write('[%d %d] 0 PS_setdash\n' % (dashLength, gapLength))
+    self.outputData('[%d %d] 0 PS_setdash\n' % (dashLength, gapLength))
     self.drawLine(x0, y0, x1, y1)
     self.setNonDashed()
 
@@ -253,40 +261,40 @@ class PostScript(Output.Output):
     text = text.replace('(', '\\(')
     text = text.replace(')', '\\)')
 
-    self.stream.write('%3.2f %3.2f %3.2f %3.2f (%s) PS_text\n' % \
+    self.outputData('%3.2f %3.2f %3.2f %3.2f (%s) PS_text\n' % \
                       (self.ax*x, self.ay*y, a, b, text))
  
   # r, g, b should be between 0 and 1
   def setColor(self, color):
 
-    self.stream.write('%3.2f %3.2f %3.2f PS_set_color\n' % color)
+    self.outputData('%3.2f %3.2f %3.2f PS_set_color\n' % color)
 
   def setFont(self, name, size):
 
     if name == 'Times':
       name = 'Times-Roman'
 
-    self.stream.write('/%s %d PS_select_font\n' % (name, size))
+    self.outputData('/%s %d PS_select_font\n' % (name, size))
 
   def setNonDashed(self):
 
-    self.stream.write('PS_nondashed\n')
+    self.outputData('PS_nondashed\n')
 
   def setDashed(self):
 
-    self.stream.write('PS_dashed\n')
+    self.outputData('PS_dashed\n')
 
   def setLineWidth(self, linewidth):
 
-    self.stream.write('%3.2f PS_set_linewidth\n' % linewidth)
+    self.outputData('%3.2f PS_set_linewidth\n' % linewidth)
 
   def save(self):
 
-    self.stream.write('PS_graphics_save\n')
+    self.outputData('PS_graphics_save\n')
 
   def restore(self):
 
-    self.stream.write('PS_graphics_restore\n')
+    self.outputData('PS_graphics_restore\n')
 
   def drawRectangle(self, rectangle):
 
@@ -295,7 +303,7 @@ class PostScript(Output.Output):
     y *= self.ay
     width *= self.ax
     height *= self.ay
-    self.stream.write('%3.2f %3.2f %3.2f %3.2f PS_draw_rectangle\n' % (x, y, width, height))
+    self.outputData('%3.2f %3.2f %3.2f %3.2f PS_draw_rectangle\n' % (x, y, width, height))
 
 if (__name__ == '__main__'):
 

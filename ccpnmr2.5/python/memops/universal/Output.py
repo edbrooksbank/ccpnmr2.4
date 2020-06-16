@@ -160,18 +160,24 @@ class Output:
     self.have_graphics_save = False
     self.file_name = file_name
     self.stream = None
+    self._file_mode = 'a'
+
     if (file_name):
       self.open(file_name, file_mode)
 
   def open(self, file_name, file_mode = 'w'):
 
-    self.close()
+    if self.stream:
+      self.close()
 
     self.file_name = file_name
 
     self.ax = self.ay = 1.0
 
     self.file_name = file_name
+    with open(file_name, 'w'):
+      pass
+
     self.stream = open(file_name, file_mode)
 
     self.outputHeader()
@@ -221,10 +227,21 @@ class Output:
     if (self.do_outline_box):
       self.drawRectangle((0, 0, ww, hh))
 
+    self._midStreamClose()
+
+  def _midStreamOpen(self):
+    self.stream = open(self.file_name, self._file_mode)
+
+  def _midStreamClose(self):
+    if self.stream:
+      self.stream.flush()
+      self.stream.close()
+      self.stream = None
+
   def close(self):
 
-    if (not self.stream):
-      return
+    # if (not self.stream):
+    #   return
 
     if (self.have_graphics_save):
       self.restore()
@@ -232,7 +249,8 @@ class Output:
 
     self.outputTrailer()
 
-    self.stream.close()
+    if self.stream:
+      self.stream.close()
     self.stream = None
     self.file_name = ''
 

@@ -104,8 +104,13 @@ class Pdf(Output.Output):
     self.setFont('Times-Roman', 12) # arbitrary, should not be needed
 
   def outputData(self, data):
-
+    """Write output to the stream
+    Only keep open whilst writing to ensure no clash with other threads
+    """
+    self._midStreamOpen()
     self.stream.write(data)
+    self._midStreamClose()
+
     self.nbytes = self.nbytes + len(data)
 
   def outputRef(self, obj = None):
@@ -206,7 +211,7 @@ class Pdf(Output.Output):
   def outputTrailer(self):
 
     # draw stuff in C world so use file size to figure out correct value for self.nbytes
-    self.stream.flush() # make sure all written
+    # self.stream.flush() # make sure all written
     self.nbytes = os.stat(self.file_name)[6]
     length = self.nbytes - self.drawingByte
 

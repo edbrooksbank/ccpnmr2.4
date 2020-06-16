@@ -261,19 +261,19 @@ static struct PyMethodDef py_handler_methods[] =
  * BASIC TYPE-OPERATIONS
  *****************************************************************************/
 
-static PyObject *new_py_pdf_handler(PyObject *fp_obj, float width, float height,
+static PyObject *new_py_pdf_handler(CcpnString *file_name, float width, float height,
                                                         CcpnString output_style)
 {
     Py_Pdf_handler obj;
     Pdf_handler pdf_handler;
-    FILE *fp;
+//    FILE *fp;
 
-    if (!PyFile_Check(fp_obj))
-	RETURN_OBJ_ERROR("argument not a Python file object");
+//    if (!PyFile_Check(fp_obj))
+//	RETURN_OBJ_ERROR("argument not a Python file object");
  
-    fp = PyFile_AsFile(fp_obj);
+//    fp = PyFile_AsFile(fp_obj);
 
-    pdf_handler = new_pdf_handler(fp, width, height, output_style);
+    pdf_handler = new_pdf_handler(file_name, width, height, output_style);
 
     if (!pdf_handler)
 	 RETURN_OBJ_ERROR("allocating Pdf_handler object");
@@ -385,12 +385,15 @@ static PyObject *init_Py_Pdf_handler(PyObject *self, PyObject *args)
 {
     float width, height;
     CcpnString output_style;
-    PyObject *fp_obj;
+//    PyObject *fp_obj;
+    CcpnString file_name;
 
-    if (!PyArg_ParseTuple(args, "Offs", &fp_obj, &width, &height, &output_style))
+//    if (!PyArg_ParseTuple(args, "Offs", &fp_obj, &width, &height, &output_style))
+//        RETURN_OBJ_ERROR("must have four arguments: stream width height output_style");
+    if (!PyArg_ParseTuple(args, "sffs", &file_name, &width, &height, &output_style))
         RETURN_OBJ_ERROR("must have four arguments: stream width height output_style");
 
-    return new_py_pdf_handler(fp_obj, width, height, output_style);
+    return new_py_pdf_handler(file_name, width, height, output_style);
 }
 
 /******************************************************************************

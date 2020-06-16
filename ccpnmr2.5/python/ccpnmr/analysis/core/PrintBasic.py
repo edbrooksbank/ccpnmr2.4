@@ -62,6 +62,7 @@ def printWindow(windowDraw, outputHandler, tick_location, tick_placement, aspect
     outputHandler.save()
     if outputHandler.cHandler:
       windowDraw.drawAll(handlers)
+
   finally:
     del window.inOverrideMode
 

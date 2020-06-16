@@ -172,14 +172,16 @@ Drawing_funcs *ps_drawing_funcs(void)
     return &drawing_funcs;
 }
 
-Ps_handler new_ps_handler(FILE *fp, float width, float height,
+Ps_handler new_ps_handler(CcpnString *file_name, float width, float height,
                                                 CcpnString output_style)
 {
     Ps_handler ps_handler;
 
     MALLOC_NEW(ps_handler, struct Ps_handler, 1);
 
-    ps_handler->fp = fp;
+    strcpy(ps_handler->fp, file_name);
+
+//    ps_handler->fp = file_name;
     ps_handler->width = width;
     ps_handler->height = height;
 
@@ -207,10 +209,12 @@ void delete_ps_handler(Ps_handler ps_handler)
 void new_range_ps_handler(Ps_handler ps_handler, float x0, float y0,
 					float x1, float y1)
 {
-    FILE *fp = ps_handler->fp;
+//    FILE *fp = ps_handler->fp;
     float width = ps_handler->width;
     float height = ps_handler->height;
 
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, ps_handler->fp);
     fprintf(fp, "PS_graphics_restore\n");
     fprintf(fp, "PS_graphics_save\n");
 
@@ -241,14 +245,21 @@ void new_range_ps_handler(Ps_handler ps_handler, float x0, float y0,
 /*  scaling causes problems with fonts, think again about this later
     fprintf(fp, FMT FMT "PS_scale\n", ps_handler->ax, ps_handler->ay);
 */
+    FCLOSE(fp);
 }
 
 void clip_range_ps_handler(Ps_handler ps_handler, float x0, float y0,
 					float x1, float y1)
 {
-    fprintf(ps_handler->fp, FMT FMT FMT FMT "PS_rectangle_clip\n",
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, ps_handler->fp);
+//    fprintf(ps_handler->fp, FMT FMT FMT FMT "PS_rectangle_clip\n",
+//				ps_handler->ax*x0, ps_handler->ay*y0,
+//				ps_handler->ax*(x1-x0), ps_handler->ay*(y1-y0));
+    fprintf(fp, FMT FMT FMT FMT "PS_rectangle_clip\n",
 				ps_handler->ax*x0, ps_handler->ay*y0,
 				ps_handler->ax*(x1-x0), ps_handler->ay*(y1-y0));
+    FCLOSE(fp);
 }
 
 void draw_line_ps_handler(Ps_handler ps_handler, float x0, float y0,
@@ -256,8 +267,10 @@ void draw_line_ps_handler(Ps_handler ps_handler, float x0, float y0,
 {
     float ax = ps_handler->ax;
     float ay = ps_handler->ay;
-    FILE *fp = ps_handler->fp;
+//    FILE *fp = ps_handler->fp;
 
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, ps_handler->fp);
     fprintf(fp, "NP " FMT FMT "M ", ax*x0, ay*y0);
     fprintf(fp, FMT FMT "L ", ax*x1, ay*y1);
     fprintf(fp, "S\n");
@@ -266,6 +279,7 @@ void draw_line_ps_handler(Ps_handler ps_handler, float x0, float y0,
 				ps_handler->ax*x0, ps_handler->ay*y0,
 				ps_handler->ax*x1, ps_handler->ay*y1);
 */
+    FCLOSE(fp);
 }
 
 void draw_clipped_line_ps_handler(Ps_handler ps_handler,
@@ -288,7 +302,11 @@ void fill_circle_ps_handler(Ps_handler ps_handler, float x, float y, float r)
     y *= ps_handler->ay;
     r *= s;
 
-    fprintf(ps_handler->fp, FMT FMT FMT "PS_fill_circle\n", x, y, r);
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, ps_handler->fp);
+//    fprintf(ps_handler->fp, FMT FMT FMT "PS_fill_circle\n", x, y, r);
+    fprintf(fp, FMT FMT FMT "PS_fill_circle\n", x, y, r);
+    FCLOSE(fp)
 }
 
 void fill_ellipse_ps_handler(Ps_handler ps_handler, float x, float y, float rx, float ry)
@@ -306,7 +324,11 @@ void draw_circle_ps_handler(Ps_handler ps_handler, float x, float y, float r)
     y *= ps_handler->ay;
     r *= s;
 
-    fprintf(ps_handler->fp, FMT FMT FMT "PS_draw_circle\n", x, y, r);
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, ps_handler->fp);
+//    fprintf(ps_handler->fp, FMT FMT FMT "PS_draw_circle\n", x, y, r);
+    fprintf(fp, FMT FMT FMT "PS_draw_circle\n", x, y, r);
+    FCLOSE(fp)
 }
 
 void draw_ellipse_ps_handler(Ps_handler ps_handler, float x, float y, float rx, float ry)
@@ -322,11 +344,13 @@ void draw_polyline_ps_handler(Ps_handler ps_handler, Poly_line polyline)
     Point2f *v = polyline->vertices;
     float ax = ps_handler->ax;
     float ay = ps_handler->ay;
-    FILE *fp = ps_handler->fp;
+//    FILE *fp = ps_handler->fp;
 
     if (n < 2)
 	return;
 
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, ps_handler->fp);
     fprintf(fp, "NP " FMT FMT "M ", ax*v[0].x, ay*v[0].y);
 
     for (i = 1; i < n; i++)
@@ -343,6 +367,7 @@ void draw_polyline_ps_handler(Ps_handler ps_handler, Poly_line polyline)
     if (polyline->closed)
 	draw_line_ps_handler(ps_handler, v[n-1].x, v[n-1].y, v[0].x, v[0].y);
 */
+    FCLOSE(fp)
 }
 
 void draw_clipped_polyline_ps_handler(Ps_handler ps_handler, Poly_line polyline)
@@ -401,9 +426,14 @@ void draw_text_ps_handler(Ps_handler ps_handler, CcpnString text,
 {
     Line line;
 
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, ps_handler->fp);
     string_c_to_ps(line, text);
-    fprintf(ps_handler->fp, FMT FMT FMT2 FMT2 "(%s) PS_text\n",
+//    fprintf(ps_handler->fp, FMT FMT FMT2 FMT2 "(%s) PS_text\n",
+//		ps_handler->ax*x, ps_handler->ay*y, a, b, line);
+    fprintf(fp, FMT FMT FMT2 FMT2 "(%s) PS_text\n",
 		ps_handler->ax*x, ps_handler->ay*y, a, b, line);
+	FCLOSE(fp)
 }
 
 void draw_dash_box_ps_handler(Ps_handler ps_handler,
@@ -429,7 +459,11 @@ void set_color_ps_handler(Ps_handler ps_handler, float *color)
             r = g = b = 1.0;
     }
 
-    fprintf(ps_handler->fp, FMT2 FMT2 FMT2 "PS_set_color\n", r, g, b);
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, ps_handler->fp);
+//    fprintf(ps_handler->fp, FMT2 FMT2 FMT2 "PS_set_color\n", r, g, b);
+    fprintf(fp, FMT2 FMT2 FMT2 "PS_set_color\n", r, g, b);
+    FCLOSE(fp)
 }
 
 void set_black_ps_handler(Ps_handler ps_handler)
@@ -450,20 +484,35 @@ void set_font_ps_handler(Ps_handler ps_handler, CcpnString name, int size)
     ps_handler->font[LINE_SIZE-1] = 0;
     ps_handler->fontsize = size;
 
-    fprintf(ps_handler->fp, "/%s %d PS_select_font\n", ps_handler->font, size);
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, ps_handler->fp);
+//    fprintf(ps_handler->fp, "/%s %d PS_select_font\n", ps_handler->font, size);
+    fprintf(fp, "/%s %d PS_select_font\n", ps_handler->font, size);
+    FCLOSE(fp)
 }
 
 void set_line_style_ps_handler(Ps_handler ps_handler, int line_style)
 {
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, ps_handler->fp);
+//    if (line_style == NORMAL_LINE_STYLE)
+//	fprintf(ps_handler->fp, "PS_nondashed\n");
+//    else /* line_style == DASHED_LINE_STYLE */
+//	fprintf(ps_handler->fp, "PS_dashed\n");
     if (line_style == NORMAL_LINE_STYLE)
-	fprintf(ps_handler->fp, "PS_nondashed\n");
+	fprintf(fp, "PS_nondashed\n");
     else /* line_style == DASHED_LINE_STYLE */
-	fprintf(ps_handler->fp, "PS_dashed\n");
+	fprintf(fp, "PS_dashed\n");
+    FCLOSE(fp)
 }
 
 void set_line_width_ps_handler(Ps_handler ps_handler, float line_width)
 {
-    fprintf(ps_handler->fp, FMT "PS_set_linewidth\n", line_width);
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, ps_handler->fp);
+//    fprintf(ps_handler->fp, FMT "PS_set_linewidth\n", line_width);
+    fprintf(fp, FMT "PS_set_linewidth\n", line_width);
+    FCLOSE(fp)
 }
 
 void get_region_ps_handler(Ps_handler ps_handler, float *x0, float *y0,
@@ -495,6 +544,10 @@ void fill_triangle_ps_handler(Ps_handler ps_handler, float x0, float y0,
     x2 *= ps_handler->ax;
     y2 *= ps_handler->ay;
 
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, ps_handler->fp);
+//    fprintf(ps_handler->fp, FMT FMT FMT FMT FMT FMT "PS_fill_triangle\n", x0, y0, x1, y1, x2, y2);
     fprintf(ps_handler->fp, FMT FMT FMT FMT FMT FMT "PS_fill_triangle\n", x0, y0, x1, y1, x2, y2);
+    FCLOSE(fp)
 }
 

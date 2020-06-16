@@ -48,7 +48,8 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 
 typedef struct Pdf_handler
 {
-    FILE *fp;
+//    FILE *fp;
+    Long_line fp;
     float width, height;
     float x0, y0, x1, y1;
     float ax, ay, bx, by;
@@ -59,7 +60,9 @@ typedef struct Pdf_handler
 
 extern Drawing_funcs *pdf_drawing_funcs(void);
 
-extern Pdf_handler new_pdf_handler(FILE *fp, float width, float height,
+//extern Pdf_handler new_pdf_handler(FILE *fp, float width, float height,
+//                                                CcpnString output_style);
+extern Pdf_handler new_pdf_handler(CcpnString *file_name, float width, float height,
                                                 CcpnString output_style);
 
 extern void delete_pdf_handler(Pdf_handler pdf_handler);

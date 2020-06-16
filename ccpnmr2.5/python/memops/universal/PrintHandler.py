@@ -238,8 +238,10 @@ def getOutputHandler(file_name, pixel_width, pixel_height, unit_width=1.0, unit_
                       axis_label_offset=axis_label_offset, linewidth=linewidth,
                       fonts=fonts, do_outline_box=do_outline_box)
     if (PsHandler):
-      cHandler = PsHandler.PsHandler(outputHandler.stream, plot_size[0], plot_size[1],
-                      output_style)
+      # cHandler = PsHandler.PsHandler(outputHandler.stream, plot_size[0], plot_size[1],
+      #                 output_style)
+      cHandler = PsHandler.PsHandler(file_name, plot_size[0], plot_size[1],
+                                     output_style)
     else:
       cHandler = None
 
@@ -254,8 +256,10 @@ def getOutputHandler(file_name, pixel_width, pixel_height, unit_width=1.0, unit_
                       axis_label_offset=axis_label_offset, linewidth=linewidth,
                       fonts=fonts, do_outline_box=do_outline_box)
     if (PdfHandler):
-      cHandler = PdfHandler.PdfHandler(outputHandler.stream, plot_size[0], plot_size[1],
-                      output_style)
+      # cHandler = PdfHandler.PdfHandler(outputHandler.stream, plot_size[0], plot_size[1],
+      #                 output_style)
+      cHandler = PdfHandler.PdfHandler(file_name, plot_size[0], plot_size[1],
+                                       output_style)
     else:
       cHandler = None
 

@@ -172,14 +172,17 @@ Drawing_funcs *pdf_drawing_funcs(void)
     return &drawing_funcs;
 }
 
-Pdf_handler new_pdf_handler(FILE *fp, float width, float height,
+Pdf_handler new_pdf_handler(CcpnString *file_name, float width, float height,
                                                 CcpnString output_style)
 {
     Pdf_handler pdf_handler;
 
     MALLOC_NEW(pdf_handler, struct Pdf_handler, 1);
 
-    pdf_handler->fp = fp;
+    strcpy(pdf_handler->fp, file_name);
+//    strcat(pdf_handler->fp, "0");
+
+//    pdf_handler->fp = fp;
     pdf_handler->width = width;
     pdf_handler->height = height;
 
@@ -206,10 +209,12 @@ void delete_pdf_handler(Pdf_handler pdf_handler)
 void new_range_pdf_handler(Pdf_handler pdf_handler, float x0, float y0,
 					float x1, float y1)
 {
-    FILE *fp = pdf_handler->fp;
+//    FILE *fp = pdf_handler->fp;
     float width = pdf_handler->width;
     float height = pdf_handler->height;
 
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, pdf_handler->fp);
     fprintf(fp, "Q\n"); /* restore */
     fprintf(fp, "q\n"); /* save */
 
@@ -247,24 +252,28 @@ void new_range_pdf_handler(Pdf_handler pdf_handler, float x0, float y0,
 */
 
     fprintf(fp, "1 0 0 1 %3.2f %3.2f cm\n", pdf_handler->bx, pdf_handler->by);
+    FCLOSE(fp)
 }
 
 void clip_range_pdf_handler(Pdf_handler pdf_handler, float x0, float y0,
 					float x1, float y1)
 {
-    FILE *fp = pdf_handler->fp;
+//    FILE *fp = pdf_handler->fp;
 
     x0 *= pdf_handler->ax;
     x1 *= pdf_handler->ax;
     y0 *= pdf_handler->ay;
     y1 *= pdf_handler->ay;
 
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, pdf_handler->fp);
     fprintf(fp, FMT FMT "m\n", x0, y0);
     fprintf(fp, FMT FMT "l\n", x1, y0);
     fprintf(fp, FMT FMT "l\n", x1, y1);
     fprintf(fp, FMT FMT "l\n", x0, y1);
     fprintf(fp, FMT FMT "l\n", x0, y0);
     fprintf(fp, "W n\n");
+    FCLOSE(fp)
 }
 
 void draw_line_pdf_handler(Pdf_handler pdf_handler, float x0, float y0,
@@ -272,7 +281,7 @@ void draw_line_pdf_handler(Pdf_handler pdf_handler, float x0, float y0,
 {
     float ax = pdf_handler->ax;
     float ay = pdf_handler->ay;
-    FILE *fp = pdf_handler->fp;
+//    FILE *fp = pdf_handler->fp;
 /*
     printf("draw_line_pdf_handler0: %3.2f %3.2f\n", pdf_handler->ax, pdf_handler->ay);
     printf("draw_line_pdf_handler1: %3.2f %3.2f %3.2f %3.2f\n", x0, y0, x1, y1);
@@ -280,9 +289,12 @@ void draw_line_pdf_handler(Pdf_handler pdf_handler, float x0, float y0,
 	pdf_handler->ax*x0, pdf_handler->ay*y0, pdf_handler->ax*x1, pdf_handler->ay*y1);
 */
 
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, pdf_handler->fp);
     fprintf(fp, FMT FMT "m ", ax*x0, ay*y0);
     fprintf(fp, FMT FMT "l ", ax*x1, ay*y1);
     fprintf(fp, "S\n");
+    FCLOSE(fp)
 }
 
 void draw_clipped_line_pdf_handler(Pdf_handler pdf_handler,
@@ -310,21 +322,29 @@ void fill_ellipse_pdf_handler(Pdf_handler pdf_handler, float x, float y, float r
 {
     int i;
     float xx, yy, angle;
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, pdf_handler->fp);
 
     xx = x + rx;
     yy = y;
-    fprintf(pdf_handler->fp, FMT FMT " m\n",
+//    fprintf(pdf_handler->fp, FMT FMT " m\n",
+//			pdf_handler->ax*xx, pdf_handler->ay*yy);
+    fprintf(fp, FMT FMT " m\n",
 			pdf_handler->ax*xx, pdf_handler->ay*yy);
     for (i = 1; i <= NCIRCLE_PTS; i++)
     {
         angle = i * RADIANS_PER_PT;
         xx = x + rx * (float) cos((double) angle);
         yy = y + ry * (float) sin((double) angle);
-        fprintf(pdf_handler->fp, FMT FMT " l\n",
+//        fprintf(pdf_handler->fp, FMT FMT " l\n",
+//			pdf_handler->ax*xx, pdf_handler->ay*yy);
+        fprintf(fp, FMT FMT " l\n",
 			pdf_handler->ax*xx, pdf_handler->ay*yy);
     }
 
-    fprintf(pdf_handler->fp, "f\n");
+//    fprintf(pdf_handler->fp, "f\n");
+    fprintf(fp, "f\n");
+    FCLOSE(fp)
 }
 
 void draw_circle_pdf_handler(Pdf_handler pdf_handler, float x, float y, float r)
@@ -336,21 +356,29 @@ void draw_ellipse_pdf_handler(Pdf_handler pdf_handler, float x, float y, float r
 {
     int i;
     float xx, yy, angle;
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, pdf_handler->fp);
 
     xx = x + rx;
     yy = y;
-    fprintf(pdf_handler->fp, FMT FMT " m\n",
+//    fprintf(pdf_handler->fp, FMT FMT " m\n",
+//			pdf_handler->ax*xx, pdf_handler->ay*yy);
+    fprintf(fp, FMT FMT " m\n",
 			pdf_handler->ax*xx, pdf_handler->ay*yy);
     for (i = 1; i <= NCIRCLE_PTS; i++)
     {
         angle = i * RADIANS_PER_PT;
         xx = x + rx * (float) cos((double) angle);
         yy = y + ry * (float) sin((double) angle);
-        fprintf(pdf_handler->fp, FMT FMT " l\n",
+//        fprintf(pdf_handler->fp, FMT FMT " l\n",
+//			pdf_handler->ax*xx, pdf_handler->ay*yy);
+        fprintf(fp, FMT FMT " l\n",
 			pdf_handler->ax*xx, pdf_handler->ay*yy);
     }
 
-    fprintf(pdf_handler->fp, "S\n");
+//    fprintf(pdf_handler->fp, "S\n");
+    fprintf(fp, "S\n");
+    FCLOSE(fp)
 }
 
 void draw_polyline_pdf_handler(Pdf_handler pdf_handler, Poly_line polyline)
@@ -359,7 +387,9 @@ void draw_polyline_pdf_handler(Pdf_handler pdf_handler, Poly_line polyline)
     Point2f *v = polyline->vertices;
     float ax = pdf_handler->ax;
     float ay = pdf_handler->ay;
-    FILE *fp = pdf_handler->fp;
+//    FILE *fp = pdf_handler->fp;
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, pdf_handler->fp);
 
 /*
     for (i = 0; i < n-1; i++)
@@ -381,6 +411,7 @@ void draw_polyline_pdf_handler(Pdf_handler pdf_handler, Poly_line polyline)
         //fprintf(fp, FMT FMT "l ", ax*v[0].x, ay*v[0].y);
 
     fprintf(fp, "S\n");
+    FCLOSE(fp)
 }
 
 void draw_clipped_polyline_pdf_handler(Pdf_handler pdf_handler, Poly_line polyline)
@@ -455,12 +486,22 @@ void draw_text_pdf_handler(Pdf_handler pdf_handler, CcpnString text,
 
     string_c_to_pdf(line, text);
 
-    fprintf(pdf_handler->fp, "BT\n");
-    fprintf(pdf_handler->fp, "/%s %d Tf\n", pdf_handler->font,
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, pdf_handler->fp);
+
+//    fprintf(pdf_handler->fp, "BT\n");
+//    fprintf(pdf_handler->fp, "/%s %d Tf\n", pdf_handler->font,
+//						pdf_handler->fontsize);
+//    fprintf(pdf_handler->fp, FMT FMT "Td\n", x, y);
+//    fprintf(pdf_handler->fp, "(%s) Tj\n", line);
+//    fprintf(pdf_handler->fp, "ET\n");
+    fprintf(fp, "BT\n");
+    fprintf(fp, "/%s %d Tf\n", pdf_handler->font,
 						pdf_handler->fontsize);
-    fprintf(pdf_handler->fp, FMT FMT "Td\n", x, y);
-    fprintf(pdf_handler->fp, "(%s) Tj\n", line);
-    fprintf(pdf_handler->fp, "ET\n");
+    fprintf(fp, FMT FMT "Td\n", x, y);
+    fprintf(fp, "(%s) Tj\n", line);
+    fprintf(fp, "ET\n");
+    FCLOSE(fp)
 }
 
 void draw_dash_box_pdf_handler(Pdf_handler pdf_handler,
@@ -485,8 +526,13 @@ void set_color_pdf_handler(Pdf_handler pdf_handler, float *color)
             r = g = b = 1.0;
     }
 
-    fprintf(pdf_handler->fp, FMT2 FMT2 FMT2 "RG\n", r, g, b);
-    fprintf(pdf_handler->fp, FMT2 FMT2 FMT2 "rg\n", r, g, b);
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, pdf_handler->fp);
+//    fprintf(pdf_handler->fp, FMT2 FMT2 FMT2 "RG\n", r, g, b);
+//    fprintf(pdf_handler->fp, FMT2 FMT2 FMT2 "rg\n", r, g, b);
+    fprintf(fp, FMT2 FMT2 FMT2 "RG\n", r, g, b);
+    fprintf(fp, FMT2 FMT2 FMT2 "rg\n", r, g, b);
+    FCLOSE(fp)
 }
 
 void set_black_pdf_handler(Pdf_handler pdf_handler)
@@ -515,6 +561,14 @@ void set_line_style_pdf_handler(Pdf_handler pdf_handler, int line_style)
 	fprintf(pdf_handler->fp, "PS_nondashed\n");
     else *//* line_style == DASHED_LINE_STYLE *//*
 	fprintf(pdf_handler->fp, "PS_dashed\n");
+
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, pdf_handler->fp);
+    if (line_style == NORMAL_LINE_STYLE)
+	fprintf(fp, "PS_nondashed\n");
+    else *//* line_style == DASHED_LINE_STYLE *//*
+	fprintf(fp, "PS_dashed\n");
+	FCLOSE(fp)
 */
 }
 
@@ -553,10 +607,18 @@ void fill_triangle_pdf_handler(Pdf_handler pdf_handler, float x0, float y0,
     x2 *= pdf_handler->ax;
     y2 *= pdf_handler->ay;
 
-    fprintf(pdf_handler->fp, FMT FMT " m\n", x0, y0);
-    fprintf(pdf_handler->fp, FMT FMT " l\n", x1, y1);
-    fprintf(pdf_handler->fp, FMT FMT " l\n", x2, y2);
-    fprintf(pdf_handler->fp, "h\n");
-    fprintf(pdf_handler->fp, "f\n");
+    FILE *fp;
+    OPEN_FOR_APPENDING(fp, pdf_handler->fp);
+//    fprintf(pdf_handler->fp, FMT FMT " m\n", x0, y0);
+//    fprintf(pdf_handler->fp, FMT FMT " l\n", x1, y1);
+//    fprintf(pdf_handler->fp, FMT FMT " l\n", x2, y2);
+//    fprintf(pdf_handler->fp, "h\n");
+//    fprintf(pdf_handler->fp, "f\n");
+    fprintf(fp, FMT FMT " m\n", x0, y0);
+    fprintf(fp, FMT FMT " l\n", x1, y1);
+    fprintf(fp, FMT FMT " l\n", x2, y2);
+    fprintf(fp, "h\n");
+    fprintf(fp, "f\n");
+    FCLOSE(fp)
 }
 

@@ -48,7 +48,8 @@ Development of a Software Pipeline. Proteins 59, 687 - 696.
 
 typedef struct Ps_handler
 {
-    FILE *fp;
+//    FILE *fp;
+    Long_line fp;
     float width, height;
     float x0, y0, x1, y1;
     float ax, ay, bx, by;
@@ -59,7 +60,9 @@ typedef struct Ps_handler
 
 extern Drawing_funcs *ps_drawing_funcs(void);
 
-extern Ps_handler new_ps_handler(FILE *fp, float width, float height,
+//extern Ps_handler new_ps_handler(FILE *fp, float width, float height,
+//                                                CcpnString output_style);
+extern Ps_handler new_ps_handler(CcpnString *file_name, float width, float height,
                                                 CcpnString output_style);
 
 extern void delete_ps_handler(Ps_handler ps_handler);
