@@ -348,6 +348,7 @@ if __name__ == '__main__':
   ITALIC = 'italic'
   UNDERLINE = 'underline'
   fontSpec = '%s %d %s' % (fontNames[2], 24, ITALIC)
+  fontSpecUnderline = '%s %d %s %s' % (fontNames[2], 24, ITALIC, UNDERLINE)
   mediumFontSpec = '%s %d %s' % (fontNames[2], 16, ITALIC)
   tinyFontSpec = '%s %d %s' % (fontNames[2], 1, ITALIC)
 
@@ -368,11 +369,122 @@ if __name__ == '__main__':
   for x in range(24,48):
     img.put("#000000", (x , 0))
 
+  from PIL import ImageDraw, Image, ImageTk, ImageFont
+  import tkFont
+  import matplotlib.font_manager as fontman
+  import os
+
+  _fList = fontman.findSystemFonts(fontpaths=None, fontext='ttf')
+  # for fn in sorted(_fList[:20]):
+  #   print(fn)
+
+  def findFontFile(searchFont):
+    targetFont = []
+    for row in _fList:
+      try:
+        if searchFont in row:
+          targetFont.append(row)
+      except TypeError:
+        pass
+    return targetFont[0]
+
+  tkFontNames = tkFont.families()
+  # for fn in sorted(tkFontNames[:50]):
+  #   print(fn)
+
+  img = Image.new(mode="RGBA", size=(300, 700), color=(128, 128, 128, 0))
+  d = ImageDraw.Draw(img)
+
+  menuImages = []
+
+  x, y = 0, 0
+  for ii, fontName in enumerate(sorted(tkFontNames[:20])):
+    _ul = ii % 6
+
+    # split font into three for underlining
+    nameGroup = (fontName[0:_ul], fontName[_ul:_ul+1], fontName[_ul+1:])
+    print(nameGroup)
+
+    try:
+      fnt = ImageFont.truetype(fontName, 24)
+    except Exception as es:
+      # font can't be loaded
+      continue
+
+    # make two different images for pos/neg
+    _imgW, _imgH = fnt.getsize(fontName)
+    img = Image.new(mode="RGBA", size=(_imgW, _imgH+2), color=(0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    imgNeg = Image.new(mode="RGBA", size=(_imgW, _imgH+2), color=(255, 255, 255, 0))
+    dNeg = ImageDraw.Draw(imgNeg)
+
+    # text_width, text_height = fnt.getsize(fontName)
+    ascend, descend = fnt.getmetrics()
+
+    x = 0
+    # _maxH = 0
+    for gr, txt in enumerate(nameGroup):
+      if not txt:
+        # skip the first group if empty
+        continue
+
+      _w, _h = fnt.getsize(txt)
+      ascend, descend = fnt.getmetrics()
+
+      d.text((x, 0), txt, fill=(0, 0, 0, 255), font=fnt)
+      dNeg.text((x, 0), txt, fill=(255, 255, 255, 255), font=fnt)
+      if gr == 1:
+        d.line((x, min(ascend + 1, _h + 1), x+_w-1, min(ascend + 1, _h + 1)), fill=(0, 0, 0, 255))
+        dNeg.line((x, min(ascend + 1, _h + 1), x + _w - 1, min(ascend + 1, _h + 1)), fill=(255, 255, 255, 255))
+      x += _w
+      # _maxH = max(_maxH, _h)
+
+    # fnt = ImageFont.load_default()
+    # text_width, text_height = 10, 10
+    # ascend, descend = 10, 10
+    #
+    # for jj in range(1):
+    #   print('>> {} {} {} {}'.format(text_width, text_height, ascend, descend))
+    #   d.text((0, 0), os.path.basename(fontName), fill=(0, 0, 0), font=fnt)
+    #   d.line((12, min(ascend+1, text_height+1), 24, min(ascend+1, text_height+1)), fill=(0, 0, 0))
+
+    # imgTk = ImageTk.PhotoImage(img.crop(img.getbbox()))
+    # _maxH += 2
+    # imgTk = ImageTk.PhotoImage(img.crop((0, 0, x, _maxH)))
+    imgTk = ImageTk.PhotoImage(img)
+    imgTkNeg = ImageTk.PhotoImage(imgNeg)
+    menuImages.append((fontName, imgTk, imgTkNeg, _imgW, _imgH, ascend, descend))
+
+  # img = Image.new(mode="RGBA", size=(100, 150), color=(128, 128, 128, 0))
+  # d = ImageDraw.Draw(img)
+  # x, y = 0, 0
+  # for ii, fontName in enumerate(fontNames):
+  #   try:
+  #     tkfont = tkFont.Font(family="Courier", size=28)
+  #     d.text((x, y), fontName, fill=(0, 0, 0), font=tkfont)
+  #     x += 5
+  #     y += 28
+  #   except Exception as es:
+  #     pass
+  # imgTk = ImageTk.PhotoImage(img.crop(img.getbbox()))
+
   menu.add_command(label='New', shortcut='N', command=new, compound="left")
   menuItem = menu.add_command(label='Pick', shortcut='P', command=pick, font=fontSpec)
   menu.entryconfig(1, underline=0, accelerator='P')
-  menuItem = menu.add_command(label='Pick1', shortcut='1', command=pick, tipText='Tip A', underline=1, image=img, compound='top')
-  menuItem = menu.add_command(label=' ', image=img, compound=Tkinter.TOP, font=tinyFontSpec)
+  # menuItem = menu.add_command(label='Pick1', shortcut='1', command=pick, tipText='Tip A', underline=1, image=imgTk, compound='top')
+  # menuItem = menu.add_command(label=' ', image=imgTk, compound=Tkinter.TOP, font=tinyFontSpec)
+
+  for ii, (item, img, imgNeg, _, _, _, _) in enumerate(menuImages[:20]):
+    if ii % 2:
+      menuItem = menu.add_command(image=img, compound='top')
+    else:
+      menuItem = menu.add_command(image=imgNeg, compound='top')
+    # def _enter():
+    #   menuItem["image"] = img
+    # def _leave():
+    #   menuItem["image"] = imgNeg
+    # menuItem.bind("<Enter>", _enter)
+    # menuItem.bind("<Leave>", _leave)
 
   # menu.entryconfig(2, underline=2, accelerator='c', image=img, compound='bottom')
   menu.add_command(label='Pick2', shortcut='2', command=pick, tipText='Tip B')
@@ -387,15 +499,19 @@ if __name__ == '__main__':
   # image = self.image, compound = "left"),
 
   menu = Menu(menubar, tearoff=0, font=fontSpec)
-  menu.add_command(label='My Menu Option', command=new, image=img, compound='top')
+  menu.add_command(label='My Menu Option', command=new, image=imgTk, compound='top')
   menubar.add_cascade(label='View', menu=menu)
  
   root.config(menu=menubar)
 
-  button = Tkinter.Label(root, text="UNDERLINE\nTEXT", underline=4, font=fontSpec)
-  button.pack()
-  button = Tkinter.Button(root, text="UNDERLINE\nTEXT", underline=2, font=fontSpec)
-  button.pack()
+  buttonBox = Tkinter.Frame(root)
+  button = Tkinter.Label(root, text="U", underline=4, font=fontSpec)
+  button.grid(row = 0, column = 1, sticky = Tkinter.NS )
+  # button.pack()
+  button = Tkinter.Button(root, text="N", underline=2, font=fontSpecUnderline)
+  button.grid(row = 0, column = 2, sticky = Tkinter.NS )
+  # button.pack()
+  button = Tkinter.Button(root, text="DERLINE", underline=2, font=fontSpec)
+  button.grid(row = 0, column = 3, sticky = Tkinter.NS )
 
   root.mainloop()
-
