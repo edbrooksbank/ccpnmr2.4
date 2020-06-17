@@ -2611,7 +2611,7 @@ class AnalysisPopup(BasePopup, Analysis):
 
     try:
       geometry = popup.geometry()
-      self.application.setValue(self.analysisProject, key, geometry)
+      self.application.setValue(self.analysisProject, key, str(geometry))
     except Exception, e:
       print 'setPopupGeometry exception', str(e)
     except:
@@ -2626,7 +2626,7 @@ class AnalysisPopup(BasePopup, Analysis):
     for key in self.popups.keys():
       popup = self.popups[key]
       if not key.startswith(window_popup_prefix): # bit of a hack
-        not self.setPopupGeometry(popup, key)
+        self.setPopupGeometry(popup, key)
 
   def getPopupsOpen(self):
 
