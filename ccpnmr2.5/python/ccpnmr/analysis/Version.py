@@ -1,6 +1,6 @@
-version = '2.5.0'
+version = '2.5.1'
 build = ''
-timestamp = 'Wed Feb 12 09:00:00 2020'
+timestamp = 'Wed Jun 17 09:00:00 2020'
 platform = 'darwin'
 bits = 64
 arch = 'x86_64'

@@ -357,36 +357,16 @@ if __name__ == '__main__':
 
   # cannot set any colours here otherwise overrides the MacOS defaults
 
-  WIDTH, HEIGHT = 64, 1
-
-  # window = Tk()
-  # canvas = Canvas(window, width=WIDTH, height=HEIGHT, bg="#000000")
-  # canvas.pack()
-
-  img = Tkinter.PhotoImage(width=WIDTH, height=HEIGHT)
-  # canvas.create_image((WIDTH / 2, HEIGHT / 2), image=img, state="normal")
-
-  for x in range(24,48):
-    img.put("#000000", (x , 0))
-
   from PIL import ImageDraw, Image, ImageTk, ImageFont
   import tkFont
 
   tkFontNames = tkFont.families()
-  # for fn in sorted(tkFontNames[:50]):
-  #   print(fn)
-
-  img = Image.new(mode="RGBA", size=(300, 700), color=(128, 128, 128, 0))
-  d = ImageDraw.Draw(img)
-
   menuImages = []
-
   x, y = 0, 0
   for ii, fontName in enumerate(sorted(tkFontNames[:20])):
     _ul = ii % 6
-
-      #fnt = ImageFont.truetype(fontName, 24)
-
+    _numUl = 1
+    # try to load fontName
     tkF = tkFont.Font(name=fontName)
     actual = tkF.actual()
     try:
@@ -396,23 +376,23 @@ if __name__ == '__main__':
         fnt = ImageFont.truetype(actual['family'].lower(), 24)
       except Exception as es:
         print(str(es))
+        continue
 
-  # split font into three for underlining
-    nameGroup = (fontName[0:_ul], fontName[_ul:_ul+1], fontName[_ul+1:])
+    # split font into three for underlining the middle group
+    nameGroup = (fontName[0:_ul], fontName[_ul:_ul+_numUl], fontName[_ul+_numUl:])
     print(nameGroup)
 
-    # make two different images for pos/neg
+    # make two different images for pos/neg - can't catch mouse hover on the menu though so may be redundant
     _imgW, _imgH = fnt.getsize(fontName)
     img = Image.new(mode="RGBA", size=(_imgW, _imgH+2), color=(0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     imgNeg = Image.new(mode="RGBA", size=(_imgW, _imgH+2), color=(255, 255, 255, 0))
     dNeg = ImageDraw.Draw(imgNeg)
 
-    # text_width, text_height = fnt.getsize(fontName)
+    # get metrics to place the underline
     ascend, descend = fnt.getmetrics()
 
     x = 0
-    # _maxH = 0
     for gr, txt in enumerate(nameGroup):
       if not txt:
         # skip the first group if empty
@@ -427,81 +407,31 @@ if __name__ == '__main__':
         d.line((x, min(ascend + 1, _h + 1), x+_w-1, min(ascend + 1, _h + 1)), fill=(0, 0, 0, 255))
         dNeg.line((x, min(ascend + 1, _h + 1), x + _w - 1, min(ascend + 1, _h + 1)), fill=(255, 255, 255, 255))
       x += _w
-      # _maxH = max(_maxH, _h)
 
-    # fnt = ImageFont.load_default()
-    # text_width, text_height = 10, 10
-    # ascend, descend = 10, 10
-    #
-    # for jj in range(1):
-    #   print('>> {} {} {} {}'.format(text_width, text_height, ascend, descend))
-    #   d.text((0, 0), os.path.basename(fontName), fill=(0, 0, 0), font=fnt)
-    #   d.line((12, min(ascend+1, text_height+1), 24, min(ascend+1, text_height+1)), fill=(0, 0, 0))
-
-    # imgTk = ImageTk.PhotoImage(img.crop(img.getbbox()))
-    # _maxH += 2
-    # imgTk = ImageTk.PhotoImage(img.crop((0, 0, x, _maxH)))
-    imgTk = ImageTk.PhotoImage(img)
+    imgTk = ImageTk.PhotoImage(img)         # was (img.crop(img.getbbox())) but have created the correct box size
     imgTkNeg = ImageTk.PhotoImage(imgNeg)
     menuImages.append((fontName, imgTk, imgTkNeg, _imgW, _imgH, ascend, descend))
-
-  # img = Image.new(mode="RGBA", size=(100, 150), color=(128, 128, 128, 0))
-  # d = ImageDraw.Draw(img)
-  # x, y = 0, 0
-  # for ii, fontName in enumerate(fontNames):
-  #   try:
-  #     tkfont = tkFont.Font(family="Courier", size=28)
-  #     d.text((x, y), fontName, fill=(0, 0, 0), font=tkfont)
-  #     x += 5
-  #     y += 28
-  #   except Exception as es:
-  #     pass
-  # imgTk = ImageTk.PhotoImage(img.crop(img.getbbox()))
 
   menu.add_command(label='New', shortcut='N', command=new, compound="left")
   menuItem = menu.add_command(label='Pick', shortcut='P', command=pick, font=fontSpec)
   menu.entryconfig(1, underline=0, accelerator='P')
-  # menuItem = menu.add_command(label='Pick1', shortcut='1', command=pick, tipText='Tip A', underline=1, image=imgTk, compound='top')
-  # menuItem = menu.add_command(label=' ', image=imgTk, compound=Tkinter.TOP, font=tinyFontSpec)
 
   for ii, (item, img, imgNeg, _, _, _, _) in enumerate(menuImages[:20]):
+    # alternate between black/white - testing contrast
+    # spacing seem very large on Windows
     if ii % 2:
       menuItem = menu.add_command(image=img, compound='top')
     else:
       menuItem = menu.add_command(image=imgNeg, compound='top')
-    # def _enter():
-    #   menuItem["image"] = img
-    # def _leave():
-    #   menuItem["image"] = imgNeg
-    # menuItem.bind("<Enter>", _enter)
-    # menuItem.bind("<Leave>", _leave)
 
-  # menu.entryconfig(2, underline=2, accelerator='c', image=img, compound='bottom')
   menu.add_command(label='Pick2', shortcut='2', command=pick, tipText='Tip B')
   menu.add_command(label='Pick3', shortcut='3', command=pick, tipText='Tip C')
   menubar.add_cascade(label='Project', shortcut='P', menu=menu, font=fontSpec)
-
-  # menu.entryconfig(0, activeforeground='#3E4149', foreground='#10FF30', label='NEEEEEEW', state = Tkinter.NORMAL)
-  # menu.entryconfig(1, foreground='#10FF30', state = Tkinter.DISABLED)
   menu.entryconfig(3, state = Tkinter.DISABLED)
   menu.entryconfig(4, state = Tkinter.DISABLED)
 
-  # image = self.image, compound = "left"),
-
   menu = Menu(menubar, tearoff=0, font=fontSpec)
-  # menu.add_command(label='My Menu Option', command=new, image=imgTk, compound='top')
   menubar.add_cascade(label='View', menu=menu)
- 
   root.config(menu=menubar)
-
-  buttonBox = Tkinter.Frame(root)
-  button = Tkinter.Label(root, text="U", underline=4, font=fontSpec)
-  button.grid(row = 0, column = 1, sticky = Tkinter.NS )
-  # button.pack()
-  button = Tkinter.Button(root, text="N", underline=2, font=fontSpecUnderline)
-  button.grid(row = 0, column = 2, sticky = Tkinter.NS )
-  # button.pack()
-  button = Tkinter.Button(root, text="DERLINE", underline=2, font=fontSpec)
-  button.grid(row = 0, column = 3, sticky = Tkinter.NS )
 
   root.mainloop()
