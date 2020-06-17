@@ -1812,14 +1812,16 @@ class Analysis:
       try:
         xdim = axisMapping.analysisDataDim.dataDim.dim - 1
         # first argument = 1 for horizontal, 0 for vertical
-        view.sliceFile['x'] = SliceFile(1, xdim, block_file, self.mem_cache)
+        # view.sliceFile['x'] = SliceFile(1, xdim, block_file, self.mem_cache)
+        view._createSliceFileObjectX = (xdim, block_file, self.mem_cache)
       except:
         pass
     elif axisMapping.label == 'y' and not WindowBasic.windowPaneHasValueAxis(view.spectrumWindowPane):
       try:
         ydim = axisMapping.analysisDataDim.dataDim.dim - 1
         # first argument = 1 for horizontal, 0 for vertical
-        view.sliceFile['y'] = SliceFile(0, ydim, block_file, self.mem_cache)
+        # view.sliceFile['y'] = SliceFile(0, ydim, block_file, self.mem_cache)
+        view._createSliceFileObjectY = (ydim, block_file, self.mem_cache)
       except:
         pass
 

@@ -4968,7 +4968,18 @@ class WindowFrame(Frame, WindowDraw):
 
   def drawViewSlice(self, slice, view, sliceRange = None):
 
+    from ccpnmr.c.SliceFile import SliceFile
+
     analysisProject = view.topObject
+
+    if hasattr(view, '_createSliceFileObjectX'):
+      xdim, block_file, mem_cache = view._createSliceFileObjectX
+      view.sliceFile['x'] = SliceFile(1, xdim, block_file, mem_cache)
+      del view._createSliceFileObjectX
+    if hasattr(view, '_createSliceFileObjectY'):
+      ydim, block_file, mem_cache = view._createSliceFileObjectY
+      view.sliceFile['y'] = SliceFile(0, ydim, block_file, mem_cache)
+      del view._createSliceFileObjectY
 
     #print 'drawViewSliceA', view.analysisSpectrum.dataSource.name
     label = slice.label
