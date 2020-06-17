@@ -90,6 +90,10 @@ error_check
 echo "making path ${CCPNMR_TOP_DIR}/${VERSIONPATH}/c"
 if [[ ${MACHINE} != *"Windows"* ]]; then
     make -B $*
+    echo "Please navigate to ./ccpnmr2.5/c and run 'make links' to put the c-code in the correct paths"
+    echo " - only need to 'make links' once for Linux/MacOS"
 else
-    echo "Please set the conda environment use 'nmake' from an x64 terminal in the above path to compile."
+    echo "Please set the conda environment use 'nmake' from an x64 terminal in ./ccpnmr2.5/c to compile."
+    echo "Run 'make copies' to put the c-code in the correct paths"
+    echo " - 'make copies' must be executed every time the c-code is compiled on Windows"
 fi
