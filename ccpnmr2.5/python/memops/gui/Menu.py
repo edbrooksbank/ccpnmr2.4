@@ -371,22 +371,6 @@ if __name__ == '__main__':
 
   from PIL import ImageDraw, Image, ImageTk, ImageFont
   import tkFont
-  import matplotlib.font_manager as fontman
-  import os
-
-  _fList = fontman.findSystemFonts(fontpaths=None, fontext='ttf')
-  # for fn in sorted(_fList[:20]):
-  #   print(fn)
-
-  def findFontFile(searchFont):
-    targetFont = []
-    for row in _fList:
-      try:
-        if searchFont in row:
-          targetFont.append(row)
-      except TypeError:
-        pass
-    return targetFont[0]
 
   tkFontNames = tkFont.families()
   # for fn in sorted(tkFontNames[:50]):
@@ -402,9 +386,14 @@ if __name__ == '__main__':
     _ul = ii % 6
 
     try:
+      #fnt = ImageFont.truetype(fontName, 24)
+
+      tkF = tkFont.Font(name=fontName)
+      actual = tkF.actual()
       fnt = ImageFont.truetype(fontName, 24)
     except Exception as es:
       # font can't be loaded
+      print(str(es))
       continue
 
     # split font into three for underlining
@@ -499,7 +488,7 @@ if __name__ == '__main__':
   # image = self.image, compound = "left"),
 
   menu = Menu(menubar, tearoff=0, font=fontSpec)
-  menu.add_command(label='My Menu Option', command=new, image=imgTk, compound='top')
+  # menu.add_command(label='My Menu Option', command=new, image=imgTk, compound='top')
   menubar.add_cascade(label='View', menu=menu)
  
   root.config(menu=menubar)
