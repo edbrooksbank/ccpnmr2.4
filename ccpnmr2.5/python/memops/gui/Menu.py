@@ -401,15 +401,15 @@ if __name__ == '__main__':
   for ii, fontName in enumerate(sorted(tkFontNames[:20])):
     _ul = ii % 6
 
-    # split font into three for underlining
-    nameGroup = (fontName[0:_ul], fontName[_ul:_ul+1], fontName[_ul+1:])
-    print(nameGroup)
-
     try:
       fnt = ImageFont.truetype(fontName, 24)
     except Exception as es:
       # font can't be loaded
       continue
+
+    # split font into three for underlining
+    nameGroup = (fontName[0:_ul], fontName[_ul:_ul+1], fontName[_ul+1:])
+    print(nameGroup)
 
     # make two different images for pos/neg
     _imgW, _imgH = fnt.getsize(fontName)
