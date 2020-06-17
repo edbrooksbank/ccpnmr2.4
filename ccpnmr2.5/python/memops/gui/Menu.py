@@ -385,18 +385,19 @@ if __name__ == '__main__':
   for ii, fontName in enumerate(sorted(tkFontNames[:20])):
     _ul = ii % 6
 
-    try:
       #fnt = ImageFont.truetype(fontName, 24)
 
-      tkF = tkFont.Font(name=fontName)
-      actual = tkF.actual()
+    tkF = tkFont.Font(name=fontName)
+    actual = tkF.actual()
+    try:
       fnt = ImageFont.truetype(fontName, 24)
     except Exception as es:
-      # font can't be loaded
-      print(str(es))
-      continue
+      try:
+        fnt = ImageFont.truetype(actual['family'].lower(), 24)
+      except Exception as es:
+        print(str(es))
 
-    # split font into three for underlining
+  # split font into three for underlining
     nameGroup = (fontName[0:_ul], fontName[_ul:_ul+1], fontName[_ul+1:])
     print(nameGroup)
 
