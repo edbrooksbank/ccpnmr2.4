@@ -4969,17 +4969,32 @@ class WindowFrame(Frame, WindowDraw):
   def drawViewSlice(self, slice, view, sliceRange = None):
 
     from ccpnmr.c.SliceFile import SliceFile
+    from ccpnmr.analysis.core.BlockUtil import getBlockFile
 
     analysisProject = view.topObject
 
-    if hasattr(view, '_createSliceFileObjectX'):
-      xdim, block_file, mem_cache = view._createSliceFileObjectX
-      view.sliceFile['x'] = SliceFile(1, xdim, block_file, mem_cache)
-      del view._createSliceFileObjectX
-    if hasattr(view, '_createSliceFileObjectY'):
-      ydim, block_file, mem_cache = view._createSliceFileObjectY
-      view.sliceFile['y'] = SliceFile(0, ydim, block_file, mem_cache)
-      del view._createSliceFileObjectY
+    if isWindowsOS():
+      if hasattr(view, '_createSliceFileObjectX'):
+        xdim, _, mem_cache = view._createSliceFileObjectX
+        spectrum = view.analysisSpectrum.dataSource
+        writeable = hasattr(spectrum, 'writeable') and spectrum.writeable
+        self._tempblock_fileX = getBlockFile(spectrum,
+                                  mem_cache=mem_cache,
+                                  writeable=writeable)
+        if self._tempblock_fileX:
+          view.sliceFile['x'] = SliceFile(1, xdim, self._tempblock_fileX, mem_cache)
+        del view._createSliceFileObjectX
+
+      if hasattr(view, '_createSliceFileObjectY'):
+        ydim, _, mem_cache = view._createSliceFileObjectY
+        spectrum = view.analysisSpectrum.dataSource
+        writeable = hasattr(spectrum, 'writeable') and spectrum.writeable
+        self._tempblock_fileY = getBlockFile(spectrum,
+                                  mem_cache=mem_cache,
+                                  writeable=writeable)
+        if self._tempblock_fileY:
+          view.sliceFile['y'] = SliceFile(0, ydim, self._tempblock_fileY, mem_cache)
+        del view._createSliceFileObjectY
 
     #print 'drawViewSliceA', view.analysisSpectrum.dataSource.name
     label = slice.label
@@ -5125,7 +5140,10 @@ class WindowFrame(Frame, WindowDraw):
         # note b1, b0 swap, due to wanting positive values to point left, not right
         handler.mapRanges(y0, x0, y1, x1, b1, a0, b0, a1)
       #print 'drawViewSlice6', self.windowPane.name, label, first, last, position
-      sliceFile.draw(handler, first, last, position)
+      try:
+        sliceFile.draw(handler, first, last, position)
+      except Exception as es:
+        pass
       #print 'drawViewSlice7', label
 
   def doSlice(self, slice):
