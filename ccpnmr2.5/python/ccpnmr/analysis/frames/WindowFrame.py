@@ -5140,10 +5140,7 @@ class WindowFrame(Frame, WindowDraw):
         # note b1, b0 swap, due to wanting positive values to point left, not right
         handler.mapRanges(y0, x0, y1, x1, b1, a0, b0, a1)
       #print 'drawViewSlice6', self.windowPane.name, label, first, last, position
-      try:
-        sliceFile.draw(handler, first, last, position)
-      except Exception as es:
-        pass
+      sliceFile.draw(handler, first, last, position)
       #print 'drawViewSlice7', label
 
   def doSlice(self, slice):
