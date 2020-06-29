@@ -1005,15 +1005,16 @@ class CcpnNefReader():
             # read dimension transfer data
             transferData = []
             loop = saveFrame.get('nef_spectrum_dimension_transfer')
-            if loop:
+            if loop and loop.data and nmrExperiment:
                 for row in loop.data:
                     dims = [row.get(x) for x in ('dimension_1', 'dimension_2')]
-                    xdr = [nmrExperiment.findFirstExpDim(dim=dim).findFirstExpDimRef() for dim in dims]
-                    transferType = row.get('transfer_type')
-                    isDirect = not row.get('is_indirect')
-                    nmrExperiment.newExpTransfer(expDimRefs=xdr, transferType=transferType,
-                                                 isDirect=isDirect)
-                    transferData.append(dims + [transferType, not isDirect])
+                    xdr = [nmrExperiment.findFirstExpDim(dim=dim).findFirstExpDimRef() if nmrExperiment.findFirstExpDim(dim=dim) else None for dim in dims]
+                    if not any(val is None for val in xdr):
+                        transferType = row.get('transfer_type')
+                        isDirect = not row.get('is_indirect')
+                        nmrExperiment.newExpTransfer(expDimRefs=xdr, transferType=transferType,
+                                                     isDirect=isDirect)
+                        transferData.append(dims + [transferType, not isDirect])
 
             # Make data storage object
             filePath = saveFrame.get('ccpn_spectrum_file_path')
