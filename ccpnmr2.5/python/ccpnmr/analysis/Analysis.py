@@ -1756,8 +1756,10 @@ class Analysis:
     xdim = xMapping.analysisDataDim.dataDim.dim - 1
     ydim = yMapping.analysisDataDim.dataDim.dim - 1
 
-    if hasattr(dataSource, 'block_file') and dataSource.block_file:
-      view.contourFile = ContourFile(xdim, ydim, dataSource.block_file, self.mem_cache)
+    if not isWindowsOS():
+      # NOTE:ED - this is needed because there are threading issues with Windows
+      if hasattr(dataSource, 'block_file') and dataSource.block_file:
+        view.contourFile = ContourFile(xdim, ydim, dataSource.block_file, self.mem_cache)
 
   def initStoredContourFiles(self, view):
 

@@ -4976,9 +4976,9 @@ class WindowFrame(Frame, WindowDraw):
     if isWindowsOS():
       if hasattr(view, '_createSliceFileObjectX'):
         xdim, _, mem_cache = view._createSliceFileObjectX
-        spectrum = view.analysisSpectrum.dataSource
-        writeable = hasattr(spectrum, 'writeable') and spectrum.writeable
-        self._tempblock_fileX = getBlockFile(spectrum,
+        dataSource = view.analysisSpectrum.dataSource
+        writeable = hasattr(dataSource, 'writeable') and dataSource.writeable
+        self._tempblock_fileX = getBlockFile(dataSource,
                                   mem_cache=mem_cache,
                                   writeable=writeable)
         if self._tempblock_fileX:
@@ -4987,9 +4987,9 @@ class WindowFrame(Frame, WindowDraw):
 
       if hasattr(view, '_createSliceFileObjectY'):
         ydim, _, mem_cache = view._createSliceFileObjectY
-        spectrum = view.analysisSpectrum.dataSource
-        writeable = hasattr(spectrum, 'writeable') and spectrum.writeable
-        self._tempblock_fileY = getBlockFile(spectrum,
+        dataSource = view.analysisSpectrum.dataSource
+        writeable = hasattr(dataSource, 'writeable') and dataSource.writeable
+        self._tempblock_fileY = getBlockFile(dataSource,
                                   mem_cache=mem_cache,
                                   writeable=writeable)
         if self._tempblock_fileY:

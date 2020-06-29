@@ -60,6 +60,7 @@ from ccpnmr.analysis.core.Util import checkSwapRegion, calcPointsPerPixel, \
 
 from ccpnmr.analysis.core.WindowBasic import windowPaneHasValueAxis, getSpectrumWindowView
 from ccpnmr.analysis.core.WindowBasic import getAxisRegionRegion, getXAxisOffset, getValueAxisOffset
+from memops.universal.Util import isWindowsOS
 
 try:
   from memops.gui.Color import hexToRgb, inverseGrey, inverseRgb
@@ -939,9 +940,34 @@ class WindowDraw:
         
       else:
         usePrecalculated = analysisSpectrum.usePrecalculated
-      
+
         contourFile = view.contourFile
         storedContourFiles = view.storedContourFiles
+
+        if not view.contourFile and isWindowsOS():
+          # NOTE:ED - this is needed because there are threading issues with Windows
+
+          from ccpnmr.c.ContourFile import ContourFile
+          from ccpnmr.analysis.core.BlockUtil import getBlockFile
+
+          dataSource = view.analysisSpectrum.dataSource
+          if dataSource.numDim >= 2:
+            xMapping = view.findFirstAxisMapping(label='x')
+            yMapping = view.findFirstAxisMapping(label='y')
+            if xMapping and yMapping:
+              xdim = xMapping.analysisDataDim.dataDim.dim - 1
+              ydim = yMapping.analysisDataDim.dataDim.dim - 1
+              if hasattr(dataSource, 'block_file') and dataSource.block_file:
+                mem_cache = self.windowPopup.top.mem_cache
+
+                writeable = hasattr(dataSource, 'writeable') and dataSource.writeable
+                if not hasattr(self, '_tempContourBlockFile'):
+                  self._tempContourBlockFile = getBlockFile(dataSource,
+                                                            mem_cache=mem_cache,
+                                                            writeable=writeable)
+                if self._tempContourBlockFile:
+                  contourFile = view.contourFile = ContourFile(xdim, ydim, self._tempContourBlockFile, mem_cache)
+
         if contourFile and (not storedContourFiles or not usePrecalculated):
           if components: # TBD: this is not needed but will allow non-C update
             contourFile.draw(handler, firstInt, lastInt, contourLevels, contourStyle, components)
@@ -1140,11 +1166,11 @@ class WindowDraw:
 
     #print 'drawViewA', self.windowPane.name
 
-    # What is below doing? TJS  (if both of these are not set then nothing can draw)
-    if not self.hasValueAxis and \
-        (not hasattr(view, 'contourFile') or not view.contourFile) and \
-        (not hasattr(view, 'storedContourFiles') or not view.storedContourFiles):
-      return
+    # # What is below doing? TJS  (if both of these are not set then nothing can draw)
+    # if not self.hasValueAxis and \
+    #     (not hasattr(view, 'contourFile') or not view.contourFile) and \
+    #     (not hasattr(view, 'storedContourFiles') or not view.storedContourFiles):
+    #   return
 
     if self.viewNotReadyYet(view):
       return

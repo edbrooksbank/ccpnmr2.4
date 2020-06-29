@@ -34,12 +34,15 @@ check_darwin
 
 # make a symbolic link for the miniconda path (if it does not exists)
 
-if [[ ${MACHINE} == *"Windows"* ]]; then
-    # easier with Anaconda
-    CONDA_PATH="${HOME}/Anaconda3"
-else
-    CONDA_PATH="${HOME}/miniconda3"
-fi
+CONDA_DEFAULT="${HOME}/miniconda3"
+while true; do
+    read -rp "Please enter miniconda installation path [${CONDA_DEFAULT}]: " CONDA_PATH
+    CONDA_PATH="${CONDA_PATH:-$CONDA_DEFAULT}"
+    if [[ -d "${CONDA_PATH}" ]]; then
+        break
+    fi
+    echo "path not found"
+done
 CONDA_CCPN_PATH="${CONDA_PATH}/envs/${CONDA_SOURCE}"
 cd "${CCPNMR_TOP_DIR}" || exit
 if [[ ! -d "${CONDA_CCPN_PATH}" ]]; then

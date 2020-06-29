@@ -46,14 +46,19 @@ check_darwin
 
 CONDA_SITE="http://repo.continuum.io"
 CONDA_VER="Miniconda3-latest-${MACHINE}${MACOSAPPEND}-${BIT_COUNT}"
+CONDA_DEFAULT="${HOME}/miniconda3"
+while true; do
+    read -rp "Please enter miniconda installation path [${CONDA_DEFAULT}]: " CONDA_PATH
+    CONDA_PATH="${CONDA_PATH:-$CONDA_DEFAULT}"
+    if [[ -d "${CONDA_PATH}" ]]; then
+        break
+    fi
+    echo "path not found"
+done
 if [[ ${MACHINE} == *"Windows"* ]]; then
-    # easier with Anaconda
-    CONDA_PATH="${HOME}/Anaconda3"
     echo "Please install Anaconda3 manually - miniconda causes many problems for this installer :)"
     echo "and select 'n' to installing a new version of miniconda"
     continue_prompt "If you have installed Anaconda, would you like to continue?"
-else
-    CONDA_PATH="${HOME}/miniconda3"
 fi
 
 ANS='no'
