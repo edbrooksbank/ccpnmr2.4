@@ -564,40 +564,41 @@ class UpdateServer:
   def _openUrl(self, serverScript, serverDbRoot, fileName):
     """Header to open a url
     """
-    try:
-      # 20190712:ED urllib3 version with where() certificate - definitely works
-      # seems to fix problems on MacOS
-      import ssl
-      import urllib3.contrib.pyopenssl
-      import certifi
+    # try:
 
-      # fileName = os.path.join(serverDbRoot, fileName)
-      fileName = '/'.join([serverDbRoot, fileName])
+    # 20190712:ED urllib3 version with where() certificate - definitely works
+    # seems to fix problems on MacOS
+    import ssl
+    import urllib3.contrib.pyopenssl
+    import certifi
 
-      addr = '%s?fileName=%s' % (serverScript, fileName)
+    # fileName = os.path.join(serverDbRoot, fileName)
+    fileName = '/'.join([serverDbRoot, fileName])
 
-      urllib3.contrib.pyopenssl.inject_into_urllib3()
-      proxy_url = os.environ.get('HTTPS_PROXY', os.environ.get('HTTP_PROXY'))
-      if proxy_url:
-        http = urllib3.ProxyManager(proxy_url,
-                                    cert_reqs='CERT_REQUIRED',
-                                    ca_certs=certifi.where(),
-                                    timeout=urllib3.Timeout(connect=3.0, read=3.0),
-                                    retries=urllib3.Retry(1, redirect=False))
-      else:
-        http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
-                                   ca_certs=certifi.where(),
-                                   timeout=urllib3.Timeout(connect=3.0, read=3.0),
-                                   retries=urllib3.Retry(1, redirect=False))
+    addr = '%s?fileName=%s' % (serverScript, fileName)
 
-      response = http.request('GET', addr,
-                              preload_content=False)
-      return response
+    urllib3.contrib.pyopenssl.inject_into_urllib3()
+    proxy_url = os.environ.get('HTTPS_PROXY', os.environ.get('HTTP_PROXY'))
+    if proxy_url:
+      http = urllib3.ProxyManager(proxy_url,
+                                  cert_reqs='CERT_REQUIRED',
+                                  ca_certs=certifi.where(),
+                                  # timeout=urllib3.Timeout(connect=3.0, read=3.0),
+                                  retries=urllib3.Retry(1, redirect=False))
+    else:
+      http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
+                                 ca_certs=certifi.where(),
+                                 # timeout=urllib3.Timeout(connect=3.0, read=3.0),
+                                 retries=urllib3.Retry(1, redirect=False))
 
-    except Exception as es:
-      if self.parent.isGraphical:
-        self.parent.warningMessage('Warning', str(es))
-      raise
+    response = http.request('GET', addr,
+                            preload_content=False)
+    return response
+
+    # except Exception as es:
+    #   if self.parent.isGraphical:
+    #     self.parent.warningMessage('Warning', str(es))
+    #   raise
 
   def getFileUpdates(self):
   
@@ -620,9 +621,10 @@ class UpdateServer:
       if self.parent.isGraphical:
         self.parent.warningMessage('Warning','Cannot access update server via network')
       return
-      
-    line = url.readline()
+
+    line = None
     try:
+      line = url.readline()
       version = line.split()[0]
     except:
       if self.parent.isGraphical:
